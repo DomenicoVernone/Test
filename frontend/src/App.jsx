@@ -14,7 +14,7 @@ function App() {
         const data = await response.json();
         // data.dati_clinici.probability_FTD[0] contiene il valore da R!
         setMessaggio(`Diagnosi: Probabilità FTD ${data.dati_clinici.probability_FTD[0] * 100}%`);
-    } catch (e) {
+    } catch {
         setMessaggio("Errore: il backend non risponde");
     }
 };
@@ -22,6 +22,7 @@ function App() {
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
       <h1>Dashboard Clinica FTD</h1>
+      <div className="bg-red-500 text-white p-10">Test Tailwind!</div>
       <button onClick={eseguiAnalisi} style={{ padding: '10px 20px', cursor: 'pointer' }}>
         Avvia Diagnosi su Pipeline Docker
       </button>
