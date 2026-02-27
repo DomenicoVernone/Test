@@ -1,1 +1,43 @@
 @import "tailwindcss";
+
+/* In Tailwind v4, il blocco @theme centralizza l'identità visiva.
+  Definendo qui i colori, possiamo usarli in tutto il progetto React
+  con classi come 'bg-clinical-primary' o 'text-clinical-success'.
+*/
+@theme {
+  /* Colori Identitari (Brand) */
+  --color-clinical-primary: #2563eb;    /* Blu Medico Istituzionale */
+  --color-clinical-secondary: #64748b;  /* Grigio per testi e icone secondarie */
+  
+  /* Colori Semantici (Stati Clinici) */
+  --color-clinical-success: #10b981;    /* Verde per 'Analisi Completata' */
+  --color-clinical-danger: #ef4444;     /* Rosso per 'Errore di Caricamento' */
+  --color-clinical-warning: #f59e0b;    /* Arancio per 'Attenzione/Avviso' */
+
+  /* Sfondi e Superfici */
+  --color-clinical-bg: #f8fafc;         /* Sfondo principale (White Slate) */
+  --color-clinical-surface: #ffffff;    /* Bianco puro per le card e i pannelli */
+  
+  /* Bordi e Separatori */
+  --color-clinical-border: #e2e8f0;     /* Grigio tenue per divisioni eleganti */
+  
+  /* Ombre (Shadows) Personalizzate */
+  --shadow-clinical-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-clinical-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* @layer base viene usato per resettare o impostare stili globali 
+  che si applicano a tutti i tag HTML (body, h1, button, ecc.)
+*/
+@layer base {
+  body {
+    /* Applichiamo lo sfondo e il font di sistema in modo fluido */
+    @apply bg-clinical-bg text-slate-900 antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Rendiamo tutte le transizioni del progetto coerenti */
+  button, a, input {
+    @apply transition-all duration-200 ease-in-out;
+  }
+}
