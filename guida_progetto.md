@@ -151,4 +151,4 @@ Non impazzire con decine di finestre nere aperte.
 * Puoi tenere aperto a sinistra il terminale per React (npm run dev), al centro quello per Docker (docker compose up) e a destra la console per i comandi Git.  
 * Rinomina i terminali (tasto destro sul nome del terminale \-\> *Rename*) in "Frontend", "Docker" e "Git" per non confonderti mai.
 
-* Nota: Test del workflow di Git completato con successo. 
+* Nota: Test del workflow di Git completato con successo. Prova 2 
