@@ -1,0 +1,10 @@
+# Sistemi Operativi
+.DS_Store
+Thumbs.db
+
+# Dati Clinici e Modelli 
+*.nii
+*.nii.gz
+*.dcm
+*.rds
+dati_sensibili/
