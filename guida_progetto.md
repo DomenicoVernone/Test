@@ -199,3 +199,28 @@ Usa la funzione "Split Terminal" (l'icona con due pannelli affiancati in alto a 
 Puoi tenere aperto a sinistra il terminale per React (npm run dev), al centro quello per Docker (docker compose up) e a destra la console per i comandi Git.
 
 Rinomina i terminali (tasto destro sul nome del terminale -> Rename) in "Frontend", "Docker" e "Git" per non confonderti mai.
+
+FRONTEND
+🎨 Progettazione UX/UI: Digital Twin ClinicoQuesto documento definisce la struttura visiva e l'esperienza utente del frontend React.1. Analisi del Workflow dell'Utente (Il "Viaggio" del Medico)Il sistema ha una natura fortemente temporale. L'interfaccia non può mostrare tutto subito, ma deve evolversi in 3 fasi (Stati):Fase 1: Input (Stato Iniziale)L'utente seleziona l'esperimento di riferimento.L'utente fa l'upload della risonanza (NIfTI).Fase 2: Validazione & Attesa (Stato Asincrono)Il visualizzatore si attiva sulla scheda "Vista 3D (NiiVue)": il medico controlla visivamente che la slice caricata sia corretta.L'utente preme "Avvia Analisi".Cruciale: Il visualizzatore entra in stato di "Loading" (spinner, messaggi di stato "Estrazione features in corso...") inibendo ulteriori click.Fase 3: Risultati & Interpretazione (Stato Finale)Il sistema fa lo switch automatico sulla scheda "Grafico UMAP (Plotly)".Il medico può passare liberamente tra l'immagine NIfTI e il Grafico cliccando sulle linguette.Si attiva la chat LLM per interpretare i risultati.2. Proposta di Layout: "Command Center Compatto" (Scelta Ufficiale)Questo layout divide lo schermo in due colonne. La colonna di sinistra massimizza lo spazio utilizzando uno Switch (Tabs) per scambiare la vista tra l'immagine anatomica e i risultati matematici, evitando lo scrolling verticale.+---------------------------------------------------------+
+| [Logo Tesi]    Esperimento: [ Dropdown Menu ▼ ]         | <- HEADER
++-----------------------------------+---------------------+
+|                                   |                     |
+|  +-----------------------------+  |  +---------------+  |
+|  | [ Area di Drag & Drop     ] |  |  |               |  |
+|  | [ Upload File .nii        ] |  |  |               |  |
+|  +-----------------------------+  |  |   Assistente  |  |
+|                                   |  |      LLM      |  |
+|  +-----------------------------+  |  |    (Chat)     |  |
+|  | [ 🧠 Vista 3D ] [ 📊 UMAP ] |  |  |               |  | <- SWITCH TABS
+|  +-----------------------------+  |  |               |  |
+|  |                             |  |  |               |  |
+|  |                             |  |  |               |  |
+|  |   Area di Visualizzazione   |  |  |               |  |
+|  |   (Mostra NiiVue o Plotly   |  |  +---------------+  |
+|  |    in base al tab attivo)   |  |  | [ Scrivi... ] |  |
+|  |                             |  |  +---------------+  |
+|  +-----------------------------+  |                     |
+|                                   |                     |
++-----------------------------------+---------------------+
+            COLONNA DATI (65%)         COLONNA IA (35%)
+I Vantaggi di questa scelta:Zero Scrolling: L'interfaccia sta tutta in una schermata (Single Page Application pura).Focus Cognitivo: L'utente guarda solo il dato che gli serve in quel momento (l'anatomia o la matematica), senza distrazioni, ma sa che l'altro è a un click di distanza.Transizione Fluida: Il passaggio da "Vista 3D" a "UMAP" alla fine del caricamento dà una chiara sensazione di completamento dell'analisi.3. Gestione del Tempo Asincrono (UX Cruciale)Poiché l'elaborazione richiederà tempo, l'utente non deve mai pensare che il sistema si sia bloccato.Soluzione UX: Al click su "Avvia Analisi", l'Area di Visualizzazione diventerà un pannello di stato animato.Esempio di messaggi che si aggiornano:⏳ Caricamento immagine nel database...🧠 Segmentazione e Coregistrazione in corso (può richiedere alcuni minuti)...📊 Calcolo proiezioni UMAP e finalizzazione...
