@@ -61,8 +61,7 @@ export default function App() {
         <section className="col-span-8 flex flex-col p-6 gap-6 overflow-y-auto border-r border-clinical-border">
           <UploadZone file={file} uploadStatus={uploadStatus} onFileChange={handleFileChange} onUpload={uploadFile} />
           
-          <ClinicalViewer activeTab={activeTab} setActiveTab={setActiveTab} isAnalyzing={isAnalyzing} />
-
+          <ClinicalViewer file={file} activeTab={activeTab} setActiveTab={setActiveTab} isAnalyzing={isAnalyzing} />
           {/* Action Bar (Può diventare un componente separato in futuro) */}
           <div className="flex justify-between items-center bg-clinical-surface p-5 rounded-2xl border border-clinical-border shadow-clinical-sm">
             <div className="flex items-center gap-3">
