@@ -12,6 +12,9 @@ export default function App() {
   
   const [file, setFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('idle');
+  
+  // Nuovo stato per gestire l'apertura/chiusura della sidebar LLM
+  const [isChatOpen, setIsChatOpen] = useState(true);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -51,18 +54,21 @@ export default function App() {
     }
   };
 
-  // IL RENDER PRINCIPALE ORA È PULITISSIMO!
   return (
     <div className="h-screen w-full bg-clinical-bg text-slate-900 flex flex-col font-sans overflow-hidden">
       <Header experiment={selectedExperiment} />
       
-      <main className="flex-1 grid grid-cols-12 overflow-hidden">
-        {/* Colonna Sinistra */}
-        <section className="col-span-8 flex flex-col p-6 gap-6 overflow-y-auto border-r border-clinical-border">
+      {/* Sostituito 'grid grid-cols-12' con 'flex' per permettere un'animazione fluida della sidebar */}
+      <main className="flex-1 flex overflow-hidden">
+        
+        {/* Colonna Sinistra (Area di Lavoro) */}
+        {/* Usando flex-1, quest'area si espande automaticamente quando la chat si chiude */}
+        <section className="flex-1 flex flex-col p-6 gap-6 overflow-y-auto transition-all duration-300">
           <UploadZone file={file} uploadStatus={uploadStatus} onFileChange={handleFileChange} onUpload={uploadFile} />
           
           <ClinicalViewer file={file} activeTab={activeTab} setActiveTab={setActiveTab} isAnalyzing={isAnalyzing} />
-          {/* Action Bar (Può diventare un componente separato in futuro) */}
+          
+          {/* Action Bar */}
           <div className="flex justify-between items-center bg-clinical-surface p-5 rounded-2xl border border-clinical-border shadow-clinical-sm">
             <div className="flex items-center gap-3">
                <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter ${uploadStatus === 'success' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-clinical-bg text-clinical-secondary border border-clinical-border'}`}>
@@ -79,8 +85,40 @@ export default function App() {
           </div>
         </section>
 
-        {/* Colonna Destra */}
-        <ChatLLM isAnalyzing={isAnalyzing} experiment={selectedExperiment} />
+        {/* Colonna Destra (Chat LLM Collapsable) */}
+        <aside 
+          className={`relative flex flex-col bg-clinical-surface transition-all duration-300 ease-in-out border-clinical-border ${
+            isChatOpen ? 'w-1/3 border-l' : 'w-0 border-l-0'
+          }`}
+        >
+          {/* Pulsante di Toggle Flottante */}
+          {/* Posizionato con -left-10 in modo da sporgere a sinistra, rimane sul bordo schermo quando w-0 */}
+          <button
+            onClick={() => setIsChatOpen(!isChatOpen)}
+            aria-label={isChatOpen ? "Nascondi Assistente" : "Mostra Assistente"}
+            className="absolute top-6 -left-10 z-20 flex h-10 w-10 items-center justify-center rounded-l-xl border border-r-0 border-clinical-border bg-clinical-surface shadow-[-4px_4px_10px_rgba(0,0,0,0.05)] hover:bg-slate-50 active:scale-95 transition-all text-slate-500 hover:text-clinical-primary"
+          >
+            {isChatOpen ? (
+              // Icona Chevron Destra (Chiudi)
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m9 18 6-6-6-6"/>
+              </svg>
+            ) : (
+              // Icona Chevron Sinistra (Apri)
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m15 18-6-6 6-6"/>
+              </svg>
+            )}
+          </button>
+
+          {/* Contenitore interno con min-width per evitare schiacciamenti (squishing) durante l'animazione */}
+          <div className="flex-1 overflow-hidden">
+            <div className="h-full w-full min-w-[320px]">
+              <ChatLLM isAnalyzing={isAnalyzing} experiment={selectedExperiment} />
+            </div>
+          </div>
+        </aside>
+
       </main>
     </div>
   );
