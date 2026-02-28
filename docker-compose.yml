@@ -1,16 +1,20 @@
 version: '3.8'
 
 services:
-  # Il nostro cervello clinico in R
-  modello-r:
-    build: ./microservizio_r
-    ports:
-      - "8080:8000"
+  # ... (Qui sopra metti i tuoi servizi backend e R se li avevi già scritti) ...
 
-  # Il backend in Python
-  fastapi:
-    build: ./fastapi
+  # Aggiungiamo il servizio Frontend
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: clinical_frontend
     ports:
-      - "8000:8000"
-    depends_on:
-      - modello-r
+      - "5173:5173"
+    volumes:
+      # Collega la cartella locale al container per l'hot reload
+      - ./frontend:/app
+      # Protegge i moduli node installati nel container
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
