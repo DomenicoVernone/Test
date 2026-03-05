@@ -12,6 +12,7 @@ services:
     volumes:
       # Collega la cartella locale per l'hot-reload (se modifichi Python, si aggiorna da solo)
       - ./backend:/app
+      - shared_clinical_data:/shared_data
     environment:
       # Permette di stampare i log di Python sul terminale in tempo reale
       - PYTHONUNBUFFERED=1
@@ -33,3 +34,6 @@ services:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
+
+volumes:
+    shared_clinical_data:

@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from core.security import SECRET_KEY, ALGORITHM 
 
 from core.database import get_db
 from core.security import verify_password, get_password_hash, create_access_token
@@ -50,3 +53,29 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     
     # FastAPI si aspetta esattamente questa struttura per lo standard OAuth2
     return {"access_token": access_token, "token_type": "bearer"}
+
+# Specifichiamo dove FastAPI deve andare a cercare il token (la rotta di login)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Impossibile validare le credenziali",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    try:
+        # Decodifichiamo il token usando la chiave segreta
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+        
+    # Cerchiamo l'utente nel database
+    user = db.query(User).filter(User.username == username).first()
+    if user is None:
+        raise credentials_exception
+        
+    return user
