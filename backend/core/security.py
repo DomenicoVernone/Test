@@ -6,8 +6,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
-from app.models.domain import User
+from core.database import get_db
+from models.domain import User
 
 # Configurazioni di sicurezza 
 # (Nota: In produzione queste andranno in un file .env, per ora le teniamo qui)

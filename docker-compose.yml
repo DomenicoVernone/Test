@@ -1,9 +1,24 @@
 version: '3.8'
 
 services:
-  # ... (Qui sopra metti i tuoi servizi backend e R se li avevi già scritti) ...
+  # 1. IL NOSTRO API GATEWAY (FastAPI + SQLite)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: clinical_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Collega la cartella locale per l'hot-reload (se modifichi Python, si aggiorna da solo)
+      - ./backend:/app
+    environment:
+      # Permette di stampare i log di Python sul terminale in tempo reale
+      - PYTHONUNBUFFERED=1
+    # Comando di avvio del server (sovrascrive il Dockerfile per sicurezza in locale)
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
-  # Aggiungiamo il servizio Frontend
+  # 2. DASHBOARD CLINICA (React + Vite)
   frontend:
     build: 
       context: ./frontend
@@ -12,9 +27,9 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      # Collega la cartella locale al container per l'hot reload
       - ./frontend:/app
-      # Protegge i moduli node installati nel container
-      - /app/node_modules
+      - /app/node_modules 
     environment:
       - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend

@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.database import engine, Base
-from app.routers import auth
+from core.database import engine, Base
+from routers import auth
 
 # 1. Inizializzazione del Database
 # Crea fisicamente le tabelle (come la tabella users) nel file SQLite se non esistono
