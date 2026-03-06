@@ -3,7 +3,6 @@
 # e crea il Volume Condiviso (shared_clinical_data), essenziale per passare i file medici pesanti 
 # in modo asincrono senza bloccare la rete.
 
-version: '3.8'
 
 services:
   # 1. API GATEWAY (FastAPI + SQLite)
@@ -37,5 +36,15 @@ services:
     depends_on:
       - backend
 
+  # 3. INFERENCE ENGINE (Plumber + R)
+  inference:
+    build:
+      context: ./inference_engine
+    container_name: inference_service
+    ports:
+      - "8001:8000"
+    volumes:
+      - shared_clinical_data:/shared_data
+    
 volumes:
     shared_clinical_data:

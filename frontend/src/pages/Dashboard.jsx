@@ -24,6 +24,10 @@ export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeSidebarTab, setActiveSidebarTab] = useState('chat');
 
+  // --- NUOVI STATI PER LA MODALE ---
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedModel, setSelectedModel] = useState('HC_vs_bvFTD'); // Modello di default
+
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
@@ -33,12 +37,21 @@ export default function Dashboard() {
     }
   };
 
-  const uploadFile = async () => {
+  // Funzione che apre la modale invece di caricare subito
+  const handleConfirmClick = () => {
     if (!file) return;
+    setIsModalOpen(true);
+  };
+
+  // La VERA funzione di upload che parte DALLA modale
+  const executeUploadAndAnalyze = async () => {
+    setIsModalOpen(false); // Chiudi la modale
     setUploadStatus('uploading');
 
     const formData = new FormData();
     formData.append('file', file);
+    // AGGIUNGIAMO IL MODELLO SCELTO ALLA CHIAMATA API!
+    formData.append('model_name', selectedModel); 
 
     try {
       const response = await fetch('http://localhost:8000/analyze/', {
@@ -56,7 +69,6 @@ export default function Dashboard() {
 
         setActiveSidebarTab('history');
         setIsSidebarOpen(true);
-
       } else {
         setUploadStatus('error');
       }
@@ -65,13 +77,10 @@ export default function Dashboard() {
     }
   };
 
+  // Funzione mock per la UI (rimasta invariata se serve al Viewer)
   const handleStartAnalysis = async () => {
-    // Al momento questo bottone "finge" l'analisi visiva. 
-    // In futuro a Nextflow.
     if (uploadStatus !== 'success') return;
     setIsAnalyzing(true);
-
-    // Simuliamo un'attesa per la UI
     setTimeout(() => {
       setIsAnalyzing(false);
       setActiveTab('umap');
@@ -79,13 +88,53 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="h-screen w-full bg-clinical-bg text-slate-900 flex flex-col font-sans overflow-hidden">
+    <div className="h-screen w-full bg-clinical-bg text-slate-900 flex flex-col font-sans overflow-hidden relative">
       <Header experiment={selectedExperiment} />
 
-      <main className="flex-1 flex overflow-hidden">
+      {/* --- LA NOSTRA MODALE OVERLAY --- */}
+      {isModalOpen && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl w-[450px] flex flex-col gap-6 animate-in fade-in zoom-in duration-200">
+            <div>
+              <h3 className="text-2xl font-bold text-slate-800">Sospetto Clinico</h3>
+              <p className="text-sm text-slate-500 mt-1">Seleziona il modello diagnostico da applicare per l'estrazione e l'inferenza:</p>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              <label className={`flex items-center gap-3 cursor-pointer p-4 rounded-xl border-2 transition-all ${selectedModel === 'HC_vs_bvFTD' ? 'border-clinical-primary bg-blue-50/50' : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50'}`}>
+                <input type="radio" name="model" value="HC_vs_bvFTD" className="w-5 h-5 accent-clinical-primary" checked={selectedModel === 'HC_vs_bvFTD'} onChange={(e) => setSelectedModel(e.target.value)} />
+                <span className="font-semibold text-slate-700">Variante Comportamentale (bvFTD)</span>
+              </label>
 
+              <label className={`flex items-center gap-3 cursor-pointer p-4 rounded-xl border-2 transition-all ${selectedModel === 'HC_vs_svPPA' ? 'border-clinical-primary bg-blue-50/50' : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50'}`}>
+                <input type="radio" name="model" value="HC_vs_svPPA" className="w-5 h-5 accent-clinical-primary" checked={selectedModel === 'HC_vs_svPPA'} onChange={(e) => setSelectedModel(e.target.value)} />
+                <span className="font-semibold text-slate-700">Variante Semantica (svPPA)</span>
+              </label>
+
+              <label className={`flex items-center gap-3 cursor-pointer p-4 rounded-xl border-2 transition-all ${selectedModel === 'HC_vs_nfvPPA' ? 'border-clinical-primary bg-blue-50/50' : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50'}`}>
+                <input type="radio" name="model" value="HC_vs_nfvPPA" className="w-5 h-5 accent-clinical-primary" checked={selectedModel === 'HC_vs_nfvPPA'} onChange={(e) => setSelectedModel(e.target.value)} />
+                <span className="font-semibold text-slate-700">Variante Non Fluente (nfvPPA)</span>
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-2">
+              <button onClick={() => setIsModalOpen(false)} className="px-5 py-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-xl font-bold transition-colors">
+                Annulla
+              </button>
+              <button onClick={executeUploadAndAnalyze} className="px-5 py-3 bg-clinical-primary text-white rounded-xl font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-200 active:scale-95">
+                Conferma e Analizza
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ------------------------------- */}
+
+      <main className="flex-1 flex overflow-hidden">
         <section className="flex-1 flex flex-col p-6 gap-6 overflow-y-auto transition-all duration-300">
-          <UploadZone file={file} uploadStatus={uploadStatus} onFileChange={handleFileChange} onUpload={uploadFile} />
+          
+          {/* INTERCETTATO onUpload! */}
+          <UploadZone file={file} uploadStatus={uploadStatus} onFileChange={handleFileChange} onUpload={handleConfirmClick} />
 
           <ClinicalViewer file={file} activeTab={activeTab} setActiveTab={setActiveTab} isAnalyzing={isAnalyzing} />
 
@@ -97,13 +146,10 @@ export default function Dashboard() {
                 }`}>
                 <div className={`w-2 h-2 rounded-full ${uploadStatus === 'success' ? 'bg-amber-500 animate-pulse' : 'bg-slate-300'
                   }`}></div>
-
-                {/* Logica del testo del monitor */}
                 {uploadStatus === 'idle' && "Sistema in Attesa"}
                 {uploadStatus === 'uploading' && "Caricamento Rete..."}
                 {uploadStatus === 'success' && currentTaskStatus === 'PENDING' && "In Coda (Pending)"}
                 {uploadStatus === 'error' && "Errore di Rete"}
-
               </div>
             </div>
 
@@ -116,12 +162,11 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* Colonna Destra (Sidebar con Tabs) */}
+        {/* ... (IL RESTO DELLA SIDEBAR DESTRA RIMANE IDENTICO) ... */}
         <aside
           className={`relative flex flex-col bg-clinical-surface transition-all duration-300 ease-in-out border-clinical-border ${isSidebarOpen ? 'w-1/3 border-l' : 'w-0 border-l-0'
             }`}
         >
-          {/* Bottone Toggle (freccina) - Rimasto Invariato */}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             aria-label={isSidebarOpen ? "Nascondi Sidebar" : "Mostra Sidebar"}
@@ -132,7 +177,6 @@ export default function Dashboard() {
             </svg>
           </button>
 
-          {/* I TABS (Solo visibili se aperta) */}
           {isSidebarOpen && (
             <div className="flex border-b border-clinical-border bg-slate-50/50 p-1 z-10 w-full min-w-[320px]">
               <button
@@ -152,7 +196,6 @@ export default function Dashboard() {
 
           <div className="flex-1 overflow-hidden">
             <div className="h-full w-full min-w-[320px]">
-              {/* Rendering Condizionale basato sul Tab attivo */}
               {activeSidebarTab === 'chat' ? (
                 <ChatLLM isAnalyzing={isAnalyzing} experiment={selectedExperiment} />
               ) : (
