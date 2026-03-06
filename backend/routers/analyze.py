@@ -2,10 +2,11 @@
 L'endpoint riceve il file .nii, lo salva fisicamente nel Volume Docker condiviso e 
 crea un record PENDING nella tabella Tasks, rispondendo immediatamente al client senza bloccarsi.
 """
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from core.database import get_db
 from models.domain import Task, User
+from services.pipeline import run_mock_nextflow
 import shutil
 import uuid
 import os
@@ -21,6 +22,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/")
 async def upload_nifti_file(
+    background_tasks: BackgroundTasks, #  Dichiariamo il background
     file: UploadFile = File(...), 
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -52,9 +54,13 @@ async def upload_nifti_file(
     db.commit()
     db.refresh(new_task)
 
-    # 5. RISPOSTA IMMEDIATA
+  # 5. LANCIO DELLA PIPELINE IN BACKGROUND (NUOVO)
+    # FastAPI delega la funzione e risponde istantaneamente all'utente
+    background_tasks.add_task(run_mock_nextflow, new_task.id, unique_filename, UPLOAD_DIR)
+
+    # 6. RISPOSTA IMMEDIATA
     return {
-        "message": "File caricato nel volume condiviso. Elaborazione in coda.",
+        "message": "File caricato. Elaborazione in coda.",
         "task_id": new_task.id,
         "status": new_task.status
     }
