@@ -1,3 +1,7 @@
+/*
+  Gestore dello stato globale. Memorizza il token JWT nel browser del medico 
+  e mantiene la sessione attiva in tutta l'applicazione.
+*/
 import React, { createContext, useState } from 'react';
 import { authService } from '../services/authService';
 // eslint-disable-next-line react-refresh/only-export-components

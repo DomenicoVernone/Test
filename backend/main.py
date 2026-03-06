@@ -1,3 +1,10 @@
+"""
+API Gateway Principale (FastAPI).
+Inizializza il server Uvicorn, connette il database e registra 
+le rotte a cui il frontend può fare richieste.
+"""
+from fastapi import FastAPI
+# ... resto del codice ...
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 

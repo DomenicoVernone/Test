@@ -1,3 +1,10 @@
+"""
+Contiene lo schema relazionale del Database (SQLAlchemy). Attualmente definisce 
+la tabella Users (per i medici) e la tabella Tasks (per tracciare lo stato di 
+elaborazione delle Risonanze Magnetiche).
+"""
+from fastapi import FastAPI
+# ... resto del codice ...
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from core.database import Base

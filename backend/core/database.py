@@ -1,3 +1,8 @@
+"""
+Moduli di base. Gestisce la connessione a SQLite e fornisce la classe Base per i modelli SQLAlchemy.
+"""
+from fastapi import FastAPI
+# ... resto del codice ...
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -13,10 +18,10 @@ engine = create_engine(
 # Creazione della fabbrica di sessioni
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Classe base per i nostri modelli SQLAlchemy
+# Classe base per i modelli SQLAlchemy
 Base = declarative_base()
 
-# Dependency (Yield) per ottenere la sessione del DB nei nostri router
+# Dependency (Yield) per ottenere la sessione del DB nei router
 def get_db():
     db = SessionLocal()
     try:

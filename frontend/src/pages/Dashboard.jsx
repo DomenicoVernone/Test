@@ -1,6 +1,8 @@
+/*
+  L'area di lavoro privata del medico.
+*/
 import React, { useState } from 'react';
 
-// Attenzione ai percorsi: ora usiamo ../ per risalire dalla cartella pages
 import Header from '../components/layout/Header';
 import UploadZone from '../components/clinical/UploadZone';
 import ClinicalViewer from '../components/viewers/Viewer';

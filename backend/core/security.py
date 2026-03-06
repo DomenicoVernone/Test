@@ -1,3 +1,7 @@
+"""
+Moduli di base. Contiene le funzioni crittografiche per l'hashing delle password (Bcrypt)
+e le funzioni per l'autenticazionee la generazione dei token JWT.
+"""
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
@@ -10,7 +14,7 @@ from core.database import get_db
 from models.domain import User
 
 # Configurazioni di sicurezza 
-# (Nota: In produzione queste andranno in un file .env, per ora le teniamo qui)
+# (Nota: In produzione queste andranno in un file .env)
 SECRET_KEY = "clinical-twin-super-secret-key-change-me" 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1440  # Il token scade dopo 24 ore

@@ -1,8 +1,13 @@
+/*
+  Router principale dell'interfaccia. 
+  Separa le rotte pubbliche (login) dalle rotte private (dashboard), 
+  impedendo l'accesso ai non autorizzati.
+*/
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 
-// Importiamo le pagine e la protezione delle rotte
+// Importa le pagine e la protezione delle rotte
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './routes/ProtectedRoute';

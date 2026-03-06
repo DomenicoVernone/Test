@@ -1,7 +1,10 @@
+/*
+  L'interfaccia utente che cattura le credenziali del medico e chiama l'endpoint /login del backend.
+*/
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
-import { Brain } from 'lucide-react'; // Uso l'icona che hai già importato altrove
+import { Brain } from 'lucide-react';
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -17,11 +20,10 @@ export default function Login() {
         setError('');
         setIsLoading(true);
 
-        // Chiama la funzione di login che abbiamo definito nel Context
+        // Chiama la funzione di login
         const result = await login(username, password);
         
         if (result.success) {
-            // Se il backend ci dà l'ok, andiamo alla control room
             navigate('/dashboard', { replace: true });
         } else {
             setError(result.error);

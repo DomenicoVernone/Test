@@ -1,3 +1,7 @@
+"""
+L'endpoint riceve il file .nii, lo salva fisicamente nel Volume Docker condiviso e 
+crea un record PENDING nella tabella Tasks, rispondendo immediatamente al client senza bloccarsi.
+"""
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from sqlalchemy.orm import Session
 from core.database import get_db
