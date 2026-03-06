@@ -47,7 +47,7 @@ const Header = ({ experiment }) => {
   }, []);
 
   return (
-    <header className="h-16 border-b border-clinical-border flex items-center justify-between px-6 bg-clinical-surface shadow-clinical-sm z-10 sticky top-0">
+    <header className="relative z-50 h-16 border-b border-clinical-border flex items-center justify-between px-6 bg-clinical-surface shadow-clinical-sm top-0">
       
       {/* SEZIONE SINISTRA: Logo */}
       <div className="flex items-center gap-3">

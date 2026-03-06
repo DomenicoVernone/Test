@@ -58,3 +58,14 @@ async def upload_nifti_file(
         "task_id": new_task.id,
         "status": new_task.status
     }
+
+@router.get("/")
+async def get_medico_tasks(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Restituisce tutti i task (file caricati) appartenenti al medico loggato."""
+    # Cerca nel DB tutti i task dove l'owner_id corrisponde all'ID del medico
+    # e li ordina dal più recente al più vecchio
+    tasks = db.query(Task).filter(Task.owner_id == current_user.id).order_by(Task.created_at.desc()).all()
+    return tasks
