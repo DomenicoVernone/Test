@@ -1,50 +1,58 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Niivue } from 'https://esm.sh/@niivue/niivue';
 
-const NiiVue = ({ file }) => {
+const NiiVueCanvas = ({ file, niftiUrl }) => {
   const canvasRef = useRef(null);
   const nvRef = useRef(null);
 
   useEffect(() => {
+    // Inizializza Niivue se non esiste
     if (!nvRef.current && canvasRef.current) {
-      const nv = new Niivue({
-        logging: false,
-        dragAndDropEnabled: false,
-        backColor: [0, 0, 0, 1], 
-        show3Dcrosshair: true,    
-        loadingText: "Caricamento volume anatomico in corso...",
-
-        multiplanarShowRender: false, 
+      nvRef.current = new Niivue({
+        backColor: [0, 0, 0, 1],
+        show3Dcrosshair: true,
       });
-      
-      nv.attachToCanvas(canvasRef.current);
-      nvRef.current = nv;
+      nvRef.current.attachToCanvas(canvasRef.current);
     }
-  }, []);
 
-  useEffect(() => {
-    if (file && nvRef.current) {
-      console.log("NiiVue sta caricando:", file.name);
-      
-      while (nvRef.current.volumes.length > 0) {
-        nvRef.current.removeVolume(nvRef.current.volumes[0]);
+    const loadVolume = async () => {
+      if (nvRef.current) {
+        // Se c'è un file locale (Nuovo Upload)
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = async (e) => {
+            const buffer = e.target.result;
+            const volume = {
+              name: file.name,
+              dataBuffer: buffer,
+            };
+            await nvRef.current.loadVolumes([volume]);
+          };
+          reader.readAsArrayBuffer(file);
+        } 
+        // Se c'è un URL (Caricamento dallo Storico)
+        else if (niftiUrl) {
+          try {
+            // Niivue gestisce automaticamente il fetching dalla rete
+            await nvRef.current.loadVolumes([{ url: niftiUrl }]);
+          } catch (error) {
+            console.error("Errore nel caricamento del NIfTI di rete:", error);
+          }
+        }
       }
-      
-      nvRef.current.loadFromFile(file).catch(err => {
-        console.error("Errore critico nel caricamento NiiVue:", err);
-      });
-    }
-  }, [file]);
+    };
 
+    loadVolume();
+
+  }, [file, niftiUrl]); // Si attiva ogni volta che cambia il file locale o l'URL
 
   return (
-    <div className="relative w-full h-full bg-black overflow-hidden rounded-xl shadow-inner">
-      <canvas 
-        ref={canvasRef} 
-        className="w-full h-full outline-none block" 
-      />
+    <div className="w-full h-full flex flex-col bg-black">
+      <div className="flex-1 relative">
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full focus:outline-none" />
+      </div>
     </div>
   );
 };
 
-export default NiiVue;
+export default NiiVueCanvas;

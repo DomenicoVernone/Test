@@ -22,6 +22,7 @@ class Task(Base):
     filename = Column(String) # Il nome della Risonanza (es. paziente_01.nii)
     status = Column(String, default="PENDING") # Stati: PENDING, PROCESSING, COMPLETED, FAILED
     progress = Column(Float, default=0.0) # Utile per la barra di caricamento sul frontend
+    model_name = Column(String, default=None) # Es: HC_vs_bvFTD o HC_vs_svPPA
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     

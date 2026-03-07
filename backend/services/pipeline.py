@@ -1,78 +1,92 @@
-"""
-Servizio di simulazione della pipeline di estrazione dati (Mock Nextflow)
-e orchestrazione dell'Inferenza tramite microservizio R (Plumber).
-"""
+# File: backend/services/pipeline.py
+
 import asyncio
 import os
 import csv
-import requests  # <-- Nuova libreria per le chiamate HTTP
+import random
 from sqlalchemy.orm import Session
 from core.database import SessionLocal
 from models.domain import Task
 
-async def run_mock_nextflow(task_id: int, filename: str, volume_dir: str, model_name: str):
+async def run_mock_nextflow(task_id: str, filename: str, volume_dir: str, model_name: str):
     db: Session = SessionLocal()
     try:
-        print(f"🎯 [ORCHESTRATOR] Avvio Task {task_id}. Il medico ha scelto il modello: >>> {model_name} <<<")
-        # 1. PENDING -> PROCESSING
+        print(f"🎯 [NEXTFLOW MOCK] Avvio Task {task_id}. Modello: >>> {model_name} <<<")
+        
         task = db.query(Task).filter(Task.id == task_id).first()
         if not task:
             return
+            
         task.status = "PROCESSING"
         db.commit()
 
-        print(f"⚙️ [ORCHESTRATOR] Avvio estrazione feature per task {task_id}...")
-        
-        # 2. Simuliamo l'attesa di Nextflow
-        await asyncio.sleep(5) 
+        print(f"⚙️ [NEXTFLOW MOCK] Estrazione feature radiomiche per {model_name}...")
+        await asyncio.sleep(20) # Simulazione tempo di calcolo
 
-        # 3. Generiamo il CSV nel Volume Condiviso
+        # --- ROUTING DINAMICO DELLE FEATURE IN BASE AL MODELLO ---
+        if model_name == "HC_vs_svPPA":
+            # Le 24 feature per il modello KNN (caret)
+            exact_features = [
+                "original_firstorder_Minimum.1", "original_firstorder_Energy.4", 
+                "original_firstorder_Skewness.4", "original_glcm_DifferenceEntropy.4",
+                "original_glcm_DifferenceVariance.4", "original_glrlm_LongRunEmphasis.4",
+                "original_glrlm_ShortRunEmphasis.4", "original_firstorder_Energy.14",
+                "original_firstorder_Skewness.28", "original_firstorder_Energy.31",
+                "original_firstorder_Skewness.31", "original_glszm_SmallAreaEmphasis.31",
+                "original_glcm_Idmn.38", "original_gldm_SmallDependenceLowGrayLevelEmphasis.38",
+                "original_glcm_Correlation.62", "original_gldm_DependenceNonUniformity.65",
+                "original_glcm_Idmn.67", "original_firstorder_10Percentile.71",
+                "original_firstorder_Minimum.71", "original_gldm_DependenceEntropy.71",
+                "original_firstorder_Energy.72", "original_glszm_GrayLevelNonUniformity.72",
+                "original_gldm_DependenceNonUniformity.72", "original_glcm_Imcl.77"
+            ]
+            
+        elif model_name == "HC_vs_bvFTD":
+            # Le 9 feature per il modello Random Forest (mlr)
+            exact_features = [
+                "original_firstorder_Energy.71", "original_glszm_LargeAreaEmphasis.74",
+                "original_glszm_ZoneVariance.4", "original_glszm_ZoneVariance.69",
+                "original_glszm_ZoneVariance.74", "original_glszm_LargeAreaHighGrayLevelEmphasis.74",
+                "original_firstorder_Energy.76", "original_glcm_Idn.69",
+                "original_firstorder_Energy.36"
+            ]
+            
+        elif model_name == "HC_vs_nfvPPA":
+            # Le 11 feature per il modello XGBoost
+            exact_features = [
+                "original_firstorder_Energy", "original_glcm_ClusterShade", "original_glcm_InverseVariance.2",
+                "original_gldm_GrayLevelNonUniformity.2", "original_glcm_ClusterShade.16", "original_firstorder_Energy.18",
+                "original_firstorder_Minimum.21", "original_gldm_DependenceNonUniformity.22", "original_firstorder_Skewness.31",
+                "original_glrlm_GrayLevelNonUniformity.64", "original_gldm_GrayLevelNonUniformity.69"
+            ]
+            
+        else:
+            # Fallback di sicurezza in caso di modelli non censiti
+            exact_features = ["feature_sconosciuta"]
+
+        # -----------------------------------------------------------
+
+        # Generiamo la finta riga del paziente (mock data)
+        mock_patient_data = [round(random.uniform(0.1, 10.0), 4) for _ in exact_features]
+
+        # Creiamo il CSV
         output_filename = f"features_{task_id}.csv"
         output_path = os.path.join(volume_dir, output_filename)
         
         with open(output_path, mode='w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(["ROI", "Volume", "Spessore_Corticale"])
-            writer.writerow(["Ippocampo", "3500.5", "2.8"])
-            writer.writerow(["Amigdala", "1450.2", "3.1"])
+            writer.writerow(exact_features)      
+            writer.writerow(mock_patient_data)   
 
-        print(f"✅ [ORCHESTRATOR] CSV generato nel volume condiviso: {output_filename}")
+        print(f"✅ [NEXTFLOW MOCK] CSV perfetto generato: {output_filename}")
 
-        # --- IL PONTE DI COMANDO (Chiamata a Plumber) ---
-        print(f"🚀 [ORCHESTRATOR] Invio richiesta di diagnosi al motore di inferenza (R)...")
-        
-        # L'URL interno di Docker (nome_servizio:porta_interna)
-        inference_url = "http://inference:8000/predict"
-        
-        # Per ora diciamo che il medico aveva scelto la variante Comportamentale
-        payload = {
-            "task_id": task_id,
-            "model_name": model_name
-        }
-
-        # Facciamo la chiamata POST a Plumber
-        response = requests.post(inference_url, json=payload)
-        
-        if response.status_code == 200:
-            risultato = response.json()
-            diagnosi = risultato.get("diagnosi", "Errore di lettura")
-            print(f"🎯 [INFERENCE RESULT] Il motore R ha sentenziato: >>> {diagnosi} <<<")
-            
-            # (Opzionale) Se hai una colonna 'result' nel database, salvalo qui:
-            # task.result = diagnosi
-        else:
-            print(f"❌ [INFERENCE ERROR] Il container R ha risposto con errore: {response.text}")
-        # ------------------------------------------------
-
-        # 5. PROCESSING -> COMPLETED
-        task.status = "COMPLETED"
+        task.status = "NEXTFLOW_COMPLETED"
         task.progress = 100.0
         db.commit()
-        print(f"🏁 [ORCHESTRATOR] Task {task_id} completato e archiviato.")
 
     except Exception as e:
         task.status = "ERROR"
         db.commit()
-        print(f"🚨 [ORCHESTRATOR] Errore critico nel task {task_id}: {e}")
+        print(f"🚨 [NEXTFLOW MOCK] Errore critico: {e}")
     finally:
         db.close()

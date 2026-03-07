@@ -16,6 +16,8 @@ services:
     volumes:
       - ./backend:/app
       - shared_clinical_data:/shared_data
+    env_file:
+      - .env
     environment:
       - PYTHONUNBUFFERED=1
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
@@ -37,10 +39,10 @@ services:
       - backend
 
   # 3. INFERENCE ENGINE (Plumber + R)
-  inference:
+  inference_engine:
     build:
       context: ./inference_engine
-    container_name: inference_service
+    container_name: inference_engine
     ports:
       - "8001:8000"
     volumes:

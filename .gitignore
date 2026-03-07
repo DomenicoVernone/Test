@@ -8,3 +8,4 @@ Thumbs.db
 *.dcm
 *.rds
 dati_sensibili/
+.env
