@@ -121,6 +121,7 @@ export default function Dashboard() {
     setIsAnalyzing(false);
     setActiveTab('umap'); // Portiamo subito alla visualizzazione dati
   };
+  
 
   return (
     <div className="h-screen w-full bg-clinical-bg text-slate-900 flex flex-col font-sans overflow-hidden relative">
@@ -129,7 +130,7 @@ export default function Dashboard() {
       {/* MODALE SELEZIONE MODELLO */}
       {isModalOpen && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white p-8 rounded-2xl shadow-2xl w-[450px] flex flex-col gap-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl w-112.5 flex flex-col gap-6 animate-in fade-in zoom-in duration-200">
             <div>
               <h3 className="text-2xl font-bold text-slate-800">Sospetto Clinico</h3>
               <p className="text-sm text-slate-500 mt-1">Seleziona il modello diagnostico da applicare:</p>
@@ -152,16 +153,16 @@ export default function Dashboard() {
 
       <main className="flex-1 flex overflow-hidden">
         <section className="flex-1 flex flex-col p-6 gap-6 overflow-y-auto transition-all duration-300">
-          
-          {/* Mostra UploadZone solo se NON stiamo visualizzando un record storico */}
-          {!niftiUrl && (
-             <UploadZone 
-                file={file} 
-                uploadStatus={uploadStatus} 
-                onFileChange={handleFileChange} 
-                onUpload={handleConfirmClick} 
-             />
-          )}
+                    
+          {/* Zona di caricamento SEMPRE visibile e pronta all'uso */}
+          <UploadZone 
+             file={file} 
+             uploadStatus={uploadStatus} 
+             onFileChange={handleFileChange} 
+             onUpload={handleConfirmClick} 
+          />
+
+          {/* Visualizzatore Clinico (Viewer) */}
 
           {/* Visualizzatore Clinico (Viewer) */}
           <ClinicalViewer 
@@ -177,43 +178,48 @@ export default function Dashboard() {
         </section>
 
         {/* SIDEBAR DESTRA (Chat e Storico) */}
-        <aside className={`relative flex flex-col bg-clinical-surface transition-all duration-300 ease-in-out border-clinical-border ${isSidebarOpen ? 'w-1/3 border-l' : 'w-0 border-l-0 overflow-hidden'}`}>
+        <div className={`relative h-full transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-1/3' : 'w-0'}`}>
+          
+          {/* IL BOTTONE: Ora è al sicuro fuori dalla "ghigliottina" dell'overflow-hidden */}
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
-            className="absolute top-6 -left-10 z-20 flex h-10 w-10 items-center justify-center rounded-l-xl border border-r-0 border-clinical-border bg-clinical-surface text-slate-500 hover:text-clinical-primary shadow-sm"
+            className="absolute top-6 -left-10 z-50 flex h-10 w-10 items-center justify-center rounded-l-xl border border-r-0 border-clinical-border bg-clinical-surface text-slate-500 hover:text-clinical-primary shadow-sm"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               {isSidebarOpen ? <path d="m9 18 6-6-6-6" /> : <path d="m15 18-6-6 6-6" />}
             </svg>
           </button>
 
-          {isSidebarOpen && (
-            <div className="flex border-b border-clinical-border bg-slate-50/50 p-1 z-10 w-full min-w-[320px]">
-              <button 
-                onClick={() => setActiveSidebarTab('chat')} 
-                className={`flex-1 px-4 py-3 text-xs font-bold rounded-xl transition-all ${activeSidebarTab === 'chat' ? 'bg-white text-clinical-primary shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
-              >
-                💬 Chat LLM
-              </button>
-              <button 
-                onClick={() => setActiveSidebarTab('history')} 
-                className={`flex-1 px-4 py-3 text-xs font-bold rounded-xl transition-all ${activeSidebarTab === 'history' ? 'bg-white text-clinical-primary shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
-              >
-                📋 Storico Analisi
-              </button>
-            </div>
-          )}
+          {/* LA SIDEBAR VERA E PROPRIA: Questa taglia i contenuti quando si chiude */}
+          <aside className="w-full h-full bg-clinical-surface border-l border-clinical-border flex flex-col overflow-hidden">
+            {isSidebarOpen && (
+              <div className="flex border-b border-clinical-border bg-slate-50/50 p-1 z-10 w-full min-w-[320px]">
+                <button 
+                  onClick={() => setActiveSidebarTab('chat')} 
+                  className={`flex-1 px-4 py-3 text-xs font-bold rounded-xl transition-all ${activeSidebarTab === 'chat' ? 'bg-white text-clinical-primary shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                  💬 Chat LLM
+                </button>
+                <button 
+                  onClick={() => setActiveSidebarTab('history')} 
+                  className={`flex-1 px-4 py-3 text-xs font-bold rounded-xl transition-all ${activeSidebarTab === 'history' ? 'bg-white text-clinical-primary shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                  📋 Storico Analisi
+                </button>
+              </div>
+            )}
 
-          <div className="flex-1 overflow-hidden">
-            <div className="h-full w-full min-w-[320px]">
-              {activeSidebarTab === 'chat' ? (
-                <ChatLLM isAnalyzing={isAnalyzing} experiment={selectedExperiment} />
-              ) : (
-                <TaskHistory onTaskCompleted={handleAnalysisFinished} onTaskClick={handleHistoryTaskClick} /> 
-              )}
+            <div className="flex-1 overflow-hidden">
+              <div className="h-full w-full min-w-[320px]">
+                {activeSidebarTab === 'chat' ? (
+                  <ChatLLM isAnalyzing={isAnalyzing} experiment={selectedExperiment} />
+                ) : (
+                  <TaskHistory onTaskCompleted={handleAnalysisFinished} onTaskClick={handleHistoryTaskClick} /> 
+                )}
+              </div>
             </div>
-          </div>
-        </aside>
+          </aside>
+        </div>
 
       </main>
     </div>
