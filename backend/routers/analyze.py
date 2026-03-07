@@ -145,13 +145,13 @@ async def get_task_status(
 
     return {"status": task.status}
 
-@router.get("/nifti/{task_id}")
+@router.get("/nifti/{task_id}/volume.nii.gz")
 async def get_nifti_file(
     task_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Restituisce il file NIfTI originale associato a un task (per il Viewer 3D)."""
+    """Restituisce il file NIfTI originale (l'URL include fittiziamente .nii.gz per accontentare la libreria frontend)."""
     task = db.query(Task).filter(Task.id == task_id, Task.owner_id == current_user.id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Task non trovato")

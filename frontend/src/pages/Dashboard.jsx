@@ -1,9 +1,15 @@
+/*
+  L'area di lavoro privata del medico.
+  Versione ottimizzata: rimosse variabili inutilizzate e logica di stato ridondante.
+*/
 import React, { useState, useContext } from 'react';
+
 import Header from '../components/layout/Header';
 import UploadZone from '../components/clinical/UploadZone';
 import ClinicalViewer from '../components/viewers/Viewer';
 import ChatLLM from '../components/assistant/ChatLLM';
 import TaskHistory from '../components/clinical/TaskHistory';
+
 import { AuthContext } from '../contexts/AuthContext';
 
 export default function Dashboard() {
@@ -13,10 +19,9 @@ export default function Dashboard() {
   const selectedExperiment = 'FTD-Study-2024';
 
   const [file, setFile] = useState(null);
-  const [niftiUrl, setNiftiUrl] = useState(null); // <-- NUOVO STATO: per il NIfTI scaricato dalla rete
+  const [niftiUrl, setNiftiUrl] = useState(null); 
   
   const [uploadStatus, setUploadStatus] = useState('idle');
-  const [currentTaskStatus, setCurrentTaskStatus] = useState(null);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeSidebarTab, setActiveSidebarTab] = useState('chat');
@@ -26,14 +31,13 @@ export default function Dashboard() {
   const [umapData, setUmapData] = useState(null);
   const [prediction, setPrediction] = useState(null);
 
-  // GESTIONE NUOVO UPLOAD (File Locale)
+  // GESTIONE NUOVO CARICAMENTO
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
       setFile(selectedFile);
-      setNiftiUrl(null); // Resettiamo l'URL di rete se carichiamo un file locale
+      setNiftiUrl(null); // Reset URL di rete
       setUploadStatus('idle');
-      setCurrentTaskStatus(null);
       setUmapData(null);
       setPrediction(null);
       setActiveTab('3d');
@@ -45,6 +49,7 @@ export default function Dashboard() {
     setIsModalOpen(true);
   };
 
+  // ESECUZIONE ANALISI (Upload file locale)
   const executeUploadAndAnalyze = async () => {
     setIsModalOpen(false);
     setUploadStatus('uploading');
@@ -62,28 +67,29 @@ export default function Dashboard() {
       });
 
       if (response.ok) {
-        const data = await response.json();
         setUploadStatus('success');
-        setCurrentTaskStatus(data.status);
+        // Dopo l'upload, apriamo lo storico per monitorare il progresso
         setActiveSidebarTab('history');
         setIsSidebarOpen(true);
       } else {
         setUploadStatus('error');
         setIsAnalyzing(false);
       }
-    } catch {
+    } catch (error) {
+      console.error("Errore durante l'upload:", error);
       setUploadStatus('error');
       setIsAnalyzing(false);
     }
   };
 
-  // CALLBACK: Fine Polling
+  // CALLBACK: Quando un task in corso viene completato (Polling)
   const handleAnalysisFinished = (data, taskMeta) => {
     setUmapData(data.plot_data);
-    const predizioneSicura = Array.isArray(data.diagnosi_predetta) ? data.diagnosi_predetta[0] : data.diagnosi_predetta;
+    const predizioneSicura = Array.isArray(data.diagnosi_predetta) 
+      ? data.diagnosi_predetta[0] 
+      : data.diagnosi_predetta;
     setPrediction(predizioneSicura);
     
-    // Aggiorniamo la UI al modello appena usato (estraendo 'bvFTD' da 'HC_vs_bvFTD')
     if (taskMeta && taskMeta.model_name) {
        setSelectedModel(taskMeta.model_name);
     }
@@ -92,32 +98,35 @@ export default function Dashboard() {
     setActiveTab('umap');
   };
 
-  // --- NUOVO: CALLBACK QUANDO SI CLICCA UNA CARD NELLO STORICO ---
+  // CALLBACK: Quando il medico clicca un paziente dallo storico
   const handleHistoryTaskClick = (storicoData) => {
-    console.log("📥 Caricamento paziente dallo storico:", storicoData);
+    // 1. Puliamo il file locale per evitare conflitti nel Viewer
+    setFile(null); 
     
-    setFile(null); // Rimuoviamo il file locale
-    setNiftiUrl(storicoData.niftiUrl); // Impostiamo l'URL di rete fornito da FastAPI
-    
+    // 2. Carichiamo l'URL di rete e i dati salvati
+    setNiftiUrl(storicoData.niftiUrl); 
     setUmapData(storicoData.umapData);
-    const predizioneSicura = Array.isArray(storicoData.prediction) ? storicoData.prediction[0] : storicoData.prediction;
+    
+    const predizioneSicura = Array.isArray(storicoData.prediction) 
+      ? storicoData.prediction[0] 
+      : storicoData.prediction;
     setPrediction(predizioneSicura);
     
-    // Sincronizziamo il tab del Radar Locale col modello usato storicamente
     if (storicoData.modelName) {
        setSelectedModel(storicoData.modelName); 
     }
 
+    // 3. UI Adjustment
     setUploadStatus('success');
     setIsAnalyzing(false);
-    setActiveTab('umap'); // Portiamo il medico subito sul radar
+    setActiveTab('umap'); // Portiamo subito alla visualizzazione dati
   };
 
   return (
     <div className="h-screen w-full bg-clinical-bg text-slate-900 flex flex-col font-sans overflow-hidden relative">
       <Header experiment={selectedExperiment} />
 
-      {/* MODALE OVERLAY */}
+      {/* MODALE SELEZIONE MODELLO */}
       {isModalOpen && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-[450px] flex flex-col gap-6 animate-in fade-in zoom-in duration-200">
@@ -144,9 +153,17 @@ export default function Dashboard() {
       <main className="flex-1 flex overflow-hidden">
         <section className="flex-1 flex flex-col p-6 gap-6 overflow-y-auto transition-all duration-300">
           
-          <UploadZone file={file} uploadStatus={uploadStatus} onFileChange={handleFileChange} onUpload={handleConfirmClick} />
+          {/* Mostra UploadZone solo se NON stiamo visualizzando un record storico */}
+          {!niftiUrl && (
+             <UploadZone 
+                file={file} 
+                uploadStatus={uploadStatus} 
+                onFileChange={handleFileChange} 
+                onUpload={handleConfirmClick} 
+             />
+          )}
 
-          {/* PASSIAMO SIA IL FILE LOCALE CHE L'URL DI RETE AL VIEWER */}
+          {/* Visualizzatore Clinico (Viewer) */}
           <ClinicalViewer 
             file={file} 
             niftiUrl={niftiUrl} 
@@ -155,31 +172,16 @@ export default function Dashboard() {
             isAnalyzing={isAnalyzing} 
             umapData={umapData}        
             prediction={prediction}    
-            selectedModel={selectedModel} // Passiamo il modello selezionato per sincronizzare i tab
+            selectedModel={selectedModel} 
           />
-
-          <div className="flex justify-between items-center bg-clinical-surface p-5 rounded-2xl border border-clinical-border shadow-clinical-sm">
-            <div className="flex items-center gap-3">
-              <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter ${uploadStatus === 'success' ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-clinical-bg text-clinical-secondary border border-clinical-border'}`}>
-                <div className={`w-2 h-2 rounded-full ${uploadStatus === 'success' ? 'bg-amber-500 animate-pulse' : 'bg-slate-300'}`}></div>
-                {uploadStatus === 'idle' && "Sistema in Attesa"}
-                {uploadStatus === 'uploading' && "Caricamento Rete..."}
-                {uploadStatus === 'success' && currentTaskStatus === 'PENDING' && "In Coda (Pending)"}
-                {uploadStatus === 'success' && isAnalyzing && "Elaborazione in Corso"}
-                {uploadStatus === 'error' && "Errore di Rete"}
-              </div>
-            </div>
-            <button
-              onClick={() => {}} disabled={true} // Disattivato (gestito da UploadZone/Modale)
-              className="px-10 py-4 bg-slate-100 text-slate-300 rounded-xl font-bold transition-all"
-            >
-              PRONTO
-            </button>
-          </div>
         </section>
 
-        <aside className={`relative flex flex-col bg-clinical-surface transition-all duration-300 ease-in-out border-clinical-border ${isSidebarOpen ? 'w-1/3 border-l' : 'w-0 border-l-0'}`}>
-          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="absolute top-6 -left-10 z-20 flex h-10 w-10 items-center justify-center rounded-l-xl border border-r-0 border-clinical-border bg-clinical-surface text-slate-500 hover:text-clinical-primary">
+        {/* SIDEBAR DESTRA (Chat e Storico) */}
+        <aside className={`relative flex flex-col bg-clinical-surface transition-all duration-300 ease-in-out border-clinical-border ${isSidebarOpen ? 'w-1/3 border-l' : 'w-0 border-l-0 overflow-hidden'}`}>
+          <button 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+            className="absolute top-6 -left-10 z-20 flex h-10 w-10 items-center justify-center rounded-l-xl border border-r-0 border-clinical-border bg-clinical-surface text-slate-500 hover:text-clinical-primary shadow-sm"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               {isSidebarOpen ? <path d="m9 18 6-6-6-6" /> : <path d="m15 18-6-6 6-6" />}
             </svg>
@@ -187,8 +189,18 @@ export default function Dashboard() {
 
           {isSidebarOpen && (
             <div className="flex border-b border-clinical-border bg-slate-50/50 p-1 z-10 w-full min-w-[320px]">
-              <button onClick={() => setActiveSidebarTab('chat')} className={`flex-1 px-4 py-3 text-xs font-bold rounded-xl ${activeSidebarTab === 'chat' ? 'bg-white text-clinical-primary shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}>💬 Chat LLM</button>
-              <button onClick={() => setActiveSidebarTab('history')} className={`flex-1 px-4 py-3 text-xs font-bold rounded-xl ${activeSidebarTab === 'history' ? 'bg-white text-clinical-primary shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}>📋 Storico Analisi</button>
+              <button 
+                onClick={() => setActiveSidebarTab('chat')} 
+                className={`flex-1 px-4 py-3 text-xs font-bold rounded-xl transition-all ${activeSidebarTab === 'chat' ? 'bg-white text-clinical-primary shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                💬 Chat LLM
+              </button>
+              <button 
+                onClick={() => setActiveSidebarTab('history')} 
+                className={`flex-1 px-4 py-3 text-xs font-bold rounded-xl transition-all ${activeSidebarTab === 'history' ? 'bg-white text-clinical-primary shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                📋 Storico Analisi
+              </button>
             </div>
           )}
 

@@ -69,10 +69,9 @@ export default function TaskHistory({ onTaskCompleted, onTaskClick }) {
 
     // GESTIONE DEL CLICK SULLA CARD
     const handleCardClick = async (task) => {
-        if (task.status !== 'COMPLETED') return; // I task non completati non sono navigabili
+        if (task.status !== 'COMPLETED') return; 
         
         try {
-            // 1. Recupera i dati UMAP (JSON) dal backend
             const res = await fetch(`http://localhost:8000/analyze/status/${task.id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -80,11 +79,11 @@ export default function TaskHistory({ onTaskCompleted, onTaskClick }) {
             if (res.ok) {
                 const data = await res.json();
                 if (onTaskClick) {
-                    // Passiamo al padre: il JSON (data), l'URL del NIfTI, e il nome del modello (es. HC_vs_bvFTD)
                     onTaskClick({
                         umapData: data.plot_data,
                         prediction: data.diagnosi_predetta,
-                        niftiUrl: `http://localhost:8000/analyze/nifti/${task.id}`,
+                        // FIX: Aggiunto /volume.nii.gz alla fine dell'URL per Niivue
+                        niftiUrl: `http://localhost:8000/analyze/nifti/${task.id}/volume.nii.gz`,
                         modelName: task.model_name 
                     });
                 }
