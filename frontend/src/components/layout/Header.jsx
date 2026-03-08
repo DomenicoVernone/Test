@@ -1,15 +1,14 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
-import { Activity, ChevronDown, User, Settings, LogOut } from 'lucide-react';
+import { Activity, User, Settings, LogOut } from 'lucide-react';
 import { AuthContext } from '../../contexts/AuthContext';
 import { jwtDecode } from 'jwt-decode';
 
-const Header = ({ experiment }) => {
+const Header = ({ onOpenSettings }) => { // <-- Modificato: riceve la funzione per aprire la modale
   const { logout, token } = useContext(AuthContext);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine); 
   const dropdownRef = useRef(null);
 
-  // 1. Estrazione Username
   let username = "Medico";
   if (token) {
     try {
@@ -20,25 +19,20 @@ const Header = ({ experiment }) => {
     }
   }
 
-  // 2. Gestione Click Esterno e Stato Rete
   useEffect(() => {
-    // Funzione per chiudere il menu
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
     };
 
-    // Funzioni per aggiornare lo stato online/offline
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
-    // Aggiungiamo i listener
     document.addEventListener('mousedown', handleClickOutside);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Pulizia dei listener quando il componente viene smontato
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       window.removeEventListener('online', handleOnline);
@@ -59,18 +53,9 @@ const Header = ({ experiment }) => {
         </h1>
       </div>
 
-      {/* SEZIONE DESTRA: Protocollo e Controlli Utente */}
+      {/* SEZIONE DESTRA: Controlli Utente & Impostazioni */}
       <div className="flex items-center gap-6">
-        
-        <div className="hidden md:flex flex-col items-end border-r border-clinical-border pr-4">
-          <span className="text-[10px] text-clinical-secondary uppercase font-bold tracking-widest text-right">Protocollo Attivo</span>
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-            {experiment}
-            <ChevronDown className="w-4 h-4 text-clinical-secondary" />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4"> {/* Aumentato il gap per respiro */}
           
           <div className="relative" ref={dropdownRef}>
             <div 
@@ -82,15 +67,12 @@ const Header = ({ experiment }) => {
               <User className="w-5 h-5" />
             </div>
 
-            {/* Menu a Tendina (Allargato a w-64) */}
+            {/* Menu a Tendina */}
             {isDropdownOpen && (
               <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-xl border border-slate-200 py-1 origin-top-right transition-all">
-                
-                {/* Intestazione (Padding aumentato) */}
                 <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50 rounded-t-xl">
                   <p className="text-base font-bold text-slate-800 truncate">{username}</p>
                   
-                  {/* Indicatore Dinamico di Rete */}
                   <div className="flex items-center gap-2 mt-1.5">
                     <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
                     <p className={`text-[11px] font-bold uppercase tracking-wider ${isOnline ? 'text-green-600' : 'text-red-600'}`}>
@@ -110,7 +92,15 @@ const Header = ({ experiment }) => {
             )}
           </div>
 
-          <Settings className="w-5 h-5 text-clinical-secondary cursor-pointer hover:text-slate-600" />
+          {/* PULSANTE IMPOSTAZIONI: Ora collegato alla funzione */}
+          <button 
+            onClick={onOpenSettings}
+            className="p-2 -mr-2 text-clinical-secondary hover:text-clinical-primary hover:bg-slate-100 rounded-full transition-colors"
+            title="Impostazioni Visualizzatore"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
+          
         </div>
       </div>
     </header>

@@ -3,7 +3,7 @@ import { Brain, LineChart, Activity } from 'lucide-react';
 import NiiVueCanvas from './NiiVue';
 import UmapPlot from './UmapPlot';
 
-const ClinicalViewer = ({ file, niftiUrl, activeTab, setActiveTab, isAnalyzing, umapData, selectedModel }) => {
+const ClinicalViewer = ({ file, niftiUrl, activeTab, setActiveTab, isAnalyzing, umapData, selectedModel, colorMap }) => {
   
   return (
     <div className="flex-1 bg-white rounded-2xl border border-slate-200 flex flex-col overflow-hidden shadow-sm">
@@ -38,7 +38,7 @@ const ClinicalViewer = ({ file, niftiUrl, activeTab, setActiveTab, isAnalyzing, 
         
         activeTab === '3d' ? (
           (file || niftiUrl) ? (
-            <NiiVueCanvas file={file} niftiUrl={niftiUrl} />
+            <NiiVueCanvas file={file} niftiUrl={niftiUrl} colorMap={colorMap} />
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-10 z-10 text-center">
               <Activity className="w-12 h-12 mx-auto mb-4 text-slate-300" />

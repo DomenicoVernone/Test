@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useContext } from 'react';
 import { Niivue } from '@niivue/niivue';
 import { AuthContext } from '../../contexts/AuthContext'; 
 
-const NiiVueCanvas = ({ file, niftiUrl }) => {
+const NiiVueCanvas = ({ file, niftiUrl, colorMap = 'gray' }) => {
   const canvasRef = useRef(null);
   const nvRef = useRef(null);
   const { token } = useContext(AuthContext); 
 
   useEffect(() => {
-    // Inizializzazione singola del motore 3D
+    // Inizializzazione singola
     if (!nvRef.current && canvasRef.current) {
       nvRef.current = new Niivue({
         backColor: [0, 0, 0, 1],
@@ -20,49 +20,40 @@ const NiiVueCanvas = ({ file, niftiUrl }) => {
     const loadVolume = async () => {
       if (!nvRef.current) return;
 
-      // Pulisci il volume precedente per non sovrapporre i cervelli
       if (nvRef.current.volumes.length > 0) {
         nvRef.current.removeVolume(nvRef.current.volumes[0]);
       }
 
-      let blobUrl = null; // Il nostro finto URL temporaneo
+      let blobUrl = null;
 
       try {
-        // 1. CARICAMENTO FILE LOCALE (Nuovo Upload dal PC)
         if (file) {
           blobUrl = URL.createObjectURL(file);
-          
           await nvRef.current.loadVolumes([{
             url: blobUrl,
-            name: file.name // NiiVue legge l'estensione da qui
+            name: file.name,
+            colormap: colorMap // Imposta il colore al caricamento
           }]);
         } 
-        
-        // 2. CARICAMENTO DALLO STORICO (Rete + Token)
         else if (niftiUrl) {
-          // Scarichiamo noi il file usando il Token per bypassare l'errore 401
           const response = await fetch(niftiUrl, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
 
           if (!response.ok) throw new Error("Accesso negato o file non trovato");
 
-          // Trasformiamo la risposta in un Blob (dati binari grezzi)
           const blob = await response.blob();
-          
-          // Creiamo un URL fittizio che punta alla RAM del browser
           blobUrl = URL.createObjectURL(blob);
           
-          // Passiamo tutto a NiiVue!
           await nvRef.current.loadVolumes([{
             url: blobUrl,
-            name: "paziente_storico.nii.gz" // NiiVue capisce che è zippato e non crasha
+            name: "paziente_storico.nii.gz",
+            colormap: colorMap // Imposta il colore al caricamento
           }]);
         }
       } catch (error) {
         console.error("Errore irreversibile nel caricamento NIfTI:", error);
       } finally {
-        // Buona pratica: puliamo la memoria del browser dopo aver caricato il 3D
         if (blobUrl) {
           URL.revokeObjectURL(blobUrl);
         }
@@ -71,7 +62,15 @@ const NiiVueCanvas = ({ file, niftiUrl }) => {
 
     loadVolume();
 
-  }, [file, niftiUrl, token]); 
+  }, [file, niftiUrl, colorMap, token]); // NB: colorMap NON è qui per evitare doppi caricamenti
+
+  // EFFETTO SEPARATO: Cambia solo il colore in tempo reale senza ricaricare il file
+  useEffect(() => {
+    if (nvRef.current && nvRef.current.volumes.length > 0) {
+      nvRef.current.volumes[0].colormap = colorMap;
+      nvRef.current.updateGLVolume();
+    }
+  }, [colorMap]);
 
   return (
     <div className="w-full h-full flex flex-col bg-black rounded-xl overflow-hidden">

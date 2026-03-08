@@ -1,9 +1,9 @@
 /*
   L'area di lavoro privata del medico.
-  Versione ottimizzata: rimosse variabili inutilizzate e logica di stato ridondante.
+  Versione ottimizzata: rimosse variabili inutilizzate, logica di stato ridondante e aggiunto SettingsModal.
 */
 import React, { useState, useContext } from 'react';
-
+import SettingsModal from '../components/layout/SettingsModal';
 import Header from '../components/layout/Header';
 import UploadZone from '../components/clinical/UploadZone';
 import ClinicalViewer from '../components/viewers/Viewer';
@@ -16,17 +16,23 @@ export default function Dashboard() {
   const { token } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState('3d');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const selectedExperiment = 'FTD-Study-2024';
 
+  // --- STATI DATI ---
   const [file, setFile] = useState(null);
   const [niftiUrl, setNiftiUrl] = useState(null); 
-  
   const [uploadStatus, setUploadStatus] = useState('idle');
 
+  // --- STATI UI ---
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeSidebarTab, setActiveSidebarTab] = useState('chat');
-
+  
+  // --- STATI MODALI E SETTINGS ---
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false); // Nuovo stato modale impostazioni
+  const [colorMap, setColorMap] = useState('gray'); // Nuovo stato mappa colori
+  const [theme, setTheme] = useState('light'); // Nuovo stato tema
+
+  // --- STATI MODELLO E INFERENZA ---
   const [selectedModel, setSelectedModel] = useState('HC_vs_bvFTD'); 
   const [umapData, setUmapData] = useState(null);
   const [prediction, setPrediction] = useState(null);
@@ -124,13 +130,25 @@ export default function Dashboard() {
   
 
   return (
-    <div className="h-screen w-full bg-clinical-bg text-slate-900 flex flex-col font-sans overflow-hidden relative">
-      <Header experiment={selectedExperiment} />
+    <div className={`h-screen w-full flex flex-col font-sans overflow-hidden relative transition-colors duration-300 ${theme === 'dark' ? 'bg-slate-900 text-slate-100' : 'bg-clinical-bg text-slate-900'}`}>
+      
+      {/* HEADER: Passiamo la funzione per aprire la modale Settings */}
+      <Header onOpenSettings={() => setIsSettingsOpen(true)} />
+
+      {/* MODALE IMPOSTAZIONI */}
+      <SettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+        colorMap={colorMap} 
+        setColorMap={setColorMap} 
+        theme={theme} 
+        setTheme={setTheme} 
+      />
 
       {/* MODALE SELEZIONE MODELLO */}
       {isModalOpen && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white p-8 rounded-2xl shadow-2xl w-112.5 flex flex-col gap-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl w-112.5 flex flex-col gap-6 animate-in fade-in zoom-in duration-200 text-slate-900">
             <div>
               <h3 className="text-2xl font-bold text-slate-800">Sospetto Clinico</h3>
               <p className="text-sm text-slate-500 mt-1">Seleziona il modello diagnostico da applicare:</p>
@@ -163,8 +181,6 @@ export default function Dashboard() {
           />
 
           {/* Visualizzatore Clinico (Viewer) */}
-
-          {/* Visualizzatore Clinico (Viewer) */}
           <ClinicalViewer 
             file={file} 
             niftiUrl={niftiUrl} 
@@ -174,13 +190,14 @@ export default function Dashboard() {
             umapData={umapData}        
             prediction={prediction}    
             selectedModel={selectedModel} 
+            colorMap={colorMap} // PASSAGGIO DELLA MAPPA COLORI AL VIEWER
           />
         </section>
 
         {/* SIDEBAR DESTRA (Chat e Storico) */}
         <div className={`relative h-full transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-1/3' : 'w-0'}`}>
           
-          {/* IL BOTTONE: Ora è al sicuro fuori dalla "ghigliottina" dell'overflow-hidden */}
+          {/* IL BOTTONE */}
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
             className="absolute top-6 -left-10 z-50 flex h-10 w-10 items-center justify-center rounded-l-xl border border-r-0 border-clinical-border bg-clinical-surface text-slate-500 hover:text-clinical-primary shadow-sm"
@@ -190,10 +207,10 @@ export default function Dashboard() {
             </svg>
           </button>
 
-          {/* LA SIDEBAR VERA E PROPRIA: Questa taglia i contenuti quando si chiude */}
-          <aside className="w-full h-full bg-clinical-surface border-l border-clinical-border flex flex-col overflow-hidden">
+          {/* LA SIDEBAR VERA E PROPRIA */}
+          <aside className={`w-full h-full border-l border-clinical-border flex flex-col overflow-hidden ${theme === 'dark' ? 'bg-slate-800' : 'bg-clinical-surface'}`}>
             {isSidebarOpen && (
-              <div className="flex border-b border-clinical-border bg-slate-50/50 p-1 z-10 w-full min-w-[320px]">
+              <div className={`flex border-b border-clinical-border p-1 z-10 w-full min-w-[320px] ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-50/50'}`}>
                 <button 
                   onClick={() => setActiveSidebarTab('chat')} 
                   className={`flex-1 px-4 py-3 text-xs font-bold rounded-xl transition-all ${activeSidebarTab === 'chat' ? 'bg-white text-clinical-primary shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
@@ -212,7 +229,7 @@ export default function Dashboard() {
             <div className="flex-1 overflow-hidden">
               <div className="h-full w-full min-w-[320px]">
                 {activeSidebarTab === 'chat' ? (
-                  <ChatLLM isAnalyzing={isAnalyzing} experiment={selectedExperiment} />
+                  <ChatLLM isAnalyzing={isAnalyzing} experiment="N/A" />
                 ) : (
                   <TaskHistory onTaskCompleted={handleAnalysisFinished} onTaskClick={handleHistoryTaskClick} /> 
                 )}
