@@ -1,7 +1,7 @@
 import React from 'react';
 import Plot from 'react-plotly.js';
 
-export default function UmapPlot({ data, selectedModel }) {
+export default function UmapPlot({ data, selectedModel, theme }) {
   if (!data || !data.storico) return null;
 
   const { storico, nuovo_paziente } = data;
@@ -59,18 +59,35 @@ export default function UmapPlot({ data, selectedModel }) {
     }
   ];
 
+  // --- LOGICA COLORI IN BASE AL TEMA ---
+  const isDark = theme === 'dark';
+  const wallColor = isDark ? '#1e293b' : '#f8fafc'; // Pareti del cubo 3D (slate-800 o slate-50)
+  const gridColor = isDark ? '#334155' : '#e2e8f0'; // Linee griglia (slate-700 o slate-200)
+  const fontColor = isDark ? '#cbd5e1' : '#334155'; // Testo (slate-300 o slate-700)
+  const legendBg = isDark ? 'rgba(30,41,59,0.8)' : 'rgba(255,255,255,0.8)'; // Sfondo legenda
+
+  const axisStyle = { 
+    title: '', 
+    backgroundcolor: wallColor, 
+    gridcolor: gridColor, 
+    showbackground: true, 
+    zeroline: false,
+    tickfont: { color: fontColor }
+  };
+
   const layout = {
     autosize: true,
-    margin: { l: 0, r: 0, b: 0, t: 0 }, // ZERO MARGINI: previene tagli inferiori
+    margin: { l: 0, r: 0, b: 0, t: 0 }, // ZERO MARGINI
+    font: { color: fontColor },
     scene: {
-      xaxis: { title: '', backgroundcolor: '#f8fafc', gridcolor: '#e2e8f0', showbackground: true, zeroline: false },
-      yaxis: { title: '', backgroundcolor: '#f8fafc', gridcolor: '#e2e8f0', showbackground: true, zeroline: false },
-      zaxis: { title: '', backgroundcolor: '#f8fafc', gridcolor: '#e2e8f0', showbackground: true, zeroline: false },
+      xaxis: axisStyle,
+      yaxis: axisStyle,
+      zaxis: axisStyle,
       camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
     },
-    legend: { x: 0, y: 1, orientation: 'v', bgcolor: 'rgba(255,255,255,0.8)' },
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)'
+    legend: { x: 0, y: 1, orientation: 'v', bgcolor: legendBg, font: { color: fontColor } },
+    paper_bgcolor: 'rgba(0,0,0,0)', // Trasparente fuori
+    plot_bgcolor: 'rgba(0,0,0,0)'   // Trasparente dentro
   };
 
   return (
@@ -80,7 +97,7 @@ export default function UmapPlot({ data, selectedModel }) {
         layout={layout}
         useResizeHandler={true}
         className="w-full h-full"
-        config={{ displayModeBar: false }} // FIX: Rimuove la toolbar brutta in alto a destra
+        config={{ displayModeBar: false }}
       />
     </div>
   );
