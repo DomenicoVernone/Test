@@ -17,6 +17,7 @@ export default function Dashboard() {
   const { token } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState('3d');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [refreshHistoryTrigger, setRefreshHistoryTrigger] = useState(0);
 
   // --- STATI DATI ---
   const [file, setFile] = useState(null);
@@ -75,6 +76,7 @@ export default function Dashboard() {
 
       if (response.ok) {
         setUploadStatus('success');
+        setRefreshHistoryTrigger(prev => prev + 1);
         // Dopo l'upload, apriamo lo storico per monitorare il progresso
         setActiveSidebarTab('history');
         setIsSidebarOpen(true);
@@ -202,6 +204,7 @@ export default function Dashboard() {
           handleHistoryTaskClick={handleHistoryTaskClick}
           theme={theme}
           prediction={prediction}
+          refreshHistoryTrigger={refreshHistoryTrigger} 
         />
       </main>
     </div>

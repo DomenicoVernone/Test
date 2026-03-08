@@ -136,7 +136,7 @@ async def get_task_status(
         if os.path.exists(result_path):
             with open(result_path, "r") as f:
                 saved_result = json.load(f)
-            return saved_result # Restituisce i dati completi con plot_data!
+            return saved_result
         else:
             return {"status": "COMPLETED", "message": "L'analisi è terminata (dati grafici non più disponibili)."}
         

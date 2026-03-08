@@ -11,7 +11,8 @@ export default function RightSidebar({
   handleAnalysisFinished, 
   handleHistoryTaskClick,
   theme, 
-  prediction
+  prediction,
+  refreshHistoryTrigger 
 }) {
   return (
     <div className={`relative h-full transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-1/3' : 'w-0'}`}>
@@ -60,7 +61,7 @@ export default function RightSidebar({
             {activeSidebarTab === 'chat' ? (
               <ChatLLM isAnalyzing={isAnalyzing} experiment="N/A" theme={theme} prediction={prediction} />
             ) : (
-              <TaskHistory onTaskCompleted={handleAnalysisFinished} onTaskClick={handleHistoryTaskClick} theme={theme} /> 
+              <TaskHistory onTaskCompleted={handleAnalysisFinished} onTaskClick={handleHistoryTaskClick} theme={theme} refreshHistoryTrigger={refreshHistoryTrigger} /> 
             )}
           </div>
         </div>

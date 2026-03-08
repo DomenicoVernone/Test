@@ -6,6 +6,8 @@ import mlflow.artifacts
 from fastapi import HTTPException
 import logging
 import os
+import shutil
+import glob
 
 logger = logging.getLogger(__name__)
 
@@ -39,24 +41,38 @@ class InferenceOrchestrator:
             model_uri = self.get_champion_uri(model_name)
             logger.info(f"Task {task_id}: Trovato modello champion con URI -> {model_uri}")
 
-            # 2. DOWNLOAD CON PYTHON NEL VOLUME CONDIVISO
-            # Python ha le chiavi DagsHub, quindi scarica l'artefatto per conto di R
+            # 2. CACHING E PULIZIA (La Best Practice)
             download_path = f"/shared_data/models/{model_name}"
+            
+            # Se la cartella esiste, la SVUOTIAMO per evitare conflitti con vecchi modelli "fantasma"
+            if os.path.exists(download_path):
+                logger.info(f"Pulizia vecchia cache del modello in {download_path}...")
+                shutil.rmtree(download_path)
+            
             os.makedirs(download_path, exist_ok=True)
             
+            # 3. Download "Fresco" del modello Champion
             logger.info("Scaricamento artefatti da MLflow in corso...")
             local_model_dir = mlflow.artifacts.download_artifacts(
                 artifact_uri=model_uri, 
                 dst_path=download_path
             )
-            logger.info(f"Modello scaricato fisicamente in: {local_model_dir}")
+            
+            # 4. Trova ESATTAMENTE il file .rds scaricato
+            rds_files = glob.glob(f"{local_model_dir}/**/*.rds", recursive=True)
+            
+            if not rds_files:
+                raise Exception("MLflow non ha restituito nessun file .rds! Controlla l'artefatto su DagsHub.")
+                
+            exact_rds_path = rds_files[0] # Prendiamo il primo (e speriamo unico) modello R
+            logger.info(f"File modello R esatto trovato in: {exact_rds_path}")
 
-            # 3. Chiamata asincrona al microservizio R (passando la cartella!)
+            # 5. Chiamata asincrona al microservizio R (passando il file ESATTO!)
             async with httpx.AsyncClient() as client:
                 payload = {
                     "task_id": task_id,
                     "model_name": model_name,
-                    "model_dir": local_model_dir # R ora deve solo leggere da questo percorso locale
+                    "model_dir": exact_rds_path # ORA PASSIAMO IL FILE SPECIFICO!
                 }
                 
                 response = await client.post(self.r_engine_url, json=payload, timeout=60.0)

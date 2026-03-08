@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../contexts/AuthContext';
 
-export default function TaskHistory({ onTaskCompleted, onTaskClick, theme }) {
+export default function TaskHistory({ onTaskCompleted, onTaskClick, theme, refreshHistoryTrigger }) {
     const { token } = useContext(AuthContext);
     const [tasks, setTasks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -66,7 +66,11 @@ export default function TaskHistory({ onTaskCompleted, onTaskClick, theme }) {
     }, [tasks, token, onTaskCompleted]);
 
     useEffect(() => { fetchTasks(); }, []);
-
+    useEffect(() => {
+        if (refreshHistoryTrigger > 0) {
+            fetchTasks();
+        }
+    }, [refreshHistoryTrigger]);
     const handleCardClick = async (task) => {
         if (task.status !== 'COMPLETED') return; 
         
