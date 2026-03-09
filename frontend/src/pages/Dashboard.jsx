@@ -16,7 +16,8 @@ import api from '../services/api'; // <-- Importiamo la nostra istanza Axios cen
 export default function Dashboard() {
   
   // --- STATI DATI ---
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState(null); // Tiene il PRIMO file per l'anteprima 3D
+  const [files, setFiles] = useState([]); // NUOVO: Array di tutti i file selezionati per il batch
   const [niftiUrl, setNiftiUrl] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('idle');
 
@@ -40,9 +41,13 @@ export default function Dashboard() {
 
   // --- HANDLERS ---
   const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    if (selectedFile) {
-      setFile(selectedFile);
+    // Trasforma i file selezionati in un vero Array JavaScript
+    const selectedFiles = Array.from(event.target.files);
+    
+    if (selectedFiles.length > 0) {
+      setFiles(selectedFiles); // Salva l'intero batch
+      setFile(selectedFiles[0]); // L'anteprima mostrerà solo il primo file del batch
+      
       setNiftiUrl(null);
       setUploadStatus('idle');
       setUmapData(null);
@@ -52,37 +57,47 @@ export default function Dashboard() {
   };
 
   const handleConfirmClick = () => {
-    if (!file) return;
+    // Il controllo ora si fa sull'array dei file
+    if (files.length === 0) return;
     setIsModalOpen(true);
   };
 
   /**
-   * Avvia l'upload del file NIfTI verso il backend asincrono.
-   * Utilizza l'istanza Axios centralizzata (api.js).
+   * Avvia l'upload del/dei file NIfTI verso il backend asincrono.
+   * Invia i file in parallelo sfruttando Promise.all e l'architettura non bloccante di FastAPI.
    */
   const executeUploadAndAnalyze = async () => {
     setIsModalOpen(false);
     setUploadStatus('uploading');
     setIsAnalyzing(true);
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('model_name', selectedModel);
-
     try {
-      // Usiamo api.post anziché fetch. Non serve passare l'URL completo o il Bearer Token!
-      const response = await api.post('/analyze/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data' // Axios sovrascrive correttamente il content-type per i file
-        }
+      // Creiamo un array di richieste HTTP parallele, una per ogni file
+      const uploadPromises = files.map(currentFile => {
+        const formData = new FormData();
+        formData.append('file', currentFile);
+        formData.append('model_name', selectedModel);
+        
+        return api.post('/analyze/', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
       });
 
-      if (response.status === 200) {
-        setUploadStatus('success');
-        setRefreshHistoryTrigger(prev => prev + 1);
-        setActiveSidebarTab('history');
-        setIsSidebarOpen(true);
-      }
+      // Eseguiamo tutte le chiamate POST simultaneamente
+      await Promise.all(uploadPromises);
+
+      // Se tutte le elaborazioni sono state prese in carico:
+      setUploadStatus('success');
+      setRefreshHistoryTrigger(prev => prev + 1);
+      setActiveSidebarTab('history');
+      setIsSidebarOpen(true);
+      
+      // Svuota l'array per preparare la UI al prossimo caricamento multiplo, 
+      // ma mantiene l'anteprima del primo file nel viewer
+      setFiles([]); 
+      
     } catch (error) {
       console.error("🚨 Errore durante l'upload e analisi:", error);
       setUploadStatus('error');
@@ -144,7 +159,10 @@ export default function Dashboard() {
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-112.5 flex flex-col gap-6 animate-in fade-in zoom-in duration-200 text-slate-900">
             <div>
               <h3 className="text-2xl font-bold text-slate-800">Sospetto Clinico</h3>
-              <p className="text-sm text-slate-500 mt-1">Seleziona il modello diagnostico da applicare:</p>
+              {/* Resoconto dinamico di quanti file si stanno per analizzare */}
+              <p className="text-sm text-clinical-primary font-semibold mt-1">
+                Stai avviando l'analisi per {files.length} {files.length === 1 ? 'paziente' : 'pazienti'}.
+              </p>
             </div>
             <div className="flex flex-col gap-3">
               {['HC_vs_bvFTD', 'HC_vs_svPPA', 'HC_vs_nfvPPA'].map(m => (
@@ -166,6 +184,7 @@ export default function Dashboard() {
         <section className="flex-1 flex flex-col p-6 gap-6 overflow-y-auto transition-all duration-300">
           <UploadZone 
              file={file} 
+             filesCount={files.length} // Passato il conteggio all'UploadZone
              uploadStatus={uploadStatus} 
              onFileChange={handleFileChange} 
              onUpload={handleConfirmClick}

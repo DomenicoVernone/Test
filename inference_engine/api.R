@@ -34,16 +34,16 @@ function(res, task_id, model_name, model_dir) {
         model_dir = model_dir,
         csv_file = csv_file
       )
-      
+       # nolint: trailing_whitespace_linter.
       # 2. Salvataggio nel Volume
       results_dir <- file.path(volume_dir, "results")
       if (!dir.exists(results_dir)) {
         dir.create(results_dir, recursive = TRUE)
       }
-      
-      # FIX: Ora il nome combacia esattamente con quello che Python (analyze.py) cerca!
+       # nolint: trailing_whitespace_linter, trailing_whitespace_linter, indentation_linter.
+      # FIX: Ora il nome combacia esattamente con quello che Python (analyze.py) cerca! # nolint: line_length_linter.
       out_file <- file.path(results_dir, paste0("result_", task_id, ".json"))
-      
+       # nolint: trailing_whitespace_linter, indentation_linter.
       jsonlite::write_json(risultato, out_file, auto_unbox = TRUE)
       print(paste("✅ Dati UMAP salvati in:", out_file))
       

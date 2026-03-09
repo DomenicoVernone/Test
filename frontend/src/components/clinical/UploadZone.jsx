@@ -1,18 +1,20 @@
+// File: frontend/src/components/clinical/UploadZone.jsx
 /**
  * Componente per il caricamento dei file (NIfTI/DICOM).
  * Gestisce visivamente gli stati di idle, caricamento in corso, successo o errore.
  *
  * @param {Object} props
- * @param {File|null} props.file - Il file correntemente selezionato.
+ * @param {File|null} props.file - Il file correntemente selezionato (anteprima).
+ * @param {number} props.filesCount - Numero totale di file selezionati per il batch.
  * @param {string} props.uploadStatus - Stato del caricamento ('idle', 'uploading', 'success', 'error').
  * @param {Function} props.onFileChange - Handler scatenato alla selezione di un file.
- * @param {Function} props.onUpload - Handler per inviare il file al backend.
+ * @param {Function} props.onUpload - Handler per inviare il/i file al backend.
  * @param {string} props.theme - Tema grafico attuale ('light' o 'dark').
  */
 import React, { useRef } from 'react';
-import { FileUp, CheckCircle2, AlertCircle } from 'lucide-react';
+import { FileUp, Files, CheckCircle2, AlertCircle } from 'lucide-react'; // Aggiunta icona 'Files' per il batch
 
-const UploadZone = ({ file, uploadStatus, onFileChange, onUpload, theme }) => {
+const UploadZone = ({ file, filesCount = 0, uploadStatus, onFileChange, onUpload, theme }) => {
   const fileInputRef = useRef(null);
   const isDark = theme === 'dark';
 
@@ -29,6 +31,8 @@ const UploadZone = ({ file, uploadStatus, onFileChange, onUpload, theme }) => {
       : 'border-clinical-border hover:border-clinical-primary hover:bg-blue-50/50';
   };
 
+  const hasFiles = filesCount > 0 || file;
+
   return (
     <div 
       onClick={() => fileInputRef.current?.click()}
@@ -41,6 +45,7 @@ const UploadZone = ({ file, uploadStatus, onFileChange, onUpload, theme }) => {
         className="hidden" 
         accept=".nii,.nii.gz,.dcm" 
         aria-label="Carica file NIfTI"
+        multiple // <-- LA MAGIA DEL BATCH UPLOAD
       />
       
       {/* Icona Dinamica */}
@@ -50,22 +55,31 @@ const UploadZone = ({ file, uploadStatus, onFileChange, onUpload, theme }) => {
         <AlertCircle className={`w-12 h-12 ${isDark ? 'text-red-400' : 'text-clinical-danger'}`} /> 
       ) : (
         <div className={`p-4 rounded-full transition-colors duration-300 ${isDark ? 'bg-slate-800 group-hover:bg-slate-700' : 'bg-clinical-bg group-hover:bg-blue-100'}`}>
-          <FileUp className={`w-8 h-8 ${file ? 'text-clinical-primary' : (isDark ? 'text-slate-500 group-hover:text-blue-400' : 'text-slate-300 group-hover:text-clinical-primary')}`} />
+          {/* Se ci sono più file, mostriamo l'icona multipla */}
+          {filesCount > 1 ? (
+            <Files className="w-8 h-8 text-clinical-primary" />
+          ) : (
+            <FileUp className={`w-8 h-8 ${hasFiles ? 'text-clinical-primary' : (isDark ? 'text-slate-500 group-hover:text-blue-400' : 'text-slate-300 group-hover:text-clinical-primary')}`} />
+          )}
         </div>
       )}
 
-      {/* Testo Descrittivo */}
+      {/* Testo Descrittivo Dinamico */}
       <div className="text-center">
         <p className={`text-lg font-bold transition-colors duration-300 ${isDark ? 'text-white' : 'text-slate-800'}`}>
-          {file ? file.name : "Carica Esame MRI"}
+          {filesCount > 1 
+            ? `${filesCount} Esami Selezionati` 
+            : file ? file.name : "Carica Esame MRI"}
         </p>
         <p className={`text-sm font-medium transition-colors duration-300 ${isDark ? 'text-slate-400' : 'text-clinical-secondary'}`}>
-          {file ? `${(file.size / (1024*1024)).toFixed(2)} MB` : "Seleziona file NIfTI (.nii) o DICOM"}
+          {filesCount > 1 
+            ? "Pronto per l'analisi multipla in background" 
+            : file ? `${(file.size / (1024*1024)).toFixed(2)} MB` : "Seleziona uno o più file NIfTI (.nii) o DICOM"}
         </p>
       </div>
 
       {/* Bottone di Conferma */}
-      {file && uploadStatus !== 'success' && (
+      {hasFiles && uploadStatus !== 'success' && (
         <button 
           onClick={(e) => { e.stopPropagation(); onUpload(); }}
           disabled={uploadStatus === 'uploading'}
@@ -73,7 +87,9 @@ const UploadZone = ({ file, uploadStatus, onFileChange, onUpload, theme }) => {
             uploadStatus === 'uploading' ? 'bg-blue-400 cursor-not-allowed' : 'bg-clinical-primary hover:bg-blue-600'
           }`}
         >
-          {uploadStatus === 'uploading' ? "Trasferimento..." : "Conferma Invio"}
+          {uploadStatus === 'uploading' 
+            ? "Trasferimento in corso..." 
+            : filesCount > 1 ? "Conferma Analisi Batch" : "Conferma Invio"}
         </button>
       )}
     </div>
