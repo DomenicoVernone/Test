@@ -17,7 +17,7 @@ mlflow.set_tracking_uri(tracking_uri)
 client = MlflowClient()
 
 # --- 2. I DATI DELLA RUN CHE ABBIAMO SCELTO ---
-run_id = "3bd66d4008bd4699a0c3d92fc2969f0e" 
+run_id = "c6dd2232b1444cc4b3308766d7bd28a2" 
 model_name = "HC_vs_nfvPPA"
 artifact_path = "model" 
 

@@ -70,8 +70,10 @@ async def run_mock_nextflow(task_id: str, filename: str, volume_dir: str, model_
         mock_patient_data = [round(random.uniform(0.1, 10.0), 4) for _ in exact_features]
 
         # Creiamo il CSV
+        features_dir = os.path.join(volume_dir, "features")
+        os.makedirs(features_dir, exist_ok=True) # Sicurezza extra
         output_filename = f"features_{task_id}.csv"
-        output_path = os.path.join(volume_dir, output_filename)
+        output_path = os.path.join(features_dir, output_filename)
         
         with open(output_path, mode='w', newline='') as file:
             writer = csv.writer(file)

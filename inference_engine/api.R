@@ -21,7 +21,7 @@ function(req) {
 #* @param model_dir La cartella nel volume (che ora contiene il percorso ESATTO del file .rds)
 #* @post /infer
 function(res, task_id, model_name, model_dir) {
-  csv_file <- file.path(VOLUME_DIR, paste0("features_", task_id, ".csv"))
+  csv_file <- file.path(VOLUME_DIR, "features", paste0("features_", task_id, ".csv"))
 
   tryCatch(
     {
@@ -79,7 +79,7 @@ function(res, task_id, model_name, model_dir) {
       colnames(dati_nuovo_paz) <- feature_necessarie
 
       colonne_in_comune <- intersect(feature_necessarie, colnames(dati_paziente))
-      
+
       for (col in colonne_in_comune) {
         dati_nuovo_paz[1, col] <- as.numeric(dati_paziente[1, col])
       }
@@ -111,39 +111,44 @@ function(res, task_id, model_name, model_dir) {
       )
       print(paste("🎯 Diagnosi calcolata:", predizione))
 
-      # --- 5. UMAP 3D (Solo se abbiamo lo storico) ---
-      print("🌀 Calcolo UMAP 3D...")
+      # --- 5. UMAP 3D (Spazio Congelato / Proiezione Clinica) ---
+      print("🌀 Calcolo UMAP 3D (Fase di Fit e Transform)...")
       plot_data_list <- NULL
 
       if (!is.null(storico_X) && nrow(storico_X) > 5) {
-        dataset_combinato <- rbind(storico_X, dati_nuovo_paz)
         set.seed(42)
 
-        # Adattiamo i vicini in modo dinamico per evitare crash se ci sono pochi dati
-        n_neigh <- min(15, nrow(dataset_combinato) - 1)
-        umap_res <- uwot::umap(dataset_combinato, n_components = 3, n_neighbors = n_neigh, min_dist = 0.1, n_threads = 1)
+        # Il vicinato si calcola SOLO sui pazienti storici
+        n_neigh <- min(15, nrow(storico_X) - 1)
+
+        # 1. FIT (Congelamento): Creiamo lo spazio topologico SOLO sullo storico
+        # ret_model = TRUE ci salva la "mappa" per usarla dopo
+        umap_mappa <- uwot::umap(storico_X, n_components = 3, n_neighbors = n_neigh, min_dist = 0.1, n_threads = 1, ret_model = TRUE)
 
         n_storico <- nrow(storico_X)
         storico_coords <- data.frame(
-          x = umap_res[1:n_storico, 1], y = umap_res[1:n_storico, 2], z = umap_res[1:n_storico, 3],
+          x = umap_mappa$embedding[, 1],
+          y = umap_mappa$embedding[, 2],
+          z = umap_mappa$embedding[, 3],
           label = as.character(storico_y)
         )
 
-        # --- SMART MOCKING METADATI CLINICI ---
-        storico_coords$subject_id <- paste0("sub-", sprintf("%03d", 1:n_storico))
-        storico_coords$sex <- sample(c("M", "F"), n_storico, replace = TRUE)
-        is_hc <- grepl("sano|hc|control", tolower(storico_coords$label))
+        # Manteniamo gli ID originali per pulizia
+        id_reali <- rownames(storico_X)
+        if (is.null(id_reali) || all(id_reali == as.character(1:n_storico))) {
+          storico_coords$subject_id <- paste0("Paziente_Storico_", 1:n_storico)
+        } else {
+          storico_coords$subject_id <- id_reali
+        }
 
-        storico_coords$age <- 0
-        if (any(is_hc)) storico_coords$age[is_hc] <- round(rnorm(sum(is_hc), mean = 72, sd = 4))
-        if (any(!is_hc)) storico_coords$age[!is_hc] <- round(rnorm(sum(!is_hc), mean = 64, sd = 6))
-
-        storico_coords$mmse <- 0
-        if (any(is_hc)) storico_coords$mmse[is_hc] <- sample(28:30, sum(is_hc), replace = TRUE)
-        if (any(!is_hc)) storico_coords$mmse[!is_hc] <- sample(14:24, sum(!is_hc), replace = TRUE)
+        # 2. TRANSFORM (Proiezione): "Caliamo" il nuovo paziente nello spazio congelato
+        # Le coordinate dello storico resteranno matematicamente intatte e immobili
+        nuovo_paziente_embedding <- uwot::umap_transform(dati_nuovo_paz, umap_mappa, n_threads = 1)
 
         nuovo_paziente_coords <- list(
-          x = umap_res[n_storico + 1, 1], y = umap_res[n_storico + 1, 2], z = umap_res[n_storico + 1, 3]
+          x = nuovo_paziente_embedding[1, 1],
+          y = nuovo_paziente_embedding[1, 2],
+          z = nuovo_paziente_embedding[1, 3]
         )
 
         plot_data_list <- list(storico = storico_coords, nuovo_paziente = nuovo_paziente_coords)
@@ -151,7 +156,7 @@ function(res, task_id, model_name, model_dir) {
         print("⚠️ Storico insufficiente o mancante. Salto UMAP.")
       }
 
-      # --- 6. COMPOSIZIONE JSON FINALE ---
+      # --- 6. COMPOSIZIONE JSON FINALE (Solo Dati Reali) ---
       return(list(
         status = "success",
         task_id = task_id,

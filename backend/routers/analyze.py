@@ -22,6 +22,13 @@ router = APIRouter(prefix="/analyze", tags=["Orchestrator"])
 
 # Puntiamo al Named Volume di Docker
 UPLOAD_DIR = "/shared_data"
+NIFTI_DIR = os.path.join(UPLOAD_DIR, "nifti")
+RESULTS_DIR = os.path.join(UPLOAD_DIR, "results")
+FEATURES_DIR = os.path.join(UPLOAD_DIR, "features")
+# Creiamo le cartelle se non esistono
+os.makedirs(NIFTI_DIR, exist_ok=True)
+os.makedirs(RESULTS_DIR, exist_ok=True)
+os.makedirs(FEATURES_DIR, exist_ok=True)
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -39,7 +46,7 @@ async def upload_nifti_file(
 
     # 2. NOME UNICO (Anti-collisione)
     unique_filename = f"{uuid.uuid4()}_{file.filename}"
-    file_path = os.path.join(UPLOAD_DIR, unique_filename)
+    file_path = os.path.join(NIFTI_DIR, unique_filename)
 
     # 3. SALVATAGGIO NEL VOLUME CONDIVISO DOCKER
     try:
@@ -114,7 +121,7 @@ async def get_task_status(
             inference_result["status"] = "COMPLETED"
             
             # --- NOVITÀ: SALVATAGGIO DEL RISULTATO NEL VOLUME ---
-            result_path = os.path.join(UPLOAD_DIR, f"result_{task_id}.json")
+            result_path = os.path.join(RESULTS_DIR, f"result_{task_id}.json")
             with open(result_path, "w") as f:
                 json.dump(inference_result, f)
             # ----------------------------------------------------
@@ -129,10 +136,18 @@ async def get_task_status(
             task.status = "ERROR"
             db.commit()
             return {"status": "ERROR", "message": f"Errore Inference Engine: {str(e)}"}
+        finally:
+            # --- 🧹 GARBAGE COLLECTION ---
+            # Questo blocco scatta SEMPRE, sia che l'inferenza vada bene, sia che fallisca.
+            # Cancelliamo il CSV estratto per la privacy, ma manteniamo il NIfTI per il Viewer 3D.
+            csv_path = os.path.join(FEATURES_DIR, f"features_{task_id}.csv")
+            if os.path.exists(csv_path):
+                os.remove(csv_path)
+            # -----------------------------
 
     # --- NOVITÀ: RECUPERO DATI SE IL TASK È GIÀ FINITO ---
     if task.status == "COMPLETED":
-        result_path = os.path.join(UPLOAD_DIR, f"result_{task_id}.json")
+        result_path = os.path.join(RESULTS_DIR, f"result_{task_id}.json")
         if os.path.exists(result_path):
             with open(result_path, "r") as f:
                 saved_result = json.load(f)
@@ -156,7 +171,7 @@ async def get_nifti_file(
     if not task:
         raise HTTPException(status_code=404, detail="Task non trovato")
 
-    file_path = os.path.join(UPLOAD_DIR, task.filename)
+    file_path = os.path.join(NIFTI_DIR, task.filename)
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File NIfTI non trovato sul disco")
 
