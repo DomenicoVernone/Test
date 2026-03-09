@@ -1,26 +1,36 @@
+/**
+ * Modale delle Impostazioni.
+ * Gestisce la modifica del Tema (Chiaro/Scuro) e della Mappa Colori 3D.
+ * Sfrutta il "Render-Phase State Update" raccomandato da React per evitare 
+ * re-render a cascata durante l'apertura della modale.
+ */
 import React, { useState } from 'react';
 import { X, Palette, Moon } from 'lucide-react';
 
 export default function SettingsModal({ isOpen, onClose, colorMap, setColorMap, theme, setTheme }) {
-  // 1. STATI LOCALI e tracciamento dell'apertura
+  
+  // Stati Locali per la Modale (Modifiche temporanee)
   const [localColorMap, setLocalColorMap] = useState(colorMap);
   const [localTheme, setLocalTheme] = useState(theme);
+  
+  // Tracking della prop precedente per rilevare il momento dell'apertura
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
 
-  // 2. SINCRONIZZAZIONE "RENDER-PHASE" (Addio useEffect!)
-  // React controlla questo blocco durante il render. Se la modale si sta aprendo,
-  // allinea i dati locali prima ancora di disegnare lo schermo. Zero sprechi di performance!
+  // --- CLEAN ARCHITECTURE: Render-Phase State Update ---
+  // Invece di usare un useEffect che causa un render ritardato, aggiorniamo 
+  // lo stato durante il flusso di render. React lo gestisce in modo ottimizzato.
   if (isOpen !== prevIsOpen) {
-    setPrevIsOpen(isOpen);
+    setPrevIsOpen(isOpen); // Allineiamo il tracker
     if (isOpen) {
+      // La modale si sta aprendo ORA: resettiamo gli stati temporanei ai valori globali correnti
       setLocalColorMap(colorMap);
       setLocalTheme(theme);
     }
   }
 
+  // Se la modale è chiusa, interrompiamo il rendering qui
   if (!isOpen) return null;
 
-  // 3. IL VERO SALVATAGGIO
   const handleSave = () => {
     setColorMap(localColorMap);
     setTheme(localTheme);
@@ -29,7 +39,6 @@ export default function SettingsModal({ isOpen, onClose, colorMap, setColorMap, 
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4">
-      {/* Usiamo localTheme per mostrare l'anteprima del tema SOLO dentro la modale */}
       <div className={`p-8 rounded-2xl shadow-2xl max-w-md w-full flex flex-col gap-6 animate-in fade-in zoom-in duration-200 transition-colors ${localTheme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white'}`}>
         
         {/* Intestazione */}
@@ -38,8 +47,11 @@ export default function SettingsModal({ isOpen, onClose, colorMap, setColorMap, 
             <h3 className={`text-2xl font-bold ${localTheme === 'dark' ? 'text-white' : 'text-slate-800'}`}>Impostazioni</h3>
             <p className={`text-sm mt-1 ${localTheme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Personalizza l'ambiente clinico</p>
           </div>
-          {/* Se clicchi la X, chiama solo onClose, buttando via le modifiche temporanee */}
-          <button onClick={onClose} className={`p-2 rounded-full transition-colors ${localTheme === 'dark' ? 'text-slate-400 hover:bg-slate-700 hover:text-white' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}>
+          <button 
+            onClick={onClose} 
+            aria-label="Chiudi Impostazioni"
+            className={`p-2 rounded-full transition-colors ${localTheme === 'dark' ? 'text-slate-400 hover:bg-slate-700 hover:text-white' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -92,9 +104,12 @@ export default function SettingsModal({ isOpen, onClose, colorMap, setColorMap, 
 
         </div>
 
-        {/* Footer: Questo è l'unico bottone che fa il vero salvataggio! */}
+        {/* Footer Salvataggio */}
         <div className={`flex justify-end mt-2 pt-4 border-t ${localTheme === 'dark' ? 'border-slate-700' : 'border-slate-100'}`}>
-          <button onClick={handleSave} className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-500 shadow-md active:scale-95 transition-all">
+          <button 
+            onClick={handleSave} 
+            className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-500 shadow-md active:scale-95 transition-all"
+          >
             Salva e Chiudi
           </button>
         </div>

@@ -1,104 +1,43 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../../contexts/AuthContext';
+/**
+ * Componente per la visualizzazione dello Storico Task.
+ * Sfrutta l'hook 'useTaskPolling' per separare la logica di rete dal rendering visivo.
+ */
+import React from 'react';
+import api from '../../services/api'; 
+import { useTaskPolling } from '../../hooks/useTaskPolling'; // <-- Importiamo la logica estratta
 
 export default function TaskHistory({ onTaskCompleted, onTaskClick, theme, refreshHistoryTrigger }) {
-    const { token } = useContext(AuthContext);
-    const [tasks, setTasks] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    
+    // Deleghiamo tutta la complessità del polling al custom hook!
+    const { tasks, isLoading, fetchTasks } = useTaskPolling(refreshHistoryTrigger, onTaskCompleted);
 
-    const fetchTasks = async () => {
-        setIsLoading(true);
-        try {
-            const response = await fetch('http://localhost:8000/analyze/', {
-                method: 'GET',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setTasks(data);
-            }
-        } catch (error) {
-            console.error("Errore nel recupero dello storico:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        let intervalId;
-        const activeTasks = tasks.filter(t => ['PENDING', 'PROCESSING', 'NEXTFLOW_COMPLETED'].includes(t.status));
-
-        if (activeTasks.length > 0) {
-            intervalId = setInterval(async () => {
-                const updatedTasks = [...tasks];
-                let hasChanges = false;
-
-                for (let task of activeTasks) {
-                    try {
-                        const res = await fetch(`http://localhost:8000/analyze/status/${task.id}`, {
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        });
-                        
-                        if (res.ok) {
-                            const data = await res.json();
-                            if (data.status !== task.status) {
-                                const index = updatedTasks.findIndex(t => t.id === task.id);
-                                if (index !== -1) {
-                                    updatedTasks[index] = { ...updatedTasks[index], status: data.status };
-                                    hasChanges = true;
-                                    if (data.status === 'COMPLETED' && onTaskCompleted) {
-                                        onTaskCompleted(data, updatedTasks[index]); 
-                                    }
-                                }
-                            }
-                        }
-                    } catch (err) {
-                        console.error(`Errore nel polling del task ${task.id}:`, err);
-                    }
-                }
-
-                if (hasChanges) setTasks(updatedTasks);
-            }, 3000);
-        }
-
-        return () => { if (intervalId) clearInterval(intervalId); };
-    }, [tasks, token, onTaskCompleted]);
-
-    useEffect(() => { fetchTasks(); }, []);
-    useEffect(() => {
-        if (refreshHistoryTrigger > 0) {
-            fetchTasks();
-        }
-    }, [refreshHistoryTrigger]);
+    // --- HANDLER CLICK SU TASK COMPLETATO ---
     const handleCardClick = async (task) => {
         if (task.status !== 'COMPLETED') return; 
         
         try {
-            const res = await fetch(`http://localhost:8000/analyze/status/${task.id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const res = await api.get(`/analyze/status/${task.id}`);
+            const data = res.data;
             
-            if (res.ok) {
-                const data = await res.json();
-                if (onTaskClick) {
-                    onTaskClick({
-                        umapData: data.plot_data,
-                        prediction: data.diagnosi_predetta,
-                        niftiUrl: `http://localhost:8000/analyze/nifti/${task.id}/volume.nii.gz`,
-                        modelName: task.model_name 
-                    });
-                }
+            if (onTaskClick) {
+                const baseURL = api.defaults.baseURL || 'http://localhost:8000';
+                
+                onTaskClick({
+                    umapData: data.plot_data,
+                    prediction: data.diagnosi_predetta,
+                    niftiUrl: `${baseURL}/analyze/nifti/${task.id}/volume.nii.gz`,
+                    modelName: task.model_name 
+                });
             }
         } catch (err) {
-            console.error("Errore nel caricamento del task storico:", err);
+            console.error("🚨 Errore nel caricamento del task storico:", err);
         }
     };
 
-    // --- FUNZIONI HELPER PER I BADGE (Evitano errori di compilazione Vite) ---
+    // --- FUNZIONI HELPER PER I BADGE ---
     const getBadgeStyle = (status) => {
         const isDark = theme === 'dark';
-        if (['PENDING', 'PROCESSING', 'NEXTFLOW_COMPLETED'].includes(status)) {
+        if (['PENDING', 'PROCESSING', 'ANALYZING_R'].includes(status)) {
             return isDark ? 'bg-amber-900/40 text-amber-400 border-amber-800/50 animate-pulse' : 'bg-amber-100 text-amber-700 border-transparent animate-pulse';
         }
         if (status === 'COMPLETED') {
@@ -108,7 +47,7 @@ export default function TaskHistory({ onTaskCompleted, onTaskClick, theme, refre
     };
 
     const getBadgeText = (status) => {
-        if (['PENDING', 'PROCESSING', 'NEXTFLOW_COMPLETED'].includes(status)) return 'IN ELABORAZIONE';
+        if (['PENDING', 'PROCESSING', 'ANALYZING_R'].includes(status)) return 'IN ELABORAZIONE';
         if (status === 'COMPLETED') return 'COMPLETATO';
         return 'ERRORE';
     };

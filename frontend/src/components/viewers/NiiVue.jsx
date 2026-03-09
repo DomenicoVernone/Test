@@ -1,14 +1,23 @@
-import React, { useEffect, useRef, useContext } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+/**
+ * Componente Visualizzatore 3D (NIfTI).
+ * Sfrutta la libreria @niivue/niivue per il rendering volumetrico.
+ * Comunica con il backend asincrono tramite l'istanza Axios centralizzata.
+ */
+import React, { useEffect, useRef } from 'react';
 import { Niivue } from '@niivue/niivue';
-import { AuthContext } from '../../contexts/AuthContext'; 
+import api from '../../services/api';
 
 const NiiVueCanvas = ({ file, niftiUrl, colorMap = 'gray' }) => {
   const canvasRef = useRef(null);
   const nvRef = useRef(null);
-  const { token } = useContext(AuthContext); 
 
+  // --- 1. INIZIALIZZAZIONE ENGINE E CARICAMENTO VOLUME ---
   useEffect(() => {
-    // Inizializzazione singola
+    let isMounted = true;
+    let blobUrl = null;
+
+    // Inizializzazione singola dell'engine NiiVue
     if (!nvRef.current && canvasRef.current) {
       nvRef.current = new Niivue({
         backColor: [0, 0, 0, 1],
@@ -20,51 +29,57 @@ const NiiVueCanvas = ({ file, niftiUrl, colorMap = 'gray' }) => {
     const loadVolume = async () => {
       if (!nvRef.current) return;
 
+      // Pulisce i volumi precedenti in modo pulito
       if (nvRef.current.volumes.length > 0) {
         nvRef.current.removeVolume(nvRef.current.volumes[0]);
       }
 
-      let blobUrl = null;
-
       try {
         if (file) {
+          // Caso 1: File locale
           blobUrl = URL.createObjectURL(file);
           await nvRef.current.loadVolumes([{
             url: blobUrl,
             name: file.name,
-            colormap: colorMap // Imposta il colore al caricamento
+            colormap: colorMap 
           }]);
         } 
         else if (niftiUrl) {
-          const response = await fetch(niftiUrl, {
-            headers: { 'Authorization': `Bearer ${token}` }
+          // Caso 2: Download dal backend
+          const response = await api.get(niftiUrl, { 
+            responseType: 'blob' 
           });
-
-          if (!response.ok) throw new Error("Accesso negato o file non trovato");
-
-          const blob = await response.blob();
-          blobUrl = URL.createObjectURL(blob);
           
+          if (!isMounted) return; // Se il componente è stato chiuso durante il download, fermati.
+
+          blobUrl = URL.createObjectURL(response.data);
           await nvRef.current.loadVolumes([{
             url: blobUrl,
             name: "paziente_storico.nii.gz",
-            colormap: colorMap // Imposta il colore al caricamento
+            colormap: colorMap 
           }]);
         }
       } catch (error) {
-        console.error("Errore irreversibile nel caricamento NIfTI:", error);
-      } finally {
-        if (blobUrl) {
-          URL.revokeObjectURL(blobUrl);
-        }
-      }
+        console.error("🚨 Errore irreversibile nel caricamento NIfTI:", error);
+      } 
     };
 
     loadVolume();
 
-  }, [file, niftiUrl, colorMap, token]); // NB: colorMap NON è qui per evitare doppi caricamenti
+    // Cleanup sicuro
+    return () => {
+      isMounted = false;
+      if (blobUrl) {
+        // Il setTimeout salva la vita in React Strict Mode, dando il tempo a NiiVue 
+        // di finire il parsing interno prima che il browser distrugga il link.
+        setTimeout(() => {
+          URL.revokeObjectURL(blobUrl);
+        }, 1000);
+      }
+    };
+  }, [file, niftiUrl]); // RIMOSSO colorMap! Il caricamento avviene solo se cambia il file.
 
-  // EFFETTO SEPARATO: Cambia solo il colore in tempo reale senza ricaricare il file
+  // --- 2. AGGIORNAMENTO COLORE REAL-TIME ---
   useEffect(() => {
     if (nvRef.current && nvRef.current.volumes.length > 0) {
       nvRef.current.volumes[0].colormap = colorMap;

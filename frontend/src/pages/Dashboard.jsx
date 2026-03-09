@@ -1,50 +1,49 @@
-/*
-  L'area di lavoro privata del medico.
-  Versione ottimizzata: rimosse variabili inutilizzate, logica di stato ridondante e aggiunto SettingsModal.
-*/
-import React, { useState, useContext } from 'react';
+// File: frontend/src/pages/Dashboard.jsx
+/**
+ * L'area di lavoro privata del medico.
+ * Orchesta il caricamento del file NIfTI, la selezione del modello e 
+ * la visualizzazione 3D/UMAP.
+ */
+import React, { useState } from 'react';
 import SettingsModal from '../components/layout/SettingsModal';
 import Header from '../components/layout/Header';
 import UploadZone from '../components/clinical/UploadZone';
 import ClinicalViewer from '../components/viewers/Viewer';
-import ChatLLM from '../components/assistant/ChatLLM';
-import TaskHistory from '../components/clinical/TaskHistory';
 import RightSidebar from '../components/layout/RightSidebar';
 
-import { AuthContext } from '../contexts/AuthContext';
+import api from '../services/api'; // <-- Importiamo la nostra istanza Axios centralizzata
 
 export default function Dashboard() {
-  const { token } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState('3d');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [refreshHistoryTrigger, setRefreshHistoryTrigger] = useState(0);
-
+  
   // --- STATI DATI ---
   const [file, setFile] = useState(null);
   const [niftiUrl, setNiftiUrl] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('idle');
 
   // --- STATI UI ---
+  const [activeTab, setActiveTab] = useState('3d');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [refreshHistoryTrigger, setRefreshHistoryTrigger] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeSidebarTab, setActiveSidebarTab] = useState('chat');
 
   // --- STATI MODALI E SETTINGS ---
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false); // Nuovo stato modale impostazioni
-  const [colorMap, setColorMap] = useState('gray'); // Nuovo stato mappa colori
-  const [theme, setTheme] = useState('light'); // Nuovo stato tema
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [colorMap, setColorMap] = useState('gray'); 
+  const [theme, setTheme] = useState('light'); 
 
   // --- STATI MODELLO E INFERENZA ---
   const [selectedModel, setSelectedModel] = useState('HC_vs_bvFTD');
   const [umapData, setUmapData] = useState(null);
   const [prediction, setPrediction] = useState(null);
 
-  // GESTIONE NUOVO CARICAMENTO
+  // --- HANDLERS ---
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
       setFile(selectedFile);
-      setNiftiUrl(null); // Reset URL di rete
+      setNiftiUrl(null);
       setUploadStatus('idle');
       setUmapData(null);
       setPrediction(null);
@@ -57,7 +56,10 @@ export default function Dashboard() {
     setIsModalOpen(true);
   };
 
-  // ESECUZIONE ANALISI (Upload file locale)
+  /**
+   * Avvia l'upload del file NIfTI verso il backend asincrono.
+   * Utilizza l'istanza Axios centralizzata (api.js).
+   */
   const executeUploadAndAnalyze = async () => {
     setIsModalOpen(false);
     setUploadStatus('uploading');
@@ -68,30 +70,26 @@ export default function Dashboard() {
     formData.append('model_name', selectedModel);
 
     try {
-      const response = await fetch('http://localhost:8000/analyze/', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData
+      // Usiamo api.post anziché fetch. Non serve passare l'URL completo o il Bearer Token!
+      const response = await api.post('/analyze/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data' // Axios sovrascrive correttamente il content-type per i file
+        }
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         setUploadStatus('success');
         setRefreshHistoryTrigger(prev => prev + 1);
-        // Dopo l'upload, apriamo lo storico per monitorare il progresso
         setActiveSidebarTab('history');
         setIsSidebarOpen(true);
-      } else {
-        setUploadStatus('error');
-        setIsAnalyzing(false);
       }
     } catch (error) {
-      console.error("Errore durante l'upload:", error);
+      console.error("🚨 Errore durante l'upload e analisi:", error);
       setUploadStatus('error');
       setIsAnalyzing(false);
     }
   };
 
-  // CALLBACK: Quando un task in corso viene completato (Polling)
   const handleAnalysisFinished = (data, taskMeta) => {
     setUmapData(data.plot_data);
     const predizioneSicura = Array.isArray(data.diagnosi_predetta)
@@ -107,12 +105,8 @@ export default function Dashboard() {
     setActiveTab('umap');
   };
 
-  // CALLBACK: Quando il medico clicca un paziente dallo storico
   const handleHistoryTaskClick = (storicoData) => {
-    // 1. Puliamo il file locale per evitare conflitti nel Viewer
     setFile(null);
-
-    // 2. Carichiamo l'URL di rete e i dati salvati
     setNiftiUrl(storicoData.niftiUrl);
     setUmapData(storicoData.umapData);
 
@@ -125,19 +119,17 @@ export default function Dashboard() {
       setSelectedModel(storicoData.modelName);
     }
 
-    // 3. UI Adjustment
     setUploadStatus('success');
     setIsAnalyzing(false);
-    setActiveTab('umap'); // Portiamo subito alla visualizzazione dati
+    setActiveTab('umap'); 
   };
 
-
+  // --- RENDER ---
   return (
     <div className={`h-screen w-full flex flex-col font-sans overflow-hidden relative transition-colors duration-300 ${theme === 'dark' ? 'bg-slate-900 text-slate-100' : 'bg-clinical-bg text-slate-900'}`}>
 
-      {/* HEADER: Passiamo la funzione per aprire la modale Settings */}
       <Header onOpenSettings={() => setIsSettingsOpen(true)} theme={theme} />
-      {/* MODALE IMPOSTAZIONI */}
+      
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
@@ -147,7 +139,6 @@ export default function Dashboard() {
         setTheme={setTheme}
       />
 
-      {/* MODALE SELEZIONE MODELLO */}
       {isModalOpen && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-112.5 flex flex-col gap-6 animate-in fade-in zoom-in duration-200 text-slate-900">
@@ -178,7 +169,7 @@ export default function Dashboard() {
              uploadStatus={uploadStatus} 
              onFileChange={handleFileChange} 
              onUpload={handleConfirmClick}
-             theme={theme} // Passiamo il tema
+             theme={theme} 
           />
           <ClinicalViewer 
             file={file} 
@@ -189,11 +180,10 @@ export default function Dashboard() {
             umapData={umapData}        
             selectedModel={selectedModel} 
             colorMap={colorMap} 
-            theme={theme} // Passiamo il tema
+            theme={theme} 
           />
         </section>
 
-        {/* GUARDA CHE PULIZIA! Tutto delegato al componente dedicato */}
         <RightSidebar 
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}

@@ -1,30 +1,44 @@
+# File: backend/models/domain.py
 """
-Contiene lo schema relazionale del Database (SQLAlchemy). Attualmente definisce 
-la tabella Users (per i medici) e la tabella Tasks (per tracciare lo stato di 
-elaborazione delle Risonanze Magnetiche).
+Modulo dei Modelli di Dominio (ORM SQLAlchemy).
+Definisce la struttura delle tabelle del database relazionale.
 """
-from fastapi import FastAPI
-# ... resto del codice ...
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from core.database import Base
 
 class User(Base):
+    """
+    Modello per gli Utenti (Medici) della piattaforma Clinical Twin.
+    """
     __tablename__ = "users"
+    
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
 
+    # Relazione ORM: un utente può avere più task associati
+    tasks = relationship("Task", back_populates="owner", cascade="all, delete-orphan")
+
+
 class Task(Base):
+    """
+    Modello per i Task di elaborazione Risonanze Magnetiche (NIfTI).
+    Traccia lo stato di esecuzione asincrona della pipeline Nextflow.
+    """
     __tablename__ = "tasks"
 
     id = Column(Integer, primary_key=True, index=True)
-    filename = Column(String) # Il nome della Risonanza (es. paziente_01.nii)
-    status = Column(String, default="PENDING") # Stati: PENDING, PROCESSING, COMPLETED, FAILED
-    progress = Column(Float, default=0.0) # Utile per la barra di caricamento sul frontend
-    model_name = Column(String, default=None) # Es: HC_vs_bvFTD o HC_vs_svPPA
+    filename = Column(String, nullable=False)  # Il nome del file (es. paziente_01.nii)
+    status = Column(String, default="PENDING", nullable=False)  # Stati: PENDING, PROCESSING, COMPLETED, FAILED
+    progress = Column(Float, default=0.0)  # Progresso per il frontend (0.0 - 100.0)
+    model_name = Column(String, nullable=True)  # Es: HC_vs_bvFTD
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    # Questo collega il Task al Medico che lo ha avviato (Privacy/Multi-tenancy)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    # Chiave esterna per il multi-tenancy (Privacy SaMD)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    # Relazione ORM verso l'utente proprietario
+    owner = relationship("User", back_populates="tasks")

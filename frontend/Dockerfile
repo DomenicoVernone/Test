@@ -1,21 +1,21 @@
-# Usiamo una versione leggera di Node.js (la 20 Alpine)
+# File: frontend/Dockerfile
+# Usiamo una versione leggera di Node.js
 FROM node:20-alpine
 
-# Impostiamo la cartella di lavoro dentro il container
+# Impostiamo la cartella di lavoro
 WORKDIR /app
 
-# Copiamo PRIMA solo i file delle dipendenze (package.json)
-# Questo trucco sfrutta la cache di Docker e velocizza i caricamenti futuri
+# Copiamo prima package.json per sfruttare la cache dei layer Docker
 COPY package*.json ./
 
-# Installiamo i pacchetti (lucide-react, tailwind, vite, ecc.)
+# Installiamo le dipendenze
 RUN npm install
 
-# Ora copiamo tutto il resto del codice sorgente
+# [FIX SINTASSI] Copiamo il resto del codice sorgente
 COPY . .
 
-# Esponiamo la porta 5173 (quella di default di Vite)
+# Esponiamo la porta di default di Vite
 EXPOSE 5173
 
-# Avviamo il server di sviluppo forzando l'esposizione sulla rete di Docker
+# Avviamo il server di sviluppo esposto sulla rete Docker
 CMD ["npm", "run", "dev", "--", "--host"]

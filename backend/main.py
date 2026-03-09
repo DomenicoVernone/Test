@@ -1,39 +1,41 @@
+# File: backend/main.py
 """
 API Gateway Principale (FastAPI).
-Inizializza il server Uvicorn, connette il database e registra 
-le rotte a cui il frontend può fare richieste.
+Punto d'ingresso dell'applicazione. Configura i middleware (CORS), 
+inizializza il DB e registra i router dei microservizi.
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.database import engine, Base
+from core.config import settings
 from routers import auth, analyze
 
 # 1. Inizializzazione del Database
-# Crea fisicamente le tabelle (come la tabella users) nel file SQLite se non esistono
+# Crea le tabelle nel database (se non esistono già)
 Base.metadata.create_all(bind=engine)
 
 # 2. Inizializzazione dell'applicazione FastAPI
 app = FastAPI(
     title="Clinical Twin API",
-    description="Gateway asincrono per l'analisi clinica di risonanze magnetiche",
-    version="1.0.0"
+    description="Gateway asincrono MLOps per l'analisi clinica di risonanze magnetiche",
+    version="2.0.0"  
 )
 
-# 3. Configurazione CORS (Fondamentale per far comunicare React e FastAPI)
-# Autorizziamo esplicitamente le porte usate dal nostro frontend Vite/Docker
+# 3. Configurazione CORS (Centralizzata)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174"], 
+    allow_origins=settings.CORS_ORIGINS, 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 4. Registrazione dei Router (I nostri moduli separati)
+# 4. Registrazione dei Router
 app.include_router(auth.router)
 app.include_router(analyze.router)
 
-@app.get("/")
+@app.get("/", tags=["Health"])
 def read_root():
-    return {"message": "Clinical Twin API Gateway è operativo."}
+    """Endpoint di Health Check per Kubernetes / Docker Compose."""
+    return {"status": "ok", "message": "Clinical Twin API Gateway è operativo."}

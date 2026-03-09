@@ -1,38 +1,26 @@
-"""
-L'endpoint riceve il file .nii, lo salva fisicamente nel Volume Docker condiviso e 
-crea un record PENDING nella tabella Tasks, rispondendo immediatamente al client senza bloccarsi.
-"""
 # File: backend/routers/analyze.py
-
-from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, BackgroundTasks
-from fastapi.responses import FileResponse
-from sqlalchemy.orm import Session
-from core.database import get_db
-from models.domain import Task, User
-from services.pipeline import run_mock_nextflow
-from services.inference import InferenceOrchestrator  # Il nostro nuovo ponte verso R
+"""
+Router per l'Orchestrazione Asincrona.
+Gestisce unicamente le richieste HTTP, delegando l'elaborazione ai background tasks.
+"""
 import shutil
 import uuid
 import os
-import json 
+import json
+from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, BackgroundTasks
+from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
 
-from routers.auth import get_current_user 
+from core.database import get_db
+from core.config import settings
+from models.domain import Task, User
+from models.schemas import TaskResponse  # Importiamo lo schema creato in precedenza
+from core.security import get_current_user
+from services.pipeline import run_mock_nextflow
 
 router = APIRouter(prefix="/analyze", tags=["Orchestrator"])
 
-# Puntiamo al Named Volume di Docker
-UPLOAD_DIR = "/shared_data"
-NIFTI_DIR = os.path.join(UPLOAD_DIR, "nifti")
-RESULTS_DIR = os.path.join(UPLOAD_DIR, "results")
-FEATURES_DIR = os.path.join(UPLOAD_DIR, "features")
-# Creiamo le cartelle se non esistono
-os.makedirs(NIFTI_DIR, exist_ok=True)
-os.makedirs(RESULTS_DIR, exist_ok=True)
-os.makedirs(FEATURES_DIR, exist_ok=True)
-
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-@router.post("/")
+@router.post("/", response_model=dict)
 async def upload_nifti_file(
     background_tasks: BackgroundTasks, 
     file: UploadFile = File(...), 
@@ -40,25 +28,22 @@ async def upload_nifti_file(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # 1. CONTROLLO FORMATO
-    if not file.filename.endswith('.nii') and not file.filename.endswith('.nii.gz'):
+    """Endpoint per l'upload del file NIfTI e l'avvio della pipeline asincrona."""
+    if not file.filename.endswith(('.nii', '.nii.gz')):
         raise HTTPException(status_code=400, detail="Formato non supportato. Caricare solo .nii o .nii.gz")
 
-    # 2. NOME UNICO (Anti-collisione)
     unique_filename = f"{uuid.uuid4()}_{file.filename}"
-    file_path = os.path.join(NIFTI_DIR, unique_filename)
+    file_path = os.path.join(settings.NIFTI_DIR, unique_filename)
 
-    # 3. SALVATAGGIO NEL VOLUME CONDIVISO DOCKER
     try:
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Errore nel salvataggio: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Errore I/O Volume Condiviso: {str(e)}")
 
-    # 4. CREAZIONE TASK NEL DATABASE
     new_task = Task(
         filename=unique_filename,
-        model_name=model_name,  # Salviamo la scelta del modello direttamente nel Task
+        model_name=model_name,
         status="PENDING",
         progress=0.0,
         owner_id=current_user.id
@@ -68,28 +53,28 @@ async def upload_nifti_file(
     db.commit()
     db.refresh(new_task)
 
-    # 5. LANCIO DELLA PIPELINE IN BACKGROUND 
-    background_tasks.add_task(run_mock_nextflow, new_task.id, unique_filename, UPLOAD_DIR, model_name)
+    # Il task in background gestirà SIA Nextflow CHE l'inferenza R
+    background_tasks.add_task(
+        run_mock_nextflow, 
+        task_id=new_task.id, 
+        model_name=model_name
+    )
 
-    # 6. RISPOSTA IMMEDIATA
     return {
         "message": "File caricato. Elaborazione in coda.",
         "task_id": new_task.id,
         "status": new_task.status
     }
 
-@router.get("/")
+@router.get("/", response_model=list[TaskResponse])
 async def get_medico_tasks(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Restituisce tutti i task (file caricati) appartenenti al medico loggato."""
-    tasks = db.query(Task).filter(Task.owner_id == current_user.id).order_by(Task.created_at.desc()).all()
-    return tasks
+    """Restituisce lo storico task dell'utente (Tipizzato con Pydantic)."""
+    return db.query(Task).filter(Task.owner_id == current_user.id).order_by(Task.created_at.desc()).all()
 
-# ==========================================
-# AGGIUNTA ARCHITETTURALE: Endpoint Polling
-# ==========================================
+
 @router.get("/status/{task_id}")
 async def get_task_status(
     task_id: int,
@@ -97,68 +82,39 @@ async def get_task_status(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Endpoint per il polling asincrono di React.
-    Se Nextflow ha finito, scatena l'inferenza R e restituisce il risultato.
+    Endpoint di Polling Puro (Sola Lettura).
+    Legge lo stato dal DB. Se completato, recupera il JSON calcolato dal task in background.
     """
     task = db.query(Task).filter(Task.id == task_id, Task.owner_id == current_user.id).first()
     
     if not task:
         raise HTTPException(status_code=404, detail="Task non trovato o non autorizzato")
 
-    if task.status in ["PENDING", "PROCESSING"]:
-        return {"status": task.status, "message": "Nextflow (FastSurfer) è in esecuzione...", "progress": task.progress}
+    # Se la pipeline (Nextflow + R) è ancora in corso
+    if task.status in ["PENDING", "PROCESSING", "ANALYZING_R"]:
+        return {"status": task.status, "message": "Elaborazione in corso...", "progress": task.progress}
 
-    # Il "ponte" verso R scatta solo in questo esatto istante
-    if task.status == "NEXTFLOW_COMPLETED":
-        try:
-            orchestrator = InferenceOrchestrator()
-            model_to_use = task.model_name
-
-            # Deleghiamo al microservizio R
-            inference_result = await orchestrator.trigger_r_inference(str(task_id), model_to_use)
-            
-            # Allineiamo lo stato di R a quello di React
-            inference_result["status"] = "COMPLETED"
-            
-            # --- NOVITÀ: SALVATAGGIO DEL RISULTATO NEL VOLUME ---
-            result_path = os.path.join(RESULTS_DIR, f"result_{task_id}.json")
-            with open(result_path, "w") as f:
-                json.dump(inference_result, f)
-            # ----------------------------------------------------
-            
-            # Aggiorniamo il DB con il successo
-            task.status = "COMPLETED"
-            db.commit()
-            
-            return inference_result
-            
-        except Exception as e:
-            task.status = "ERROR"
-            db.commit()
-            return {"status": "ERROR", "message": f"Errore Inference Engine: {str(e)}"}
-        finally:
-            # --- 🧹 GARBAGE COLLECTION ---
-            # Questo blocco scatta SEMPRE, sia che l'inferenza vada bene, sia che fallisca.
-            # Cancelliamo il CSV estratto per la privacy, ma manteniamo il NIfTI per il Viewer 3D.
-            csv_path = os.path.join(FEATURES_DIR, f"features_{task_id}.csv")
-            if os.path.exists(csv_path):
-                os.remove(csv_path)
-            # -----------------------------
-
-    # --- NOVITÀ: RECUPERO DATI SE IL TASK È GIÀ FINITO ---
+    # Se il background task ha finito TUTTO con successo
     if task.status == "COMPLETED":
-        result_path = os.path.join(RESULTS_DIR, f"result_{task_id}.json")
+        result_path = os.path.join(settings.RESULTS_DIR, f"result_{task_id}.json")
+        
+        # CONTROLLO ANTI-RACE CONDITION DOCKER
         if os.path.exists(result_path):
             with open(result_path, "r") as f:
-                saved_result = json.load(f)
-            return saved_result
+                dati_json = json.load(f)
+                # Assicuriamoci di iniettare lo status "COMPLETED" dentro il payload per React
+                dati_json["status"] = "COMPLETED"
+                return dati_json
         else:
-            return {"status": "COMPLETED", "message": "L'analisi è terminata (dati grafici non più disponibili)."}
+            # TRUCCO: Il database ha finito, ma il file system Docker è in ritardo.
+            # Diciamo al frontend che stiamo ancora elaborando, così riproverà tra 1 secondo!
+            return {"status": "PROCESSING", "message": "Sincronizzazione disco in corso...", "progress": 99.0}
         
     if task.status == "ERROR":
-        return {"status": "ERROR", "message": "L'analisi ha subito un arresto anomalo."}
+        return {"status": "ERROR", "message": "La pipeline ha subito un arresto anomalo."}
 
     return {"status": task.status}
+
 
 @router.get("/nifti/{task_id}/volume.nii.gz")
 async def get_nifti_file(
@@ -166,12 +122,12 @@ async def get_nifti_file(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Restituisce il file NIfTI originale (l'URL include fittiziamente .nii.gz per accontentare la libreria frontend)."""
+    """Restituisce il file NIfTI per il Viewer 3D."""
     task = db.query(Task).filter(Task.id == task_id, Task.owner_id == current_user.id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Task non trovato")
 
-    file_path = os.path.join(NIFTI_DIR, task.filename)
+    file_path = os.path.join(settings.NIFTI_DIR, task.filename)
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File NIfTI non trovato sul disco")
 

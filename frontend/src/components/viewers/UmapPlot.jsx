@@ -1,3 +1,13 @@
+/**
+ * Componente Grafico UMAP 3D (Plotly).
+ * Renderizza lo spazio latente calcolato dal motore R, posizionando
+ * il paziente corrente rispetto alle coorti storiche (Sani vs Patologici).
+ *
+ * @param {Object} props
+ * @param {Object} props.data - JSON con coordinate { storico: [...], nuovo_paziente: {...} }
+ * @param {string} props.selectedModel - Nome del modello per l'etichetta legenda.
+ * @param {string} props.theme - Tema grafico ('light' o 'dark').
+ */
 import React from 'react';
 import Plot from 'react-plotly.js';
 
@@ -15,7 +25,6 @@ export default function UmapPlot({ data, selectedModel, theme }) {
   const n_y = Array.isArray(nuovo_paziente.y) ? nuovo_paziente.y[0] : nuovo_paziente.y;
   const n_z = Array.isArray(nuovo_paziente.z) ? nuovo_paziente.z[0] : nuovo_paziente.z;
 
-  // FIX PALLINI ROSSI: Controllo flessibile ('Sano', 'HC', 'Controllo', etc.)
   const isSano = (label) => {
     if (!label) return false;
     const l = label.toString().toLowerCase();
@@ -59,12 +68,11 @@ export default function UmapPlot({ data, selectedModel, theme }) {
     }
   ];
 
-  // --- LOGICA COLORI IN BASE AL TEMA ---
   const isDark = theme === 'dark';
-  const wallColor = isDark ? '#1e293b' : '#f8fafc'; // Pareti del cubo 3D (slate-800 o slate-50)
-  const gridColor = isDark ? '#334155' : '#e2e8f0'; // Linee griglia (slate-700 o slate-200)
-  const fontColor = isDark ? '#cbd5e1' : '#334155'; // Testo (slate-300 o slate-700)
-  const legendBg = isDark ? 'rgba(30,41,59,0.8)' : 'rgba(255,255,255,0.8)'; // Sfondo legenda
+  const wallColor = isDark ? '#1e293b' : '#f8fafc'; 
+  const gridColor = isDark ? '#334155' : '#e2e8f0'; 
+  const fontColor = isDark ? '#cbd5e1' : '#334155'; 
+  const legendBg = isDark ? 'rgba(30,41,59,0.8)' : 'rgba(255,255,255,0.8)'; 
 
   const axisStyle = { 
     title: '', 
@@ -77,7 +85,7 @@ export default function UmapPlot({ data, selectedModel, theme }) {
 
   const layout = {
     autosize: true,
-    margin: { l: 0, r: 0, b: 0, t: 0 }, // ZERO MARGINI
+    margin: { l: 0, r: 0, b: 0, t: 0 }, 
     font: { color: fontColor },
     scene: {
       xaxis: axisStyle,
@@ -86,8 +94,8 @@ export default function UmapPlot({ data, selectedModel, theme }) {
       camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
     },
     legend: { x: 0, y: 1, orientation: 'v', bgcolor: legendBg, font: { color: fontColor } },
-    paper_bgcolor: 'rgba(0,0,0,0)', // Trasparente fuori
-    plot_bgcolor: 'rgba(0,0,0,0)'   // Trasparente dentro
+    paper_bgcolor: 'rgba(0,0,0,0)', 
+    plot_bgcolor: 'rgba(0,0,0,0)'   
   };
 
   return (

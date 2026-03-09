@@ -1,13 +1,12 @@
-/*
-  Router principale dell'interfaccia. 
-  Separa le rotte pubbliche (login) dalle rotte private (dashboard), 
-  impedendo l'accesso ai non autorizzati.
-*/
+/**
+ * Entry Point e Router Principale dell'applicazione React.
+ * Configura il routing lato client e avvolge l'app nei Provider di stato globali.
+ * Applica la separazione rigorosa tra rotte pubbliche e rotte private.
+ */
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 
-// Importa le pagine e la protezione delle rotte
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './routes/ProtectedRoute';
@@ -17,10 +16,10 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Rotta Pubblica: accessibile a tutti */}
+          {/* Rotta Pubblica: Autenticazione */}
           <Route path="/login" element={<Login />} />
           
-          {/* Rotta Privata: Il cuore dell'applicazione medica */}
+          {/* Rotta Privata: Area Medica (Protetta dal Guardiano JWT) */}
           <Route 
             path="/dashboard" 
             element={
@@ -30,7 +29,7 @@ export default function App() {
             } 
           />
           
-          {/* Rotta di Fallback: redirige alla dashboard, che a sua volta valuterà se l'utente ha il token */}
+          {/* Fallback Catch-All: Reindirizza al nodo centrale */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </BrowserRouter>

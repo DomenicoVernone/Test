@@ -1,46 +1,54 @@
-/*
-  Gestore dello stato globale. Memorizza il token JWT nel browser del medico 
-  e mantiene la sessione attiva in tutta l'applicazione.
-*/
-import React, { createContext, useState } from 'react';
-import { authService } from '../services/authService';
-// eslint-disable-next-line react-refresh/only-export-components
-export const AuthContext = createContext(null);
+/* eslint-disable react-refresh/only-export-components */
+/**
+ * Contesto Globale di Autenticazione.
+ * Gestisce lo stato della sessione attiva (Token JWT) nella memoria di React,
+ * sincronizzandolo con il localStorage. 
+ * Implementa il pattern 'useAuth' per incapsulare il contesto.
+ */
+import React, { createContext, useState, useEffect, useContext } from 'react';
+
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    // Inizializziamo lo stato leggendo dal localStorage (utile se si ricarica la pagina)
     const [token, setToken] = useState(localStorage.getItem('access_token') || null);
-    const [isAuthenticated, setIsAuthenticated] = useState(!!token);
 
-    const login = async (username, password) => {
-        try {
-            const data = await authService.login(username, password);
-            const jwt = data.access_token;
-            
-            // Salviamo in memoria e nel localStorage
-            setToken(jwt);
-            setIsAuthenticated(true);
-            localStorage.setItem('access_token', jwt);
-            
-            return { success: true };
-        } catch (error) {
-            console.error("Errore di login:", error);
-            return { 
-                success: false, 
-                error: error.response?.data?.detail || "Errore di connessione al server" 
-            };
-        }
+    const login = (jwt) => {
+        setToken(jwt);
+        localStorage.setItem('access_token', jwt);
     };
 
     const logout = () => {
         setToken(null);
-        setIsAuthenticated(false);
         localStorage.removeItem('access_token');
+        window.location.href = '/login';
     };
 
+    // Sincronizzazione Multi-Tab
+    useEffect(() => {
+        const handleStorageChange = (e) => {
+            if (e.key === 'access_token') {
+                setToken(e.newValue);
+                if (!e.newValue) {
+                    window.location.href = '/login';
+                }
+            }
+        };
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated, token, login, logout }}>
+        <AuthContext.Provider value={{ token, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
+};
+
+// --- CLEAN ARCHITECTURE: CUSTOM HOOK ---
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth deve essere utilizzato all'interno di un AuthProvider");
+    }
+    return context;
 };

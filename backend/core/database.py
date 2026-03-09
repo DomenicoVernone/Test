@@ -1,28 +1,34 @@
+# File: backend/core/database.py
 """
-Moduli di base. Gestisce la connessione a SQLite e fornisce la classe Base per i modelli SQLAlchemy.
+Modulo di configurazione del Database.
+Gestisce l'inizializzazione del motore SQLAlchemy e la session factory per SQLite.
 """
-from fastapi import FastAPI
-# ... resto del codice ...
+from typing import Generator
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker, Session
 
-# Configurazione del DB SQLite (il file verrà creato automaticamente)
-SQLALCHEMY_DATABASE_URL = "sqlite:///./clinical_twin.db"
+# Importiamo la configurazione centralizzata
+from core.config import settings
 
 # Creazione del motore del database
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    settings.DATABASE_URL, 
+    connect_args={"check_same_thread": False}
 )
-
 # Creazione della fabbrica di sessioni
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Classe base per i modelli SQLAlchemy
+# Classe base per i modelli (ORM)
 Base = declarative_base()
 
-# Dependency (Yield) per ottenere la sessione del DB nei router
-def get_db():
+def get_db() -> Generator[Session, None, None]:
+    """
+    Dependency FastAPI per iniettare la sessione del database.
+    Garantisce l'apertura e la chiusura sicura della connessione ad ogni richiesta HTTP.
+    
+    Yields:
+        Session: Oggetto sessione di SQLAlchemy.
+    """
     db = SessionLocal()
     try:
         yield db

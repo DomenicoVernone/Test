@@ -1,8 +1,17 @@
-# Mappa generale della nostra architettura.
-# Definisce i due container principali (Frontend e Backend), espone le porte di comunicazione
-# e crea il Volume Condiviso (shared_clinical_data), essenziale per passare i file medici pesanti 
-# in modo asincrono senza bloccare la rete.
+# File: docker-compose.yml
+# Mappa generale dell'architettura "Clinical Twin".
+# Definisce i microservizi, la rete interna isolata e il Volume Condiviso.
 
+version: '3.8'
+
+networks:
+  clinical_network:
+    driver: bridge
+    name: clinical_twin_net
+
+volumes:
+  shared_clinical_data:
+    name: clinical_twin_shared_data
 
 services:
   # 1. API GATEWAY (FastAPI + SQLite)
@@ -11,23 +20,47 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: clinical_backend
+    networks:
+      - clinical_network
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
       - shared_clinical_data:/shared_data
     env_file:
-      - .env
+      - ./backend/.env
     environment:
       - PYTHONUNBUFFERED=1
+    # Il backend richiede che l'engine R sia in piedi per completare l'orchestrazione asincrona
+    depends_on:
+      - inference_engine
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
-  # 2. DASHBOARD CLINICA (React + Vite)
+  # 2. INFERENCE ENGINE (Plumber + R)
+  inference_engine:
+    build:
+      context: ./inference_engine
+      dockerfile: Dockerfile
+    container_name: inference_engine
+    networks:
+      - clinical_network
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./inference_engine:/app # Hot-reload per R durante lo sviluppo locale
+      - shared_clinical_data:/shared_data
+    environment:
+      # Passiamo la variabile in modo che api.R sappia dove leggere
+      - SHARED_VOLUME_DIR=/shared_data
+
+  # 3. DASHBOARD CLINICA (React + Vite)
   frontend:
     build: 
       context: ./frontend
       dockerfile: Dockerfile
     container_name: clinical_frontend
+    networks:
+      - clinical_network
     ports:
       - "5173:5173"
     volumes:
@@ -37,16 +70,3 @@ services:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
-
-  # 3. INFERENCE ENGINE (Plumber + R)
-  inference_engine:
-    build:
-      context: ./inference_engine
-    container_name: inference_engine
-    ports:
-      - "8001:8000"
-    volumes:
-      - shared_clinical_data:/shared_data
-    
-volumes:
-    shared_clinical_data:
