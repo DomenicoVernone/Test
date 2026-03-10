@@ -1,105 +1,60 @@
-# File: backend/services/pipeline.py
 """
 Worker Asincrono per l'orchestrazione delle pipeline.
-Esegue l'estrazione feature (Mock Nextflow) e, in cascata, l'inferenza statistica (R).
-Non blocca MAI il thread principale di FastAPI.
+Usa il pattern Strategy per alternare l'estrazione fittizia (Mock) a quella reale (Nextflow).
 """
-import asyncio
-import os
-import csv
-import random
 import logging
 from sqlalchemy.orm import Session
 
 from core.database import SessionLocal
-from core.config import settings
 from models.domain import Task
 from services.inference import InferenceOrchestrator
 
+# Importiamo entrambi i "motori"
+from services.mock_runner import MockRunner
+from services.nextflow_runner import NextflowRunner
+
 logger = logging.getLogger(__name__)
+
+# INTERRUTTORE ARCHITETTURALE
+USE_MOCK = True 
 
 async def run_mock_nextflow(task_id: int, model_name: str):
     """
-    Task in background che simula Nextflow e avvia l'inferenza R.
+    Task in background che orchestra l'estrazione dati e l'inferenza R.
     """
     db: Session = SessionLocal()
     task = db.query(Task).filter(Task.id == task_id).first()
     
     if not task:
-        logger.error(f"Task {task_id} non trovato nel DB. Interruzione pipeline.")
+        logger.error(f"Task {task_id} non trovato. Interruzione.")
         db.close()
         return
         
     try:
         logger.info(f"🎯 [PIPELINE] Avvio Task {task_id}. Modello: {model_name}")
         
-        # 1. Stato: Elaborazione Nextflow
+        # 1. Stato: Elaborazione (Estrazione Feature)
         task.status = "PROCESSING"
         task.progress = 10.0
         db.commit()
 
-        logger.info(f"⚙️ [NEXTFLOW MOCK] Estrazione feature radiomiche...")
-        await asyncio.sleep(10)  # Simulazione tempo di calcolo (ridotto per comodità)
-
-        # Selezione feature in base al modello
-        if model_name == "HC_vs_svPPA":
-            exact_features = [
-                "original_firstorder_Minimum.1", "original_firstorder_Energy.4", 
-                "original_firstorder_Skewness.4", "original_glcm_DifferenceEntropy.4",
-                "original_glcm_DifferenceVariance.4", "original_glrlm_LongRunEmphasis.4",
-                "original_glrlm_ShortRunEmphasis.4", "original_firstorder_Energy.14",
-                "original_firstorder_Skewness.28", "original_firstorder_Energy.31",
-                "original_firstorder_Skewness.31", "original_glszm_SmallAreaEmphasis.31",
-                "original_glcm_Idmn.38", "original_gldm_SmallDependenceLowGrayLevelEmphasis.38",
-                "original_glcm_Correlation.62", "original_gldm_DependenceNonUniformity.65",
-                "original_glcm_Idmn.67", "original_firstorder_10Percentile.71",
-                "original_firstorder_Minimum.71", "original_gldm_DependenceEntropy.71",
-                "original_firstorder_Energy.72", "original_glszm_GrayLevelNonUniformity.72",
-                "original_gldm_DependenceNonUniformity.72", "original_glcm_Imcl.77"
-            ]
-        elif model_name == "HC_vs_bvFTD":
-            exact_features = [
-                "original_firstorder_Energy.71", "original_glszm_LargeAreaEmphasis.74",
-                "original_glszm_ZoneVariance.4", "original_glszm_ZoneVariance.69",
-                "original_glszm_ZoneVariance.74", "original_glszm_LargeAreaHighGrayLevelEmphasis.74",
-                "original_firstorder_Energy.76", "original_glcm_Idn.69",
-                "original_firstorder_Energy.36"
-            ]
-        elif model_name == "HC_vs_nfvPPA":
-            exact_features = [
-                "original_firstorder_Energy", "original_glcm_ClusterShade", "original_glcm_InverseVariance.2",
-                "original_gldm_GrayLevelNonUniformity.2", "original_glcm_ClusterShade.16", "original_firstorder_Energy.18",
-                "original_firstorder_Minimum.21", "original_gldm_DependenceNonUniformity.22", "original_firstorder_Skewness.31",
-                "original_glrlm_GrayLevelNonUniformity.64", "original_gldm_GrayLevelNonUniformity.69"
-            ]
-        else:
-            exact_features = ["feature_sconosciuta"]
-
-# TEST: Dati realistici di un paziente "Control" (Sano)
-        # Invece di numeri casuali piccoli, usiamo l'ordine di grandezza reale
-        mock_patient_data = []
-        for feature in exact_features:
-            if "Energy" in feature:
-                # Ordine dei milioni/miliardi
-                mock_patient_data.append(round(random.uniform(700000000.0, 900000000.0), 4))
-            elif "Variance" in feature or "Emphasis" in feature:
-                # Ordine delle decine di migliaia
-                mock_patient_data.append(round(random.uniform(10000.0, 50000.0), 4))
-            else:
-                # Numeri piccoli
-                mock_patient_data.append(round(random.uniform(0.1, 2.0), 4))
-        # Creazione del CSV usando le costanti di configurazione
-        output_filename = f"features_{task_id}.csv"
-        output_path = os.path.join(settings.FEATURES_DIR, output_filename)
+        # ==========================================
+        # FASE 1: ESTRAZIONE FEATURE (Pattern Strategy)
+        # ==========================================
+        # Seleziona dinamicamente quale "motore" usare
+        feature_extractor = MockRunner() if USE_MOCK else NextflowRunner()
         
-        with open(output_path, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(exact_features)      
-            writer.writerow(mock_patient_data)   
+        # Chiamata polimorfica (entrambi hanno lo stesso metodo)
+        await feature_extractor.extract_features(
+            task_id=task_id, 
+            nifti_filename=task.filename, 
+            model_name=model_name
+        )
 
-        logger.info(f"✅ [NEXTFLOW MOCK] CSV generato: {output_path}")
 
-        # 2. Stato: Avvio Inferenza R
+        # ==========================================
+        # FASE 2: INFERENZA STATISTICA E UMAP (R)
+        # ==========================================
         task.status = "ANALYZING_R"
         task.progress = 50.0
         db.commit()
