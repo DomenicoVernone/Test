@@ -6,6 +6,7 @@ inizializza il DB e registra i router dei microservizi.
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from routers import chat
 
 from core.database import engine, Base
 from core.config import settings
@@ -34,6 +35,9 @@ app.add_middleware(
 # 4. Registrazione dei Router
 app.include_router(auth.router)
 app.include_router(analyze.router)
+app.include_router(chat.router)
+
+# 5. Endpoint di Health Check
 
 @app.get("/", tags=["Health"])
 def read_root():

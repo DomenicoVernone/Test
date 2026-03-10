@@ -1,8 +1,8 @@
 // File: frontend/src/pages/Dashboard.jsx
 /**
  * L'area di lavoro privata del medico.
- * Orchesta il caricamento del file NIfTI, la selezione del modello e 
- * la visualizzazione 3D/UMAP.
+ * Orchesta il caricamento del file NIfTI, la selezione del modello,
+ * la visualizzazione 3D/UMAP e l'integrazione con l'Assistente AI.
  */
 import React, { useState } from 'react';
 import SettingsModal from '../components/layout/SettingsModal';
@@ -11,13 +11,13 @@ import UploadZone from '../components/clinical/UploadZone';
 import ClinicalViewer from '../components/viewers/Viewer';
 import RightSidebar from '../components/layout/RightSidebar';
 
-import api from '../services/api'; // <-- Importiamo la nostra istanza Axios centralizzata
+import api from '../services/api';
 
 export default function Dashboard() {
   
   // --- STATI DATI ---
   const [file, setFile] = useState(null); // Tiene il PRIMO file per l'anteprima 3D
-  const [files, setFiles] = useState([]); // NUOVO: Array di tutti i file selezionati per il batch
+  const [files, setFiles] = useState([]); // Array di tutti i file selezionati per il batch
   const [niftiUrl, setNiftiUrl] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('idle');
 
@@ -38,41 +38,36 @@ export default function Dashboard() {
   const [selectedModel, setSelectedModel] = useState('HC_vs_bvFTD');
   const [umapData, setUmapData] = useState(null);
   const [prediction, setPrediction] = useState(null);
+  const [currentTaskId, setCurrentTaskId] = useState(null); 
 
   // --- HANDLERS ---
   const handleFileChange = (event) => {
-    // Trasforma i file selezionati in un vero Array JavaScript
     const selectedFiles = Array.from(event.target.files);
     
     if (selectedFiles.length > 0) {
-      setFiles(selectedFiles); // Salva l'intero batch
-      setFile(selectedFiles[0]); // L'anteprima mostrerà solo il primo file del batch
+      setFiles(selectedFiles); 
+      setFile(selectedFiles[0]); 
       
       setNiftiUrl(null);
       setUploadStatus('idle');
       setUmapData(null);
       setPrediction(null);
+      setCurrentTaskId(null);
       setActiveTab('3d');
     }
   };
 
   const handleConfirmClick = () => {
-    // Il controllo ora si fa sull'array dei file
     if (files.length === 0) return;
     setIsModalOpen(true);
   };
 
-  /**
-   * Avvia l'upload del/dei file NIfTI verso il backend asincrono.
-   * Invia i file in parallelo sfruttando Promise.all e l'architettura non bloccante di FastAPI.
-   */
   const executeUploadAndAnalyze = async () => {
     setIsModalOpen(false);
     setUploadStatus('uploading');
     setIsAnalyzing(true);
 
     try {
-      // Creiamo un array di richieste HTTP parallele, una per ogni file
       const uploadPromises = files.map(currentFile => {
         const formData = new FormData();
         formData.append('file', currentFile);
@@ -85,17 +80,13 @@ export default function Dashboard() {
         });
       });
 
-      // Eseguiamo tutte le chiamate POST simultaneamente
       await Promise.all(uploadPromises);
 
-      // Se tutte le elaborazioni sono state prese in carico:
       setUploadStatus('success');
       setRefreshHistoryTrigger(prev => prev + 1);
       setActiveSidebarTab('history');
       setIsSidebarOpen(true);
       
-      // Svuota l'array per preparare la UI al prossimo caricamento multiplo, 
-      // ma mantiene l'anteprima del primo file nel viewer
       setFiles([]); 
       
     } catch (error) {
@@ -115,12 +106,18 @@ export default function Dashboard() {
     if (taskMeta && taskMeta.model_name) {
       setSelectedModel(taskMeta.model_name);
     }
+    
+    // Salviamo l'ID del task appena completato, estraendolo dai metadati
+    if (taskMeta && taskMeta.id) {
+        setCurrentTaskId(taskMeta.id);
+    }
 
     setIsAnalyzing(false);
     setActiveTab('umap');
   };
 
   const handleHistoryTaskClick = (storicoData) => {
+    console.log("🕵️ Dati grezzi cliccati dallo storico:", storicoData);
     setFile(null);
     setNiftiUrl(storicoData.niftiUrl);
     setUmapData(storicoData.umapData);
@@ -132,6 +129,11 @@ export default function Dashboard() {
 
     if (storicoData.modelName) {
       setSelectedModel(storicoData.modelName);
+    }
+    
+    // Salviamo l'ID del task selezionato dallo storico
+    if (storicoData.taskId || storicoData.id) {
+        setCurrentTaskId(storicoData.taskId || storicoData.id);
     }
 
     setUploadStatus('success');
@@ -159,7 +161,6 @@ export default function Dashboard() {
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-112.5 flex flex-col gap-6 animate-in fade-in zoom-in duration-200 text-slate-900">
             <div>
               <h3 className="text-2xl font-bold text-slate-800">Sospetto Clinico</h3>
-              {/* Resoconto dinamico di quanti file si stanno per analizzare */}
               <p className="text-sm text-clinical-primary font-semibold mt-1">
                 Stai avviando l'analisi per {files.length} {files.length === 1 ? 'paziente' : 'pazienti'}.
               </p>
@@ -184,7 +185,7 @@ export default function Dashboard() {
         <section className="flex-1 flex flex-col p-6 gap-6 overflow-y-auto transition-all duration-300">
           <UploadZone 
              file={file} 
-             filesCount={files.length} // Passato il conteggio all'UploadZone
+             filesCount={files.length} 
              uploadStatus={uploadStatus} 
              onFileChange={handleFileChange} 
              onUpload={handleConfirmClick}
@@ -214,6 +215,7 @@ export default function Dashboard() {
           theme={theme}
           prediction={prediction}
           refreshHistoryTrigger={refreshHistoryTrigger} 
+          selectedTaskId={currentTaskId}
         />
       </main>
     </div>

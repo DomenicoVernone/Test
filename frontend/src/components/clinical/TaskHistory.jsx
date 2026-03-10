@@ -146,6 +146,7 @@ export default function TaskHistory({ onTaskCompleted, onTaskClick, theme, refre
                 const baseURL = api.defaults.baseURL || 'http://localhost:8000';
                 
                 onTaskClick({
+                    taskId: task.id,
                     umapData: data.plot_data,
                     prediction: data.diagnosi_predetta,
                     niftiUrl: `${baseURL}/analyze/nifti/${task.id}/volume.nii.gz`,

@@ -1,19 +1,8 @@
+// File: frontend/src/components/layout/RightSidebar.jsx
 /**
  * Componente Presentazionale: Sidebar Destra.
  * Gestisce il layout a comparsa e l'alternanza dei tab tra l'Assistente LLM e lo Storico Pazienti.
  * Essendo un componente "Dumb", non esegue fetch di dati ma riceve handler e stato dal genitore (Dashboard).
- *
- * @param {Object} props
- * @param {boolean} props.isSidebarOpen - Stato di apertura della sidebar.
- * @param {Function} props.setIsSidebarOpen - Setter per chiudere/aprire la sidebar.
- * @param {string} props.activeSidebarTab - Tab attualmente attivo ('chat' o 'history').
- * @param {Function} props.setActiveSidebarTab - Setter per cambiare tab.
- * @param {boolean} props.isAnalyzing - Flag che indica se una pipeline di analisi è in corso.
- * @param {Function} props.handleAnalysisFinished - Callback invocata al completamento di un task.
- * @param {Function} props.handleHistoryTaskClick - Callback invocata al click su un task dello storico.
- * @param {string} props.theme - Tema grafico attuale ('light' o 'dark').
- * @param {string|null} props.prediction - Diagnosi predetta dal modello R (es. 'Malato', 'Sano').
- * @param {number} props.refreshHistoryTrigger - Contatore numerico per forzare il refresh dello storico.
  */
 import React from 'react';
 import ChatLLM from '../assistant/ChatLLM';
@@ -29,7 +18,8 @@ export default function RightSidebar({
   handleHistoryTaskClick,
   theme, 
   prediction,
-  refreshHistoryTrigger 
+  refreshHistoryTrigger,
+  selectedTaskId
 }) {
   
   // Variabili di appoggio per classi Tailwind ripetute (Clean Code)
@@ -94,9 +84,9 @@ export default function RightSidebar({
             {activeSidebarTab === 'chat' ? (
               <ChatLLM 
                 isAnalyzing={isAnalyzing} 
-                experiment="N/A" 
                 theme={theme} 
                 prediction={prediction} 
+                taskId={selectedTaskId}
               />
             ) : (
               <TaskHistory 
