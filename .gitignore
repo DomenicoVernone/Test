@@ -13,3 +13,5 @@ dati_sensibili/
 # Database locali
 *.db
 *.sqlite3
+backend/data/clinical_twin.db
+backend/data/mlflow.db
