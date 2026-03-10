@@ -12,7 +12,6 @@ library(xgboost)
 #' @param model_dir Percorso esatto del file .rds scaricato da MLflow
 #' @param csv_file Percorso esatto del file CSV contenente le feature
 run_clinical_inference <- function(task_id, model_dir, csv_file) {
-
   print(paste("🔍 Caricamento del modello esatto da:", model_dir))
   if (!file.exists(model_dir)) {
     stop(paste("File del modello non trovato:", model_dir))
@@ -70,24 +69,27 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
   print("🚀 Esecuzione predizione clinica...")
   predizione <- "Sconosciuto"
 
-  tryCatch({
-    if (inherits(modello, "xgb.Booster")) {
-      mat <- as.matrix(dati_nuovo)
-      pred_prob <- predict(modello, mat)
-      predizione <- ifelse(pred_prob > 0.5, "Malato", "Sano")
-    } else {
-      pred_raw <- predict(modello, newdata = dati_nuovo, type = "class")
-      predizione <- as.character(pred_raw)
+  tryCatch(
+    {
+      if (inherits(modello, "xgb.Booster")) {
+        mat <- as.matrix(dati_nuovo)
+        pred_prob <- predict(modello, mat)
+        predizione <- ifelse(pred_prob > 0.5, "Malato", "Sano")
+      } else {
+        pred_raw <- predict(modello, newdata = dati_nuovo, type = "class")
+        predizione <- as.character(pred_raw)
+      }
+    },
+    error = function(e) {
+      print("⚠️ Fallita pred. classificazione. Tento predizione standard.")
+      pred_raw <- predict(modello, newdata = dati_nuovo)
+      if (is.list(pred_raw) && !is.null(pred_raw$data$response)) {
+        predizione <<- as.character(pred_raw$data$response)
+      } else {
+        predizione <<- as.character(pred_raw)
+      }
     }
-  }, error = function(e) {
-    print("⚠️ Fallita pred. classificazione. Tento predizione standard.")
-    pred_raw <- predict(modello, newdata = dati_nuovo)
-    if (is.list(pred_raw) && !is.null(pred_raw$data$response)) {
-      predizione <<- as.character(pred_raw$data$response)
-    } else {
-      predizione <<- as.character(pred_raw)
-    }
-  })
+  )
   print(paste("🎯 Diagnosi calcolata:", predizione))
 
   print("🌀 Calcolo UMAP 3D (Fase di Fit e Transform)...")
@@ -105,14 +107,18 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       n_threads = 1,
       ret_model = TRUE
     )
-
-    n_storico <- nrow(storico_x)
-    storico_coords <- data.frame(
+    n_storico <- nrow(storico_x) # <--- QUESTA È LA RIGA CHE AVEVAMO PERSO!
+    # Costruisce il dataframe base con le coordinate spaziali
+    storico_coords_base <- data.frame(
       x = umap_mappa$embedding[, 1],
       y = umap_mappa$embedding[, 2],
       z = umap_mappa$embedding[, 3],
       label = as.character(storico_y)
     )
+
+    # NOVITÀ: Idratazione dei dati. Uniamo le coordinate spaziali con TUTTE le feature originali.
+    # Usiamo cbind (column bind) per attaccare il dataframe storico_x a storico_coords_base.
+    storico_coords <- cbind(storico_coords_base, storico_x)
 
     id_reali <- rownames(storico_x)
     if (is.null(id_reali) || all(id_reali == as.character(1:n_storico))) {
