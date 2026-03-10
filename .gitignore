@@ -9,3 +9,7 @@ Thumbs.db
 *.rds
 dati_sensibili/
 .env
+
+# Database locali
+*.db
+*.sqlite3

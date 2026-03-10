@@ -121,7 +121,7 @@ DATI DEL CASO CORRENTE:
 ISTRUZIONI:
 1. Rispondi alla domanda del medico in italiano in modo professionale.
 2. Spiega PERCHÉ il modello ha preso la decisione, citando le distanze spaziali e confrontando 2 o 3 feature radiomiche chiave del Paziente con le Medie (e deviazioni standard) del Vicinato e del Cluster Opposto.
-3. Dimostra che i valori del paziente rientrano nella normale varianza (deviazione standard) del cluster predetto, discostandosi dal cluster opposto.
+3. Regola Matematica Ferrea: Valuta mentalmente se il valore del Paziente è strettamente compreso nell'intervallo [Media - Dev.Std, Media + Dev.Std] del cluster predetto. Se NON lo è, devi dichiarare esplicitamente al medico che il paziente presenta un valore ANOMALO (outlier) per quella feature rispetto al cluster assegnato, senza cercare di giustificarlo forzatamente.
 4. Concludi ricordando che il medico deve visionare l'MRI grezza.
 """
 

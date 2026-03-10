@@ -75,8 +75,19 @@ async def run_mock_nextflow(task_id: int, model_name: str):
         else:
             exact_features = ["feature_sconosciuta"]
 
-        mock_patient_data = [round(random.uniform(0.1, 10.0), 4) for _ in exact_features]
-
+# TEST: Dati realistici di un paziente "Control" (Sano)
+        # Invece di numeri casuali piccoli, usiamo l'ordine di grandezza reale
+        mock_patient_data = []
+        for feature in exact_features:
+            if "Energy" in feature:
+                # Ordine dei milioni/miliardi
+                mock_patient_data.append(round(random.uniform(700000000.0, 900000000.0), 4))
+            elif "Variance" in feature or "Emphasis" in feature:
+                # Ordine delle decine di migliaia
+                mock_patient_data.append(round(random.uniform(10000.0, 50000.0), 4))
+            else:
+                # Numeri piccoli
+                mock_patient_data.append(round(random.uniform(0.1, 2.0), 4))
         # Creazione del CSV usando le costanti di configurazione
         output_filename = f"features_{task_id}.csv"
         output_path = os.path.join(settings.FEATURES_DIR, output_filename)
