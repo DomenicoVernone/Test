@@ -106,7 +106,7 @@ async def get_task_status(
                 dati_json["status"] = "COMPLETED"
                 return dati_json
         else:
-            # TRUCCO: Il database ha finito, ma il file system Docker è in ritardo.
+            # Il database ha finito, ma il file system Docker è in ritardo.
             # Diciamo al frontend che stiamo ancora elaborando, così riproverà tra 1 secondo!
             return {"status": "PROCESSING", "message": "Sincronizzazione disco in corso...", "progress": 99.0}
         

@@ -13,10 +13,10 @@ RUN apt-get update -qq && apt-get install -y \
 RUN Rscript -e "install.packages(c('plumber', 'uwot', 'jsonlite', 'caret', 'xgboost'), repos='http://cran.rstudio.com/')"
 
 # 3. Creiamo la directory di lavoro e il mount point per il Volume Condiviso
-WORKDIR /app
+WORKDIR /app 
 RUN mkdir -p /shared_data
 
-# 4. [FIX ARCHITETTURALE] Copiamo TUTTO il contenuto (inclusa la nuova cartella R/ e api.R)
+# 4. Copiamo TUTTO il contenuto (inclusa la nuova cartella R/ e api.R)
 COPY . /app/
 
 # 5. Esponiamo la porta interna

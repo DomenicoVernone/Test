@@ -1,4 +1,3 @@
-# File: backend/core/security.py
 """
 Modulo di Sicurezza.
 Centralizza l'hashing delle password (Bcrypt), la generazione dei token JWT

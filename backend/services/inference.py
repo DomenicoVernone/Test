@@ -19,8 +19,7 @@ logger = logging.getLogger(__name__)
 class InferenceOrchestrator:
     def __init__(self):
         self.client = MlflowClient()
-        # Idealmente, in futuro, sposteremo anche questo in config.py
-        self.r_engine_url = "http://inference_engine:8000/infer"
+        self.r_engine_url = settings.R_ENGINE_URL # URL interno del container R per l'inferenza
 
     def get_champion_uri(self, model_name: str) -> str:
         """Interroga il Model Registry per ottenere l'URI del modello 'champion'."""

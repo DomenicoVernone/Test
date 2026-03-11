@@ -22,7 +22,6 @@ export default function RightSidebar({
   selectedTaskId
 }) {
   
-  // Variabili di appoggio per classi Tailwind ripetute (Clean Code)
   const isDark = theme === 'dark';
   const sidebarContainerClass = isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200';
   const tabHeaderClass = isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-100/50 border-slate-200';

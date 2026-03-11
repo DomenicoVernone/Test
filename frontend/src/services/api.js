@@ -1,4 +1,3 @@
-// File: frontend/src/services/api.js
 /**
  * Servizio API Client centralizzato.
  * Configura Axios per comunicare con il backend FastAPI, iniettando automaticamente

@@ -1,4 +1,3 @@
-# File: backend/main.py
 """
 API Gateway Principale (FastAPI).
 Punto d'ingresso dell'applicazione. Configura i middleware (CORS), 

@@ -11,11 +11,11 @@ COPY package*.json ./
 # Installiamo le dipendenze
 RUN npm install
 
-# [FIX SINTASSI] Copiamo il resto del codice sorgente
+# Copiamo il resto del codice sorgente
 COPY . .
 
 # Esponiamo la porta di default di Vite
 EXPOSE 5173
 
 # Avviamo il server di sviluppo esposto sulla rete Docker
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm", "run", "dev", "--", "--host"] 

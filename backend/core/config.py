@@ -45,6 +45,9 @@ class Settings(BaseSettings):
     DAGSHUB_TOKEN: Optional[str] = Field(default=None, description="Token di accesso API DagsHub")
     REPO_OWNER: Optional[str] = Field(default=None, description="Proprietario della repository DagsHub")
     REPO_NAME: Optional[str] = Field(default=None, description="Nome della repository DagsHub")
+
+    # --- MICROSERVIZI INTERNI ---
+    R_ENGINE_URL: str = Field(default="http://inference_engine:8000/infer", description="URL interno del container R per l'inferenza")
     
     # --- VOLUMI CONDIVISI (Docker / Host) ---
     SHARED_VOLUME_DIR: str = Field(default="/shared_data", description="Mount point root del volume condiviso tra i container")

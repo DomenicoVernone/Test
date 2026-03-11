@@ -6,10 +6,10 @@ version: '3.8'
 
 networks:
   clinical_network:
-    driver: bridge
+    driver: bridge # Rete isolata per i microservizi del Clinical Twin
     name: clinical_twin_net
 
-volumes:
+volumes: # Volume condiviso per dati clinici tra backend e inference engine
   shared_clinical_data:
     name: clinical_twin_shared_data
 
@@ -23,18 +23,18 @@ services:
     networks:
       - clinical_network
     ports:
-      - "8000:8000"
+      - "8000:8000" 
     volumes:
-      - ./backend:/app
+      - ./backend:/app # Hot-reload per Python durante lo sviluppo locale
       - shared_clinical_data:/shared_data
     env_file:
       - ./backend/.env
     environment:
-      - PYTHONUNBUFFERED=1
+      - PYTHONUNBUFFERED=1 # Per log in tempo reale
     # Il backend richiede che l'engine R sia in piedi per completare l'orchestrazione asincrona
     depends_on:
       - inference_engine
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload 
 
   # 2. INFERENCE ENGINE (Plumber + R)
   inference_engine:
@@ -44,8 +44,12 @@ services:
     container_name: inference_engine
     networks:
       - clinical_network
+    # NOTA ARCHITETTURALE (SICUREZZA): 
+    # Esposizione porta abilitata ESCLUSIVAMENTE per debug locale (accesso da Postman/Browser host).
+    # In ambiente di produzione, rimuovere questa direttiva per isolare il motore di calcolo.
+    # Il Backend vi accederà comunque in modo sicuro tramite DNS interno (http://inference_engine:8000).
     ports:
-      - "8001:8000"
+      - "8001:8000" 
     volumes:
       - ./inference_engine:/app # Hot-reload per R durante lo sviluppo locale
       - shared_clinical_data:/shared_data
@@ -64,9 +68,9 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend:/app
-      - /app/node_modules 
+      - ./frontend:/app # Hot-reload per React durante lo sviluppo locale
+      - /app/node_modules  
     environment:
-      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_USEPOLLING=true # Per hot-reload affidabile su Docker  
     depends_on:
       - backend
