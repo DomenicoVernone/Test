@@ -1,0 +1,6 @@
+outs:
+- md5: 25badc35584b2db41ee6e44d58287a17.dir
+  size: 2162726720
+  nfiles: 110
+  hash: md5
+  path: HC_T1

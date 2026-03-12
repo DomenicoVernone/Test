@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  freesurfer:
+    build:
+      context: .
+      dockerfile: dockerfiles/freesurfer.dockerfile
+    image: freesurfer
+
+  fsl:
+    build:
+      context: .
+      dockerfile: dockerfiles/fsl.dockerfile
+    image: fsl
+
+  ftd_training:
+    build:
+      context: .
+      dockerfile: dockerfiles/ftd-training.dockerfile
+    image: ftd-training
+
+  pyradiomics:
+    build:
+      context: .
+      dockerfile: dockerfiles/pyradiomics.dockerfile
+    image: pyradiomics

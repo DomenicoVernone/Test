@@ -1,0 +1,6 @@
+outs:
+- md5: 8486a9de593d4c89a6530f5c3f17074e.dir
+  size: 52990094
+  nfiles: 79
+  hash: md5
+  path: feat-fastsurfer

@@ -1,0 +1,4 @@
+[core]
+    remote = dvcstore
+['remote "dvcstore"']
+    url = /mnt/disk1/boccuzzi/dvcstore

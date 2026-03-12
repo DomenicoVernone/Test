@@ -1,0 +1,25 @@
+# Usiamo Python per poter avere un mini-server API in ascolto
+FROM python:3.10-slim
+
+# Installiamo Java (serve a Nextflow), curl, e il client Docker
+RUN apt-get update && apt-get install -y \
+    default-jre \
+    curl \
+    docker.io \
+    && rm -rf /var/lib/apt/lists/*
+
+# Scarichiamo e installiamo Nextflow
+RUN curl -s https://get.nextflow.io | bash && \
+    mv nextflow /usr/local/bin/ && \
+    chmod +x /usr/local/bin/nextflow
+
+# Installiamo FastAPI per far comunicare questo worker col Backend principale
+RUN pip install fastapi uvicorn
+
+WORKDIR /app
+
+# Copiamo tutto il contenuto della repo originale (inclusi i file .nf)
+COPY . /app/
+
+# Avviamo il mini-server in ascolto sulla porta 8002
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]

@@ -1,0 +1,6 @@
+outs:
+- md5: f719c1369cf7860cc3c55d4e7f64a689.dir
+  size: 668479168
+  nfiles: 34
+  hash: md5
+  path: svPPA_T1

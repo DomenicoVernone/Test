@@ -1,0 +1,6 @@
+outs:
+- md5: 4f3002a562ba99160aea46f1b378126a.dir
+  size: 51903867
+  nfiles: 78
+  hash: md5
+  path: feat-freesurfer

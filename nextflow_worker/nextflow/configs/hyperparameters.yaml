@@ -1,0 +1,64 @@
+selection:
+  seed: 42
+
+  lasso:
+    lambda_from: 0.5
+    lambda_to: 0.0001
+    lambda_step: -0.001
+    parallel: TRUE
+    grouped: FALSE
+    type_measure: "deviance"
+    nfold: 10
+    s: "lambda.min"
+    family: "binomial"
+  
+  rfe:
+    cv_method: "cv"
+    cv_repeats: 100
+    number: 10
+    min_features: 2
+
+
+nested_cv:
+  outer_folds: 10
+  inner_folds: 10
+
+
+knn:
+  cv_method: "repeatedcv"
+  cv_number: 10
+  cv_repeats: 10
+  k_min: 11
+  k_max: 85
+  k_step: 2
+  probability_threshold: 0.5
+
+
+rf:
+  ntree_options: [1000, 1500, 2000, 2500]
+  cross: 10
+
+
+svm:
+  gamma_values: [0.1, 0.5, 1, 2, 3, 4]
+  cost_values: [0.001, 0.01, 0.1, 1, 5, 10]
+  cross: 10
+
+
+xgboost:
+  objective: "binary:logistic"
+  eval_metric: "error"
+  nthread: 12
+  tuning_iterations: 1
+  nrounds: 200
+  
+  tuning_ranges:
+    nrounds_min: 100
+    nrounds_max: 500
+    max_depth_min: 1
+    max_depth_max: 10
+    eta_min: 0.1
+    eta_max: 0.5
+    lambda_min: 0
+    lambda_max: 2
+

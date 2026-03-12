@@ -1,0 +1,6 @@
+outs:
+- md5: a0d2c5ec37c69010ad7af1a5c9394d14.dir
+  size: 668479168
+  nfiles: 34
+  hash: md5
+  path: nfvPPA_T1

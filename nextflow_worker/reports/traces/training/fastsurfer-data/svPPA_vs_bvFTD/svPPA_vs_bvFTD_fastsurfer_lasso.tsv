@@ -1,0 +1,8 @@
+task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
+1	c2/96b662	3846542	create_feat_all (1)	COMPLETED	0	2025-10-26 02:07:19.240	7.9s	7.4s	209.0%	133.8 MB	2.7 GB	104.5 MB	19.2 MB
+2	c0/aa1e32	3847609	select_features (1)	COMPLETED	0	2025-10-26 02:07:27.248	4m 2s	4m 1s	103.3%	648.4 MB	3.3 GB	40 MB	2.2 MB
+6	9d/b61626	3864459	parallel_training (4)	COMPLETED	0	2025-10-26 02:11:28.882	4m 5s	4m 5s	3970.6%	581.3 MB	52 GB	36.6 MB	61.7 KB
+3	7b/a23942	3864446	parallel_training (1)	COMPLETED	0	2025-10-26 02:11:28.876	4m 20s	4m 20s	101.3%	317.1 MB	2.9 GB	32.1 MB	2.5 KB
+5	74/0351d0	3864435	parallel_training (3)	COMPLETED	0	2025-10-26 02:11:28.869	23m 45s	23m 44s	100.3%	342.6 MB	2.9 GB	44.3 MB	1.8 KB
+4	f4/d4211d	3864432	parallel_training (2)	COMPLETED	0	2025-10-26 02:11:28.861	41m 57s	41m 57s	100.3%	302.6 MB	2.9 GB	32.3 MB	2.4 KB
+7	71/44fe7c	584068	aggregate_metrics (1)	COMPLETED	0	2025-10-26 02:53:26.330	848ms	295ms	2702.9%	21 MB	2.5 GB	7.7 MB	7.9 KB

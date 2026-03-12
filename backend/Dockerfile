@@ -2,24 +2,6 @@
 # Usa l'immagine ufficiale di Python
 FROM python:3.10-slim
 
-# ==========================================
-# DIPENDENZE DI SISTEMA: JAVA E NEXTFLOW
-# ==========================================
-# 1. Installa Java (JRE), curl, unzip e procps (richiesti da Nextflow)
-
-RUN apt-get update && apt-get install -y \ 
-    default-jre \
-    curl \
-    unzip \
-    procps \
-    && rm -rf /var/lib/apt/lists/*
-
-# 2. Scarica e installa l'eseguibile di Nextflow globalmente
-RUN curl -s https://get.nextflow.io | bash && \
-    mv nextflow /usr/local/bin/nextflow && \
-    chmod +x /usr/local/bin/nextflow
-# ==========================================
-
 # Imposta la cartella di lavoro
 WORKDIR /app
 
