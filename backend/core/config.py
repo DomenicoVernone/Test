@@ -48,6 +48,7 @@ class Settings(BaseSettings):
 
     # --- MICROSERVIZI INTERNI ---
     R_ENGINE_URL: str = Field(default="http://inference_engine:8000/infer", description="URL interno del container R per l'inferenza")
+    NEXTFLOW_WORKER_URL: str = Field(default="http://nextflow_worker:8002", description="URL interno del container Nextflow Worker")
     
     # --- VOLUMI CONDIVISI (Docker / Host) ---
     SHARED_VOLUME_DIR: str = Field(default="/shared_data", description="Mount point root del volume condiviso tra i container")

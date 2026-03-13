@@ -1,0 +1,13 @@
+# Ignora i file temporanei e di cache di Nextflow
+.nextflow/
+work/
+results/
+temp_nf_*/
+
+# Ignora cache di Python e OS
+__pycache__/
+*.pyc
+.DS_Store
+
+# Ignora i dati pesanti (verranno montati tramite il Volume Condiviso, non copiati nell'immagine!)
+data/

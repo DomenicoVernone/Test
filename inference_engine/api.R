@@ -1,4 +1,3 @@
-# File: inference_engine/api.R
 #' Router API Plumber
 #' Gestisce gli endpoint HTTP e il salvataggio su File System (I/O).
 

@@ -9,16 +9,15 @@ from core.database import SessionLocal
 from models.domain import Task
 from services.inference import InferenceOrchestrator
 
-# Importiamo entrambi i "motori"
 from services.mock_runner import MockRunner
 from services.nextflow_runner import NextflowRunner
 
 logger = logging.getLogger(__name__)
 
 # INTERRUTTORE ARCHITETTURALE
-USE_MOCK = True 
+USE_MOCK = False 
 
-async def run_mock_nextflow(task_id: int, model_name: str):
+async def run_full_pipeline(task_id: int, model_name: str):
     """
     Task in background che orchestra l'estrazione dati e l'inferenza R.
     """

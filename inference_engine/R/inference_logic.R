@@ -107,18 +107,33 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       n_threads = 1,
       ret_model = TRUE
     )
-    n_storico <- nrow(storico_x) # <--- QUESTA È LA RIGA CHE AVEVAMO PERSO!
+    n_storico <- nrow(storico_x) 
+    
     # Costruisce il dataframe base con le coordinate spaziali
     storico_coords_base <- data.frame(
       x = umap_mappa$embedding[, 1],
       y = umap_mappa$embedding[, 2],
       z = umap_mappa$embedding[, 3],
-      label = as.character(storico_y)
+      label = as.character(storico_y),
+      stringsAsFactors = FALSE
     )
-
-    # NOVITÀ: Idratazione dei dati. Uniamo le coordinate spaziali con TUTTE le feature originali.
-    # Usiamo cbind (column bind) per attaccare il dataframe storico_x a storico_coords_base.
-    storico_coords <- cbind(storico_coords_base, storico_x)
+    # ---------------------------------------------------------
+    # Forziamo storico_x ad essere un dataframe
+    storico_df <- as.data.frame(storico_x)
+    
+    # Garantiamo che i nomi delle colonne siano quelli esatti
+    if (ncol(storico_df) == length(feature_req)) {
+      colnames(storico_df) <- feature_req
+    }
+    
+    # Rimuoviamo eventuali colonne fantasma ".outcome"
+    if (".outcome" %in% colnames(storico_df)) {
+      storico_df$.outcome <- NULL
+    }
+    
+    # Idratazione sicura: uniamo le coordinate spaziali con le feature sanificate
+    storico_coords <- cbind(storico_coords_base, storico_df)
+    # ---------------------------------------------------------
 
     id_reali <- rownames(storico_x)
     if (is.null(id_reali) || all(id_reali == as.character(1:n_storico))) {
@@ -147,7 +162,6 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
     print("⚠️ Storico insufficiente o mancante. Salto UMAP.")
   }
 
-  # Return implicito (lintr rule)
   list(
     status = "success",
     task_id = task_id,

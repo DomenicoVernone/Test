@@ -1,4 +1,3 @@
-# File: backend/routers/analyze.py
 """
 Router per l'Orchestrazione Asincrona.
 Gestisce unicamente le richieste HTTP, delegando l'elaborazione ai background tasks.
@@ -16,7 +15,7 @@ from core.config import settings
 from models.domain import Task, User
 from models.schemas import TaskResponse  
 from core.security import get_current_user
-from services.pipeline import run_mock_nextflow
+from services.pipeline import run_full_pipeline
 
 router = APIRouter(prefix="/analyze", tags=["Orchestrator"])
 
@@ -55,7 +54,7 @@ async def upload_nifti_file(
 
     # Il task in background gestirà SIA Nextflow CHE l'inferenza R
     background_tasks.add_task(
-        run_mock_nextflow, 
+        run_full_pipeline, 
         task_id=new_task.id, 
         model_name=model_name
     )

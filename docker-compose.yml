@@ -88,7 +88,4 @@ services:
     volumes:
       # 1. Montiamo i file del worker
       - ./nextflow_worker:/app 
-      # 2. IL TAVOLO CONDIVISO: Così vede le risonanze salvate dal Backend
       - shared_clinical_data:/shared_data
-      # 3. IL TRUCCO MAGICO: Permette a Nextflow di "parlare" col Docker del tuo PC per avviare FastSurfer
-      - /var/run/docker.sock:/var/run/docker.sock
