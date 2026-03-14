@@ -1,4 +1,3 @@
-// File: frontend/src/components/layout/RightSidebar.jsx
 /**
  * Componente Presentazionale: Sidebar Destra.
  * Gestisce il layout a comparsa e l'alternanza dei tab tra l'Assistente LLM e lo Storico Pazienti.

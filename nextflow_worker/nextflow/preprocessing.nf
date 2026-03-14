@@ -122,6 +122,7 @@ process fastsurfer {
 }
 
 process nifti_converter {
+    errorStrategy params.error_strategy
     publishDir "${params.segmenter_folder_output}/${FTD_group}/${subject}/mri", mode: 'copy'
 
     input:
@@ -141,6 +142,7 @@ process nifti_converter {
 }
 
 process roi_creator {
+    errorStrategy params.error_strategy
     publishDir "${params.segmenter_folder_output}/${FTD_group}/${subject}/mri", mode: 'copy', pattern: "ROI"
 
     input:
@@ -173,6 +175,7 @@ process roi_creator {
 }
 
 process csv_collector {
+    errorStrategy params.error_strategy
     publishDir "${params.features_output}", mode: 'copy'
 
     input:
@@ -214,6 +217,8 @@ process csv_collector {
 }
 
 process feature_extraction {
+    maxForks params.maxforks
+    errorStrategy params.error_strategy
     publishDir "${params.feat_output}", mode: 'copy'
 
     input:

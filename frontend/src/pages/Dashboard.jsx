@@ -1,4 +1,3 @@
-// File: frontend/src/pages/Dashboard.jsx
 /**
  * L'area di lavoro privata del medico.
  * Orchesta il caricamento del file NIfTI, la selezione del modello,
@@ -55,6 +54,10 @@ export default function Dashboard() {
       setCurrentTaskId(null);
       setActiveTab('3d');
     }
+  };
+  const handleClearSelection = () => {
+    setFile(null);
+    setFiles([]); 
   };
 
   const handleConfirmClick = () => {
@@ -117,11 +120,11 @@ export default function Dashboard() {
   };
 
   const handleHistoryTaskClick = (storicoData) => {
-    console.log("🕵️ Dati grezzi cliccati dallo storico:", storicoData);
+    console.log("Dati grezzi cliccati dallo storico:", storicoData);
     setFile(null);
     setNiftiUrl(storicoData.niftiUrl);
     setUmapData(storicoData.umapData);
-
+    
     const predizioneSicura = Array.isArray(storicoData.prediction)
       ? storicoData.prediction[0]
       : storicoData.prediction;
@@ -131,14 +134,17 @@ export default function Dashboard() {
       setSelectedModel(storicoData.modelName);
     }
     
-    // Salviamo l'ID del task selezionato dallo storico
     if (storicoData.taskId || storicoData.id) {
-        setCurrentTaskId(storicoData.taskId || storicoData.id);
+      setCurrentTaskId(storicoData.taskId || storicoData.id);
     }
 
-    setUploadStatus('success');
-    setIsAnalyzing(false);
-    setActiveTab('umap'); 
+    // GESTIONE UX: Controlliamo se il task è ancora in corso
+    const isStillRunning = storicoData.status !== 'COMPLETED';
+    
+    setIsAnalyzing(isStillRunning); 
+    
+    // Altrimenti, se ha finito, apriamo direttamente il grafico UMAP.
+    setActiveTab(isStillRunning ? '3d' : 'umap');
   };
 
   // --- RENDER ---
@@ -183,13 +189,15 @@ export default function Dashboard() {
 
       <main className="flex-1 flex overflow-hidden">
         <section className="flex-1 flex flex-col p-6 gap-6 overflow-y-auto transition-all duration-300">
-          <UploadZone 
-             file={file} 
-             filesCount={files.length} 
-             uploadStatus={uploadStatus} 
-             onFileChange={handleFileChange} 
-             onUpload={handleConfirmClick}
-             theme={theme} 
+          <UploadZone
+            file={file}
+            files={files} 
+            uploadStatus={uploadStatus}
+            onFileChange={handleFileChange}
+            onFileSelect={setFile} 
+            onUpload={handleConfirmClick}
+            onClear={handleClearSelection} 
+            theme={theme}
           />
           <ClinicalViewer 
             file={file} 

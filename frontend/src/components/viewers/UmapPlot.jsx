@@ -1,4 +1,3 @@
-// File: frontend/src/components/viewers/UmapPlot.jsx
 /**
  * Componente Grafico UMAP 3D (Plotly).
  * Renderizza lo spazio latente calcolato dal motore di inferenza (R).

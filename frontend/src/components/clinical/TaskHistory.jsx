@@ -1,4 +1,3 @@
-// File: frontend/src/components/clinical/TaskHistory.jsx
 /**
  * Componente Presentazionale e di Gestione Stato Locale: Storico Task.
  * Renderizza la lista delle analisi (NIfTI) e gestisce il feedback visivo in tempo reale.
@@ -11,7 +10,7 @@
  * @param {number} props.refreshHistoryTrigger - Contatore numerico per forzare il refresh manuale dello storico.
  */
 import React, { useState, useEffect } from 'react';
-import api from '../../services/api'; 
+import api from '../../services/api';
 import { useTaskPolling } from '../../hooks/useTaskPolling';
 
 // --- HELPER DI FORMATTAZIONE DATE (FIX FUSO ORARIO UTC/CET) ---
@@ -42,17 +41,17 @@ const LiveTimer = ({ startTime, theme }) => {
 
     useEffect(() => {
         if (!startTime) return;
-        
+
         const startTimestamp = parseDateSicura(startTime).getTime();
 
         const tick = () => {
-            const now = new Date().getTime(); 
+            const now = new Date().getTime();
             // Math.max evita numeri negativi dovuti a latenze di rete di pochi millisecondi
             setElapsed(Math.max(0, Math.floor((now - startTimestamp) / 1000)));
         };
 
         tick(); // Esecuzione immediata per evitare il delay di 1s iniziale
-        const intervalId = setInterval(tick, 1000); 
+        const intervalId = setInterval(tick, 1000);
 
         return () => clearInterval(intervalId); // Cleanup al completamento o smontaggio
     }, [startTime]);
@@ -69,12 +68,12 @@ const LiveTimer = ({ startTime, theme }) => {
 };
 
 export default function TaskHistory({ onTaskCompleted, onTaskClick, theme, refreshHistoryTrigger }) {
-    
+
     // Astrazione della logica di polling API
     const { tasks, isLoading, fetchTasks } = useTaskPolling(refreshHistoryTrigger, onTaskCompleted);
 
     // --- FUNZIONI HELPER DI FORMATTAZIONE (UI) ---
-    
+
     /**
      * Pulisce il nome del file rimuovendo l'UUID generato dal backend.
      * @param {string} filename - Nome del file originale (es. '123e4567..._paziente1.nii').
@@ -97,10 +96,10 @@ export default function TaskHistory({ onTaskCompleted, onTaskClick, theme, refre
     const formatTimestamp = (dateString) => {
         if (!dateString) return "";
         const d = parseDateSicura(dateString);
-        return d.toLocaleDateString('it-IT', { 
+        return d.toLocaleDateString('it-IT', {
             day: '2-digit', month: '2-digit', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
-        }).replace(',', ''); 
+        }).replace(',', '');
     };
 
     /**
@@ -113,53 +112,67 @@ export default function TaskHistory({ onTaskCompleted, onTaskClick, theme, refre
      */
     const calculateDuration = (start, end, status) => {
         if (status !== 'COMPLETED' || !start) return null;
-        
+
         const startTime = parseDateSicura(start).getTime();
-        
+
         // Fallback: se 'end' non è ancora stato propagato o è identico a 'start',
         // usiamo l'istante attuale come stima di completamento per evitare '0s'.
         let endTime = end ? parseDateSicura(end).getTime() : new Date().getTime();
-        
+
         if (endTime <= startTime + 1000) {
-            endTime = new Date().getTime(); 
+            endTime = new Date().getTime();
         }
 
         const diffInSeconds = Math.max(1, Math.floor((endTime - startTime) / 1000));
-        
+
         if (diffInSeconds < 60) return `${diffInSeconds}s`;
-        
+
         const minutes = Math.floor(diffInSeconds / 60);
         const seconds = diffInSeconds % 60;
         return `${minutes}m ${seconds}s`;
     };
 
     // --- HANDLER EVENTI ---
-    
+
     const handleCardClick = async (task) => {
-        if (task.status !== 'COMPLETED') return; 
-        
-        try {
-            const res = await api.get(`/analyze/status/${task.id}`);
-            const data = res.data;
-            
+        // Calcoliamo l'URL del NIfTI a prescindere dallo stato (FastAPI lo salva subito!)
+        const baseURL = api.defaults.baseURL || 'http://localhost:8000';
+        const niftiUrl = `${baseURL}/analyze/nifti/${task.id}/volume.nii.gz`;
+
+        if (task.status === 'COMPLETED') {
+            try {
+                const res = await api.get(`/analyze/status/${task.id}`);
+                const data = res.data;
+                if (onTaskClick) {
+                    onTaskClick({
+                        taskId: task.id,
+                        umapData: data.plot_data,
+                        prediction: data.diagnosi_predetta,
+                        niftiUrl: niftiUrl,
+                        modelName: task.model_name,
+                        status: task.status // Passiamo lo stato al genitore!
+                    });
+                }
+            } catch (err) {
+                console.error("Errore nel caricamento del task storico:", err);
+            }
+        } else {
+            // MAGIA: Il task sta ancora frullando, ma passiamo lo stesso il NIfTI!
             if (onTaskClick) {
-                const baseURL = api.defaults.baseURL || 'http://localhost:8000';
-                
                 onTaskClick({
                     taskId: task.id,
-                    umapData: data.plot_data,
-                    prediction: data.diagnosi_predetta,
-                    niftiUrl: `${baseURL}/analyze/nifti/${task.id}/volume.nii.gz`,
-                    modelName: task.model_name 
+                    umapData: null,
+                    prediction: null,
+                    niftiUrl: niftiUrl,
+                    modelName: task.model_name,
+                    status: task.status // Segnaliamo che è ancora in corso
                 });
             }
-        } catch (err) {
-            console.error("🚨 Errore nel caricamento del task storico:", err);
         }
     };
 
     // --- STILI E CLASSI DINAMICHE ---
-    
+
     const getBadgeStyle = (status) => {
         const isDark = theme === 'dark';
         if (['PENDING', 'PROCESSING', 'ANALYZING_R'].includes(status)) {
@@ -185,8 +198,8 @@ export default function TaskHistory({ onTaskCompleted, onTaskClick, theme, refre
                 <h3 className={`font-bold text-sm tracking-wide ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>
                     STORICO PAZIENTI
                 </h3>
-                <button 
-                    onClick={fetchTasks} 
+                <button
+                    onClick={fetchTasks}
                     className={`text-xs hover:underline transition-colors ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-clinical-primary'}`}
                 >
                     Aggiorna
@@ -211,13 +224,12 @@ export default function TaskHistory({ onTaskCompleted, onTaskClick, theme, refre
                             const duration = calculateDuration(task.created_at, task.updated_at, task.status);
 
                             return (
-                                <div 
-                                    key={task.id} 
+                                <div
+                                    key={task.id}
                                     onClick={() => handleCardClick(task)}
-                                    className={`p-3 border rounded-xl shadow-sm flex flex-col gap-1 transition-all duration-200
-                                        ${task.status === 'COMPLETED' 
-                                            ? (theme === 'dark' ? 'bg-slate-800 border-slate-700 cursor-pointer hover:border-blue-500 hover:bg-slate-750' : 'bg-slate-50 border-slate-200 cursor-pointer hover:border-clinical-primary hover:shadow-md') 
-                                            : (theme === 'dark' ? 'bg-slate-800/50 border-slate-800 opacity-60 cursor-not-allowed' : 'bg-slate-50/50 border-slate-100 opacity-70 cursor-not-allowed')
+                                    className={`p-3 border rounded-xl shadow-sm flex flex-col gap-1 transition-all duration-200 cursor-pointer ${theme === 'dark'
+                                            ? 'bg-slate-800 border-slate-700 hover:border-blue-500 hover:bg-slate-750'
+                                            : 'bg-slate-50 border-slate-200 hover:border-clinical-primary hover:shadow-md'
                                         }`}
                                 >
                                     {/* Riga Superiore: Nome e Badge */}
@@ -225,17 +237,17 @@ export default function TaskHistory({ onTaskCompleted, onTaskClick, theme, refre
                                         <span className={`text-sm font-bold truncate max-w-35 ${theme === 'dark' ? 'text-slate-200' : 'text-slate-700'}`} title={cleanName}>
                                             {cleanName}
                                         </span>
-                                        
+
                                         <span className={`text-[9px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider border ${getBadgeStyle(task.status)}`}>
                                             {getBadgeText(task.status)}
                                         </span>
                                     </div>
-                                    
+
                                     {/* Riga Inferiore: Audit Trail, Timer e Modello */}
                                     <div className={`text-[10px] flex justify-between items-center mt-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
                                         <div className="flex items-center gap-2">
                                             <span>{auditTime}</span>
-                                            
+
                                             {/* RENDER CONDIZIONALE: Live Timer o Durata Statica */}
                                             {task.status === 'COMPLETED' && duration ? (
                                                 <span className={`flex items-center gap-1 ${theme === 'dark' ? 'text-emerald-400/80' : 'text-emerald-600'}`}>
