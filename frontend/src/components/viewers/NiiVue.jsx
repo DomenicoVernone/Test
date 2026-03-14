@@ -82,10 +82,21 @@ const NiiVueCanvas = ({ file, niftiUrl, colorMap = 'gray' }) => {
   // --- 2. AGGIORNAMENTO COLORE REAL-TIME ---
   useEffect(() => {
     if (nvRef.current && nvRef.current.volumes.length > 0) {
-      nvRef.current.volumes[0].colormap = colorMap;
-      nvRef.current.updateGLVolume();
+      const safeColorMap = colorMap ? colorMap.toLowerCase().trim() : 'gray';
+      
+      nvRef.current.volumes[0].colormap = safeColorMap;
+      
+      if (typeof nvRef.current.setColormap === 'function') {
+        const volumeId = nvRef.current.volumes[0].id;
+        nvRef.current.setColormap(volumeId, safeColorMap);
+      }
+      
+      if (typeof nvRef.current.updateGLVolume === 'function') {
+        nvRef.current.updateGLVolume();
+      }
     }
   }, [colorMap]);
+
 
   return (
     <div className="w-full h-full flex flex-col bg-black rounded-xl overflow-hidden">

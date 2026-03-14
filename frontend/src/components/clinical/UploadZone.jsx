@@ -94,7 +94,7 @@ const UploadZone = ({ file, files = [], uploadStatus, onFileChange, onFileSelect
                   e.stopPropagation(); 
                   if (onFileSelect) onFileSelect(f); 
                 }}
-                className={`flex-shrink-0 text-[11px] px-3 py-1 rounded-full border transition-all truncate max-w-[150px] shadow-sm ${
+                className={`shrink-0 text-[11px] px-3 py-1 rounded-full border transition-all truncate max-w-37.5 shadow-sm ${
                   file?.name === f.name
                     ? (isDark ? 'bg-blue-600 border-blue-400 text-white' : 'bg-clinical-primary border-blue-500 text-white shadow-md')
                     : (isDark ? 'bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700' : 'bg-white border-slate-300 text-slate-600 hover:border-clinical-primary')

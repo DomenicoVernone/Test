@@ -123,10 +123,10 @@ export default function Login({ theme }) {
                     <button
                         type="submit"
                         disabled={isLoading || !username || !password}
-                        className={`w-full py-3 px-4 rounded-xl text-white font-bold tracking-wide transition-all shadow-md flex justify-center items-center gap-2 
+                        className={`w-full py-3 px-4 rounded-xl font-bold tracking-wide transition-all flex justify-center items-center gap-2 
               ${isLoading || !username || !password
-                                ? 'bg-blue-300 cursor-not-allowed dark:bg-blue-800/50 dark:text-slate-400'
-                                : 'bg-clinical-primary hover:bg-blue-600 active:scale-[0.98]'}`}
+                                ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200 shadow-none dark:bg-slate-800/50 dark:text-slate-500 dark:border-slate-700'
+                                : 'bg-clinical-primary text-white hover:bg-blue-600 active:scale-[0.98] shadow-md'}`}
                     >
                         {isLoading ? (
                             <>
