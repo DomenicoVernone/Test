@@ -55,27 +55,63 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
     stop("Impossibile dedurre le feature necessarie dal modello.")
   }
 
-  print("🛡️ Allineamento dimensionale sicuro e Match Nomi...")
+  print("🛡️ Allineamento dimensionale: FUZZY MATCHING AVANZATO...")
   dati_nuovo <- data.frame(
     matrix(0, nrow = 1, ncol = length(feature_req))
   )
   colnames(dati_nuovo) <- feature_req
 
-  # --- FIX REALE: MATCH DEI NOMI IGNORANDO LA PUNTEGGIATURA ---
-  # Spostato PRIMA della predizione in modo che il modello non calcoli su 0
-  nomi_modello_puliti <- gsub("[^A-Za-z0-9]", "", feature_req)
+  # --- FIX REALE: MATCH DEI NOMI FUZZY E ANTI-DUPLICAZIONE ---
+  # 1. Rimuoviamo SOLO i suffissi creati da R (es. ".1", ".77") preservando i numeri originali (es. Imc1)
+  nomi_modello_base <- gsub("\\.[0-9]+$", "", feature_req)
+  
+  # 2. Togliamo la punteggiatura per il match con il CSV di Python
+  nomi_modello_puliti <- gsub("[^A-Za-z0-9]", "", nomi_modello_base)
   nomi_csv_puliti <- gsub("[^A-Za-z0-9]", "", colnames(dati_paziente))
   
-  # Array per salvare i nomi originali di Python (con i trattini)
   nomi_esatti_per_python <- feature_req 
+  colonne_usate <- c() # Registro per evitare di assegnare la stessa colonna del CSV più volte
   
   for (i in seq_along(feature_req)) {
+    # 1. Tentativo di Match Esatto
     idx <- match(nomi_modello_puliti[i], nomi_csv_puliti)
+    
+    # Se il match esatto è stato già usato in precedenza, forziamo il fallback
+    if (!is.na(idx) && (idx %in% colonne_usate)) {
+        idx <- NA 
+    }
+    
+    # 2. Fallback: Fuzzy Match Anti-Duplicazione (Sottostringa)
+    if (is.na(idx)) {
+      # Cerchiamo se c'è una colonna nel CSV di Nextflow che contiene questo nome pulito
+      possibili_match <- grep(nomi_modello_puliti[i], nomi_csv_puliti, ignore.case = TRUE)
+      
+      if (length(possibili_match) > 0) {
+        # Escludiamo le colonne che abbiamo già assegnato a un'altra feature
+        match_disponibili <- setdiff(possibili_match, colonne_usate)
+        
+        if (length(match_disponibili) > 0) {
+          idx <- match_disponibili[1] # Prendiamo il primo match LIBERO
+        } else {
+          idx <- possibili_match[1] # Fallback estremo se tutti sono esauriti
+        }
+      }
+    }
+    
     if (!is.na(idx)) {
+      # Registriamo la colonna come "Usata" per i prossimi cicli
+      colonne_usate <- c(colonne_usate, idx)
+      
       # Copiamo il VERO valore matematico del paziente
-      dati_nuovo[1, i] <- as.numeric(dati_paziente[1, idx])
+      val <- as.numeric(dati_paziente[1, idx])
+      
+      # Gestione sicurezza: se NA, mettiamo 0
+      dati_nuovo[1, i] <- ifelse(is.na(val), 0, val)
+      
       # Registriamo il nome esatto usato dal CSV di Python
       nomi_esatti_per_python[i] <- colnames(dati_paziente)[idx]
+    } else {
+        print(paste("⚠️ Feature non trovata nel CSV:", feature_req[i]))
     }
   }
 
@@ -122,7 +158,6 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
     )
     n_storico <- nrow(storico_x) 
     
-    # Costruisce il dataframe base con le coordinate spaziali
     storico_coords_base <- data.frame(
       x = umap_mappa$embedding[, 1],
       y = umap_mappa$embedding[, 2],
@@ -131,20 +166,16 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       stringsAsFactors = FALSE
     )
 
-    # --- SANIFICAZIONE ROBUSTA DELLE FEATURE STORICHE ---
     storico_df <- as.data.frame(storico_x)
     
-    # Garantiamo che i nomi delle colonne siano quelli di Python!
     if (ncol(storico_df) == length(feature_req)) {
       colnames(storico_df) <- nomi_esatti_per_python
     }
     
-    # Rimuoviamo eventuali colonne fantasma ".outcome"
     if (".outcome" %in% colnames(storico_df)) {
       storico_df$.outcome <- NULL
     }
     
-    # Idratazione sicura: uniamo le coordinate spaziali con le feature
     storico_coords <- cbind(storico_coords_base, storico_df)
     
     id_reali <- rownames(storico_x)
@@ -160,7 +191,6 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       n_threads = 1
     )
 
-    # --- INIEZIONE FEATURE REALI NEL NUOVO PAZIENTE ---
     dati_nuovo_json <- dati_nuovo
     colnames(dati_nuovo_json) <- nomi_esatti_per_python
     
