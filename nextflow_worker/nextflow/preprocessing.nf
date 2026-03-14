@@ -1,3 +1,16 @@
+// ==========================================
+// 0. PARAMETRI DI DEFAULT (Previene cartelle "null")
+// ==========================================
+params.outdir = "$PWD/results_fallback"
+params.segmenter_folder_output = "${params.outdir}/segmentation"
+params.features_output = "${params.outdir}/csv_interim"
+params.error_strategy = 'ignore'
+params.maxforks = 1
+params.pyradiomics_jobs = 1
+params.fastsurfer_device = 'cpu'
+params.fastsurfer_threads = 4
+params.fastsurfer_3T = false
+
 workflow {
     // ==========================================
     // 1. INGRESSO DATI (Biforcazione MLOps vs Ricerca)
@@ -5,17 +18,11 @@ workflow {
     if (params.containsKey('image') && params.image) {
         // MODO CLINICAL TWIN: Singolo paziente dalla Dashboard
         def nifti_file = file(params.image)
-        def subject_id = nifti_file.name.tokenize('.')[0] // Usa il nome del file generato da FastAPI
+        def subject_id = nifti_file.name.tokenize('.')[0] // Usa il nome del file
         def FTD_group = "clinical_patient"
         
         subjects_ch = channel.of(tuple(FTD_group, nifti_file, subject_id))
         
-        // Forziamo le cartelle di output dentro la cartella condivisa temporanea del Backend!
-        if (params.containsKey('outdir') && params.outdir) {
-            params.segmenter_folder_output = "${params.outdir}/segmentation"
-            params.features_output = "${params.outdir}/csv_interim"
-            params.feat_output = params.outdir 
-        }
     } else {
         // MODO RICERCA ORIGINALE: Batch Processing
         subjects_ch = channel
@@ -219,8 +226,8 @@ process csv_collector {
 process feature_extraction {
     maxForks params.maxforks
     errorStrategy params.error_strategy
-    publishDir "${params.feat_output}", mode: 'copy'
-
+    publishDir "${params.outdir}", mode: 'copy', pattern: 'radiomics_features.csv'
+    
     input:
     path csv_files
     path features_dir
@@ -251,12 +258,11 @@ process feature_extraction {
         fi
     done < "\${ROI_LIST_PATH}"
 
-    # --- NUOVA AGGREGAZIONE PYTHON (Sostituisce awk) ---
+    # --- AGGREGAZIONE PYTHON ---
     cat << 'EOF' > aggregate.py
 import pandas as pd
 import glob
 
-# Cerca tutti i file creati da pyradiomics nella cartella di lavoro corrente
 all_files = glob.glob('*_feat.csv')
 dfs = []
 
@@ -272,12 +278,10 @@ for f in all_files:
 
 if dfs:
     final_df = pd.concat(dfs, axis=1)
-    # Lo salva nella cartella corrente, ci penserà Nextflow a spostarlo in outdir!
     final_df.to_csv('radiomics_features.csv', index=False)
     print('✅ File radiomics_features.csv generato!')
 else:
     print('❌ Nessun file _feat.csv trovato.')
-    # Crea un file vuoto per evitare crash totali
     open('radiomics_features.csv', 'w').close()
 EOF
 

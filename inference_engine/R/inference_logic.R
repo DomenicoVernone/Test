@@ -55,15 +55,28 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
     stop("Impossibile dedurre le feature necessarie dal modello.")
   }
 
-  print("🛡️ Allineamento dimensionale sicuro...")
+  print("🛡️ Allineamento dimensionale sicuro e Match Nomi...")
   dati_nuovo <- data.frame(
     matrix(0, nrow = 1, ncol = length(feature_req))
   )
   colnames(dati_nuovo) <- feature_req
 
-  col_comuni <- intersect(feature_req, colnames(dati_paziente))
-  for (col in col_comuni) {
-    dati_nuovo[1, col] <- as.numeric(dati_paziente[1, col])
+  # --- FIX REALE: MATCH DEI NOMI IGNORANDO LA PUNTEGGIATURA ---
+  # Spostato PRIMA della predizione in modo che il modello non calcoli su 0
+  nomi_modello_puliti <- gsub("[^A-Za-z0-9]", "", feature_req)
+  nomi_csv_puliti <- gsub("[^A-Za-z0-9]", "", colnames(dati_paziente))
+  
+  # Array per salvare i nomi originali di Python (con i trattini)
+  nomi_esatti_per_python <- feature_req 
+  
+  for (i in seq_along(feature_req)) {
+    idx <- match(nomi_modello_puliti[i], nomi_csv_puliti)
+    if (!is.na(idx)) {
+      # Copiamo il VERO valore matematico del paziente
+      dati_nuovo[1, i] <- as.numeric(dati_paziente[1, idx])
+      # Registriamo il nome esatto usato dal CSV di Python
+      nomi_esatti_per_python[i] <- colnames(dati_paziente)[idx]
+    }
   }
 
   print("🚀 Esecuzione predizione clinica...")
@@ -117,13 +130,13 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       label = as.character(storico_y),
       stringsAsFactors = FALSE
     )
-    # ---------------------------------------------------------
-    # Forziamo storico_x ad essere un dataframe
+
+    # --- SANIFICAZIONE ROBUSTA DELLE FEATURE STORICHE ---
     storico_df <- as.data.frame(storico_x)
     
-    # Garantiamo che i nomi delle colonne siano quelli esatti
+    # Garantiamo che i nomi delle colonne siano quelli di Python!
     if (ncol(storico_df) == length(feature_req)) {
-      colnames(storico_df) <- feature_req
+      colnames(storico_df) <- nomi_esatti_per_python
     }
     
     # Rimuoviamo eventuali colonne fantasma ".outcome"
@@ -131,10 +144,9 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       storico_df$.outcome <- NULL
     }
     
-    # Idratazione sicura: uniamo le coordinate spaziali con le feature sanificate
+    # Idratazione sicura: uniamo le coordinate spaziali con le feature
     storico_coords <- cbind(storico_coords_base, storico_df)
-    # ---------------------------------------------------------
-
+    
     id_reali <- rownames(storico_x)
     if (is.null(id_reali) || all(id_reali == as.character(1:n_storico))) {
       storico_coords$subject_id <- paste0("Paziente_Storico_", 1:n_storico)
@@ -148,10 +160,17 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       n_threads = 1
     )
 
-    nuovo_paz_coords <- list(
-      x = nuovo_paz_emb[1, 1],
-      y = nuovo_paz_emb[1, 2],
-      z = nuovo_paz_emb[1, 3]
+    # --- INIEZIONE FEATURE REALI NEL NUOVO PAZIENTE ---
+    dati_nuovo_json <- dati_nuovo
+    colnames(dati_nuovo_json) <- nomi_esatti_per_python
+    
+    nuovo_paz_coords <- c(
+      list(
+        x = nuovo_paz_emb[1, 1],
+        y = nuovo_paz_emb[1, 2],
+        z = nuovo_paz_emb[1, 3]
+      ),
+      as.list(dati_nuovo_json)
     )
 
     plot_data_list <- list(
