@@ -75,8 +75,29 @@ export default function UmapPlot({ data, selectedModel, theme }) {
 
   // Funzione helper per rendere leggibili i nomi delle feature
   const formatFeatureName = (name) => {
-    let clean = name.replace(/_/g, ' ').replace(/-/g, ' ').replace('original', '').trim();
-    return clean.length > 20 ? clean.substring(0, 20) + '...' : clean;
+    // 1. Pulizia base dai suffissi di R (se presenti)
+    let cleanName = name.replace(/\.[0-9]+$/, ''); 
+    
+    // 2. Cerchiamo di dividere le componenti usando gli underscore
+    const parts = cleanName.split('_');
+    
+    if (parts.length >= 3) {
+      // Formato Nextflow/PyRadiomics es: "Left-Amygdala_original_firstorder_Energy"
+      // parts[0] = "Left-Amygdala"
+      // parts[1] = "original"
+      // parts[2] = "firstorder"
+      // parts[3] = "Energy" (o parts[ultimopezzo])
+      
+      const anatomy = parts[0].replace(/-/g, ' '); // Trasforma "Left-Amygdala" in "Left Amygdala"
+      const metric = parts[parts.length - 1]; // Prende l'ultima parola (es. "Energy", "Skewness")
+      
+      // Ritorniamo un formato leggibile e compatto: "Left Amygdala: Energy"
+      return `${anatomy} ${metric}`;
+    }
+    
+    // Fallback: se la stringa è corta o non ha la struttura standard, puliamola in modo classico
+    let fallbackClean = cleanName.replace(/_/g, ' ').replace(/-/g, ' ').replace('original', '').trim();
+    return fallbackClean.length > 28 ? fallbackClean.substring(0, 28) + '...' : fallbackClean;
   };
 
   // --- SEPARAZIONE CLUSTER E CREAZIONE TESTI TOOLTIP ---

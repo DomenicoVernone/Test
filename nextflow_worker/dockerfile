@@ -1,31 +1,38 @@
-# 1. Usiamo FastSurfer CPU come fondamenta
+# Dockerfile per il worker Nextflow che esegue FastAPI e PyRadiomics
 FROM deepmi/fastsurfer:cpu-v2.4.2
 
+# Imposta l'utente root
 USER root
 
+# Imposta la variabile d'ambiente per evitare interazioni durante l'installazione dei pacchetti
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 2. Installiamo SOLO Java (per Nextflow) e Python (per FastAPI e PyRadiomics)
+# Installazione di Java, curl e pip, necessari per Nextflow e FastAPI
 RUN apt-get update && apt-get install -y \
     openjdk-17-jre-headless \
     curl \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# 3. Installiamo Nextflow
+# Installazione di Nextflow
 RUN curl -s https://get.nextflow.io | bash \
     && mv nextflow /usr/local/bin/ \
     && chmod +x /usr/local/bin/nextflow
 
-# 4. Installiamo le librerie Python
+# Installazione di FastAPI, Uvicorn, Pydantic, HTTPX e PyRadiomics
 RUN pip3 install --no-cache-dir fastapi uvicorn pydantic httpx pyradiomics
 
-# 5. Setup dell'ambiente di lavoro
+# Imposta la cartella di lavoro e copia il codice del worker Nextflow
 WORKDIR /app
+
+# Copia tutto il codice del worker Nextflow nella cartella di lavoro
 COPY . /app
 
+# Esponiamo la porta su cui FastAPI ascolterà
 EXPOSE 8002
 
+# Il comando di avvio del container esegue FastAPI con Uvicorn
 ENTRYPOINT []
 
+# Comando di avvio per FastAPI, ascoltando sulla porta 8002
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]

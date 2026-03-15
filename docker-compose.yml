@@ -1,38 +1,38 @@
-# File: docker-compose.yml
 # Mappa generale dell'architettura "Clinical Twin".
 # Definisce i microservizi, la rete interna isolata e il Volume Condiviso.
 
 version: '3.8'
 
+# Rete isolata per i microservizi del Clinical Twin
 networks:
   clinical_network:
-    driver: bridge # Rete isolata per i microservizi del Clinical Twin
+    driver: bridge # Rete bridge isolata per comunicazione interna tra i container
     name: clinical_twin_net
 
-volumes: # Volume condiviso per dati clinici tra backend e inference engine
+volumes: # Volume condiviso per dati clinici tra Backend, Inference Engine e Nextflow Worker
   shared_clinical_data:
     name: clinical_twin_shared_data
 
+# Definizione dei servizi del Clinical Twin
 services:
   # 1. API GATEWAY (FastAPI + SQLite)
   backend:
-    build:
+    build: # Costruisce l'immagine del backend usando il Dockerfile nella cartella ./backend
       context: ./backend
       dockerfile: Dockerfile
     container_name: clinical_backend
     networks:
       - clinical_network
-    ports:
+    ports: 
       - "8000:8000" 
     volumes:
       - ./backend:/app # Hot-reload per Python durante lo sviluppo locale
-      - shared_clinical_data:/shared_data
-    env_file:
+      - shared_clinical_data:/shared_data # Monta il volume condiviso per l'accesso ai dati clinici
+    env_file: # Carica le variabili d'ambiente dal file .env nella cartella backend
       - ./backend/.env
     environment:
       - PYTHONUNBUFFERED=1 # Per log in tempo reale
-    # Il backend richiede che l'engine R sia in piedi per completare l'orchestrazione asincrona
-    depends_on:
+    depends_on: # Assicura che il backend sia avviato prima dell'inference_engine
       - inference_engine
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload 
 
@@ -53,8 +53,7 @@ services:
     volumes:
       - ./inference_engine:/app # Hot-reload per R durante lo sviluppo locale
       - shared_clinical_data:/shared_data
-    environment:
-      # Passiamo la variabile in modo che api.R sappia dove leggere
+    environment: 
       - SHARED_VOLUME_DIR=/shared_data
 
   # 3. DASHBOARD CLINICA (React + Vite)
@@ -85,7 +84,6 @@ services:
       - clinical_network
     ports:
       - "8002:8002"
-    volumes:
-      # 1. Montiamo i file del worker
+    volumes: # Monta il codice del worker e il volume condiviso per l'accesso ai dati clinici
       - ./nextflow_worker:/app 
       - shared_clinical_data:/shared_data

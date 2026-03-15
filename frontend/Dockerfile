@@ -1,21 +1,20 @@
-# File: frontend/Dockerfile
-# Usiamo una versione leggera di Node.js
+# Dockerfile per il frontend basato su Node.js e Vite
 FROM node:20-alpine
 
-# Impostiamo la cartella di lavoro
+# Imposta la cartella di lavoro
 WORKDIR /app
 
-# Copiamo prima package.json per sfruttare la cache dei layer Docker
+# Copia i file di configurazione e installa le dipendenze
 COPY package*.json ./
 
-# Installiamo le dipendenze
+# Installazione delle dipendenze Node.js
 RUN npm install
 
-# Copiamo il resto del codice sorgente
+# Copia tutto il codice del frontend
 COPY . .
 
-# Esponiamo la porta di default di Vite
+# Esponiamo esplicitamente la porta (Best Practice per la leggibilità)
 EXPOSE 5173
 
-# Avviamo il server di sviluppo esposto sulla rete Docker
+# Comando di avvio per Vite, ascoltando sulla porta 5173
 CMD ["npm", "run", "dev", "--", "--host"] 

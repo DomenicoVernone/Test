@@ -1,4 +1,3 @@
-# File: backend/Dockerfile
 # Usa l'immagine ufficiale di Python
 FROM python:3.10-slim
 
