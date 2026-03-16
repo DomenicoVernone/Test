@@ -61,7 +61,6 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
   )
   colnames(dati_nuovo) <- feature_req
 
-  # --- FIX REALE: MATCH DEI NOMI FUZZY E ANTI-DUPLICAZIONE ---
   # 1. Rimuoviamo SOLO i suffissi creati da R (es. ".1", ".77") preservando i numeri originali (es. Imc1)
   nomi_modello_base <- gsub("\\.[0-9]+$", "", feature_req)
   

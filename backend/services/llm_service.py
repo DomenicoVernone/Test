@@ -52,7 +52,7 @@ def estrai_dati_paziente(task_id: int) -> dict:
                     # Normalizza la chiave per il dizionario di Python
                     dati_paziente[normalizza_nome_feature(h)] = {
                         "valore": valore_float,
-                        "nome_originale": h # Manteniamo il nome bello per stamparlo all'LLM
+                        "nome_originale": h 
                     }
                 except ValueError:
                     continue
@@ -97,7 +97,8 @@ def analizza_spazio_e_statistiche(json_data: Dict[str, Any], task_id: int, k: in
     riassunto = f"[1. TOPOLOGIA SPAZIALE (UMAP)]\n"
     riassunto += f"Dei {k} pazienti storici morfologicamente più simili al caso in esame:\n"
     for label, count in conteggi.items():
-        riassunto += f"- {count} pazienti ({((count/k)*100):.1f}%) appartengono al cluster '{str(label).upper()}'.\n"
+        totale_vicini = len(vicini_top_k)
+        riassunto += f"- {count} pazienti ({((count/totale_vicini)*100):.1f}%) appartengono al cluster '{str(label).upper()}'.\n"
     riassunto += f"La distanza dal caso storico più affine è {distanze[0]['distanza']:.2f} unità.\n\n"
 
     # 3. Analisi Statistica Radiomica (Match CSV -> JSON)
@@ -158,7 +159,7 @@ def analizza_spazio_e_statistiche(json_data: Dict[str, Any], task_id: int, k: in
     for f in top_features:
         riassunto += f"- {f['nome']}:\n"
         riassunto += f"  * Paziente in esame : {f['val_paziente']:.3f}\n"
-        riassunto += f"  * Vicinato ({str(label_dominante).upper()}) : {f['media_vicini']:.3f} (± {f['std_vicini']:.3f})\n"
+        riassunto += f"  * Media Cluster ({str(label_dominante).upper()}) : {f['media_vicini']:.3f} (± {f['std_vicini']:.3f})\n"
         riassunto += f"  * Media Sani/Opposti: {f['media_opposti']:.3f}\n"
         
     if not top_features:
@@ -191,7 +192,7 @@ DATI DEL CASO CORRENTE:
 ISTRUZIONI:
 1. Rispondi alla domanda del medico in italiano in modo professionale e conciso.
 2. Spiega PERCHÉ il modello ha preso la decisione, citando la topologia e confrontando al massimo 2 o 3 feature radiomiche chiave (quelle fornite nel contesto) in cui il Paziente si discosta maggiormente dal Vicinato.
-3. Regola Matematica: Valuta se il valore del Paziente è nell'intervallo [Media - Dev.Std, Media + Dev.Std] del cluster predetto. Se è fuori, dichiara che il paziente presenta un valore ANOMALO (outlier) per quella feature.
+3. Regola Matematica: Valuta se il valore del Paziente rientra nell'intervallo [Media - (2 * Dev.Std), Media + (2 * Dev.Std)] del cluster predetto. Se è fuori, dichiara che il paziente presenta un valore ANOMALO (outlier) per quella feature.
 4. Concludi ricordando che il medico deve visionare la risonanza grezza NIfTI.
 """
 

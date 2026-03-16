@@ -137,13 +137,14 @@ process nifti_converter {
     val segmenter_folder_output
 
     output:
-    tuple val(subject), val(FTD_group), path("norm.nii"), path("aparc+aseg.nii")
+    tuple val(subject), val(FTD_group), path("nu.nii"), path("aparc+aseg.nii")
 
     script:
     """
     export FS_LICENSE=/app/license.txt
     
-    mri_convert  ${subject_dir}/mri/norm.mgz norm.nii
+    # RIPRISTINATO NU.MGZ COME DA TRAINING
+    mri_convert  ${subject_dir}/mri/nu.mgz nu.nii
     mri_convert ${subject_dir}/mri/aparc+aseg.mgz aparc+aseg.nii
     """
 }
@@ -153,7 +154,7 @@ process roi_creator {
     publishDir "${params.segmenter_folder_output}/${FTD_group}/${subject}/mri", mode: 'copy', pattern: "ROI"
 
     input:
-    tuple val(subject), val(FTD_group), path(norm_nii), path(aparc_aseg_nii), path(labels_file)
+    tuple val(subject), val(FTD_group), path(nu_nii), path(aparc_aseg_nii), path(labels_file)
     val(segmenter_folder_output)
 
     output:
@@ -176,7 +177,11 @@ process roi_creator {
             continue
         fi
 
-        mri_binarize --i ../${aparc_aseg_nii} --match \$label --o \${clean_name}.nii.gz
+        # RIPRISTINATO FSLMATHS COME DA TRAINING
+        fslmaths ../${aparc_aseg_nii} -thr \$label -uthr \$label \${clean_name}.nii.gz
+        if [[ -f "\${clean_name}.nii.gz" ]]; then
+            fslmaths \${clean_name}.nii.gz -bin \${clean_name}.nii.gz
+        fi
     done < ../${labels_file}
     """
 }
@@ -186,7 +191,6 @@ process csv_collector {
     publishDir "${params.features_output}", mode: 'copy'
 
     input:
-    //execution after segmentation
     val(segmenter_out)
     val(roi)
 
@@ -211,14 +215,15 @@ process csv_collector {
         fi
 
         echo "Image,Mask" > \${clean_name}.csv
-        find "\$REAL_SUBJECTS_DIR" -name 'norm.nii' -type f | sort > norm_images.txt
+        # RIPRISTINATO NU.NII COME DA TRAINING
+        find "\$REAL_SUBJECTS_DIR" -name 'nu.nii' -type f | sort > brain_images.txt
         while IFS= read -r image_path; do
-            mask_path="\${image_path%/norm.nii}/ROI/\${clean_name}.nii.gz"
+            mask_path="\${image_path%/nu.nii}/ROI/\${clean_name}.nii.gz"
             if [[ -f "\${mask_path}" ]]; then
                 echo "\${image_path},\${mask_path}" >> \${clean_name}.csv
             fi
-        done < norm_images.txt
-        rm -f norm_images.txt
+        done < brain_images.txt
+        rm -f brain_images.txt
     done < ${labels_file}
     """
 }
