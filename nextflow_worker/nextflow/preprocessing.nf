@@ -166,7 +166,6 @@ process roi_creator {
     
     mkdir -p ROI
 
-    # Niente 'cd ROI', lavoriamo dalla directory principale!
     while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
         if [[ -z "\$label" || "\$label" == "#"* ]]; then
             continue
@@ -177,12 +176,9 @@ process roi_creator {
             continue
         fi
 
-        # Ora le variabili puntano direttamente ai file corretti
-        fslmaths ${aparc_aseg_nii} -thr \$label -uthr \$label ROI/\${clean_name}.nii.gz
+        # SOSTITUZIONE CHIAVE: Usiamo mri_binarize invece di fslmaths!
+        mri_binarize --i ${aparc_aseg_nii} --match \$label --o ROI/\${clean_name}.nii.gz
         
-        if [[ -f "ROI/\${clean_name}.nii.gz" ]]; then
-            fslmaths ROI/\${clean_name}.nii.gz -bin ROI/\${clean_name}.nii.gz
-        fi
     done < ${labels_file}
     """
 }
