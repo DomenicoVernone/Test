@@ -34,7 +34,7 @@ class NextflowRunner:
                 response.raise_for_status()
             except Exception as e:
                 logger.error(f"🚨 Impossibile contattare il Nextflow Worker: {e}")
-                shutil.rmtree(temp_outdir, ignore_errors=True)
+                # shutil.rmtree(temp_outdir, ignore_errors=True)
                 raise RuntimeError(f"Nextflow Worker offline: {e}")
 
             logger.info(f"⏳ Nextflow in esecuzione. Attesa del file CSV o di segnali di errore...")
@@ -58,7 +58,7 @@ class NextflowRunner:
                         # Se è fallito in modo esplicito
                         if worker_status == "FAILED":
                             logger.error(f"❌ Nextflow Worker ha comunicato un FALLIMENTO per il task {task_id}!")
-                            shutil.rmtree(temp_outdir, ignore_errors=True)
+                            # shutil.rmtree(temp_outdir, ignore_errors=True)
                             raise RuntimeError(f"Il processo Nextflow è fallito internamente.")
                         
                         # Se ha finito ma il file non c'è (Evita il LOOP INFINITO!)
@@ -68,7 +68,7 @@ class NextflowRunner:
                                 generated_csv = csv_files[0]
                                 break
                             else:
-                                shutil.rmtree(temp_outdir, ignore_errors=True)
+                                # shutil.rmtree(temp_outdir, ignore_errors=True)
                                 raise RuntimeError("Nextflow ha finito ma non ha pubblicato il CSV (Errore PublishDir)!")
 
                 except httpx.RequestError as e:
@@ -82,7 +82,7 @@ class NextflowRunner:
         final_csv_path = os.path.join(settings.FEATURES_DIR, final_csv_name)
         
         shutil.move(generated_csv, final_csv_path)
-        shutil.rmtree(temp_outdir, ignore_errors=True)
+        # shutil.rmtree(temp_outdir, ignore_errors=True)
 
         logger.info(f"✅ Estrazione completata! CSV salvato in: {final_csv_path}")
         return final_csv_path

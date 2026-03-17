@@ -166,20 +166,25 @@ process roi_creator {
     
     mkdir -p ROI
 
+    # Pulizia preventiva del file TSV da eventuali ritorni a capo di Windows
+    tr -d '\\r' < ${labels_file} > clean_labels.tsv
+
     while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
         if [[ -z "\$label" || "\$label" == "#"* ]]; then
             continue
         fi
 
+        clean_label=\$(echo "\$label" | tr -cd '0-9')
         clean_name=\$(echo "\$name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
-        if [[ -z "\$clean_name" ]]; then
+        
+        if [[ -z "\$clean_name" || -z "\$clean_label" ]]; then
             continue
         fi
 
-        # SOSTITUZIONE CHIAVE: Usiamo mri_binarize invece di fslmaths!
-        mri_binarize --i ${aparc_aseg_nii} --match \$label --o ROI/\${clean_name}.nii.gz
+        # Usa il comando nativo di FreeSurfer invece di fslmaths!
+        mri_binarize --i ${aparc_aseg_nii} --match \$clean_label --o ROI/\${clean_name}.nii.gz
         
-    done < ${labels_file}
+    done < clean_labels.tsv
     """
 }
 
