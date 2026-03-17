@@ -5,10 +5,10 @@ params.outdir = "$PWD/results_fallback"
 params.segmenter_folder_output = "${params.outdir}/segmentation"
 params.features_output = "${params.outdir}/csv_interim"
 params.error_strategy = 'ignore'
-params.maxforks = 1
-params.pyradiomics_jobs = 1
+params.maxforks = 4
+params.pyradiomics_jobs = 8
 params.fastsurfer_device = 'cpu'
-params.fastsurfer_threads = 4
+params.fastsurfer_threads = 8
 params.fastsurfer_3T = false
 
 workflow {
@@ -97,7 +97,7 @@ process freesurfer {
     script:
     """
     export SUBJECTS_DIR=\$PWD   
-    recon-all -subject ${subject} -i ${nifti} -all -cw256
+    recon-all -subject ${subject} -i ${nifti} -all -cw256 -openmp ${params.fastsurfer_threads}
     """
 }
 
