@@ -170,7 +170,7 @@ export default function UmapPlot({ data, selectedModel, theme }) {
       name: '🎯 PAZIENTE IN ESAME',
       text: [hoverTextNuovo], 
       hovertemplate: '%{text}<extra></extra>',
-      marker: { size: 14, color: '#3b82f6', symbol: 'diamond', line: { color: '#ffffff', width: 3 }, opacity: 1 }
+      marker: { size: 14, color: '#3b82f6', symbol: 'circle', line: { color: '#ffffff', width: 3 }, opacity: 1 }
     }
   ];
 

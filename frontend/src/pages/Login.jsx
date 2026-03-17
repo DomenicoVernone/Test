@@ -140,8 +140,7 @@ export default function Login({ theme }) {
                 </form>
 
                 <p className={`text-center text-xs mt-8 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                    Software as a Medical Device (SaMD) • Classificazione IIa
-                </p>
+                    Progetto di Ricerca Accademica • Uso Esclusivo di Ricerca (RUO)                </p>
             </div>
         </div>
     );

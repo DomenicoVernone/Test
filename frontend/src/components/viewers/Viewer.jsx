@@ -42,7 +42,7 @@ const ClinicalViewer = ({ file, niftiUrl, activeTab, setActiveTab, isAnalyzing, 
           onClick={() => setActiveTab('3d')}
           className={`flex-1 px-4 py-3 text-xs font-bold flex items-center justify-center gap-2 rounded-xl transition-all ${activeTab === '3d' ? activeBtnClass : inactiveBtnClass}`}
         >
-          <Brain className="w-4 h-4" /> RICOSTRUZIONE ANATOMICA
+          <Brain className="w-4 h-4" /> VISUALIZZATORE MULTIPLANARE (MPR)
         </button>
         <button
           onClick={() => setActiveTab('umap')}
