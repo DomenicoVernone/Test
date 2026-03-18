@@ -60,20 +60,19 @@ workflow {
         error("Invalid brain segmenter specified. Use 'freesurfer' or 'fastsurfer'")
     }
     
-    nifti_out = nifti_converter(
-        segmenter_out,
-        params.segmenter_folder_output
-        )
-    roi = roi_creator(
-        nifti_out.combine(labels_file_ch),
-        params.segmenter_folder_output
-        )
+    // Convertiamo i file MGZ in NIfTI
+    nifti_out = nifti_converter(segmenter_out)
+    
+    // Passiamo ESATTAMENTE i due parametri al creatore di ROI
+    roi = roi_creator(nifti_out, params.labels)
+    
     csv_out = csv_collector(
         segmenter_out.collect(),
         roi.collect(), 
         segmenter_dir_ch, 
         labels_file_ch, 
         )
+        
     feature_extraction(
         csv_out, 
         features_ch, 
@@ -81,7 +80,6 @@ workflow {
         params_file_ch,
         )
 }
-
 
 process freesurfer {
     errorStrategy params.error_strategy
@@ -134,57 +132,46 @@ process nifti_converter {
 
     input:
     tuple val(subject), path(subject_dir), val(FTD_group)
-    val segmenter_folder_output
 
     output:
-    tuple val(subject), val(FTD_group), path("nu.nii"), path("aparc+aseg.nii")
+    tuple val(FTD_group), val(subject), path("aparc+aseg.nii"), path("nu.nii")
 
     script:
     """
     export FS_LICENSE=/app/license.txt
     
-    # RIPRISTINATO NU.MGZ COME DA TRAINING
-    mri_convert  ${subject_dir}/mri/nu.mgz nu.nii
+    # RIPRISTINATO NU.MGZ E APARC COME DA TRAINING
+    mri_convert ${subject_dir}/mri/nu.mgz nu.nii
     mri_convert ${subject_dir}/mri/aparc+aseg.mgz aparc+aseg.nii
     """
 }
 
 process roi_creator {
-    errorStrategy params.error_strategy
-    publishDir "${params.segmenter_folder_output}/${FTD_group}/${subject}/mri", mode: 'copy', pattern: "ROI"
-
+    label 'cpu_intensive'
+    errorStrategy 'ignore'
+    
     input:
-    tuple val(subject), val(FTD_group), path(nu_nii), path(aparc_aseg_nii), path(labels_file)
-    val(segmenter_folder_output)
+    tuple val(FTD_group), val(subject_id), path(segmentation_nifti), path(nu_nifti)
+    path labels_file 
 
     output:
-    tuple val(subject), path("ROI")
+    tuple val(FTD_group), val(subject_id), path("${subject_id}_ROIs/*.nii.gz")
 
     script:
     """
-    export FS_LICENSE=/app/license.txt
-    
-    mkdir -p ROI
+    mkdir -p ${subject_id}_ROIs
 
-    # Pulizia preventiva del file TSV da eventuali ritorni a capo di Windows
-    tr -d '\\r' < ${labels_file} > clean_labels.tsv
-
-    while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
-        if [[ -z "\$label" || "\$label" == "#"* ]]; then
-            continue
+    # Pulizia dai caratteri Windows e lettura iterativa sicura
+    tr -d '\\r' < ${labels_file} | tail -n +2 | while IFS=\$'\t' read -r roi_name roi_value || [ -n "\$roi_name" ]; do
+        if [ ! -z "\$roi_name" ] && [ ! -z "\$roi_value" ]; then
+            echo "Creazione ROI: \$roi_name (Valore: \$roi_value)"
+            
+            # Binarizzazione FreeSurfer (usa il file di segmentazione)
+            mri_binarize --i ${segmentation_nifti} \\
+                         --match "\$roi_value" \\
+                         --o ${subject_id}_ROIs/\${roi_name}.nii.gz
         fi
-
-        clean_label=\$(echo "\$label" | tr -cd '0-9')
-        clean_name=\$(echo "\$name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
-        
-        if [[ -z "\$clean_name" || -z "\$clean_label" ]]; then
-            continue
-        fi
-
-        # Usa il comando nativo di FreeSurfer invece di fslmaths!
-        mri_binarize --i ${aparc_aseg_nii} --match \$clean_label --o ROI/\${clean_name}.nii.gz
-        
-    done < clean_labels.tsv
+    done
     """
 }
 
@@ -217,6 +204,7 @@ process csv_collector {
         fi
 
         echo "Image,Mask" > \${clean_name}.csv
+        
         # RIPRISTINATO NU.NII COME DA TRAINING
         find "\$REAL_SUBJECTS_DIR" -name 'nu.nii' -type f | sort > brain_images.txt
         while IFS= read -r image_path; do
