@@ -86,4 +86,5 @@ services:
       - "8002:8002"
     volumes: # Monta il codice del worker e il volume condiviso per l'accesso ai dati clinici
       - ./nextflow_worker:/app 
+      - ./data:/app/data  
       - shared_clinical_data:/shared_data
