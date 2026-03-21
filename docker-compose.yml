@@ -12,9 +12,32 @@ networks:
 volumes: # Volume condiviso per dati clinici tra Backend, Inference Engine e Nextflow Worker
   shared_clinical_data:
     name: clinical_twin_shared_data
+  clinical_db_data:
+    name: clinical_twin_db
 
 # Definizione dei servizi del Clinical Twin
 services:
+  api_gateway:
+    build:
+      context: ./api_gateway
+      dockerfile: Dockerfile
+    container_name: clinical_api_gateway
+    networks:
+      - clinical_network
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api_gateway:/app
+      - clinical_db_data:/shared_db
+    env_file:
+      - ./api_gateway/.env
+    environment:
+      - PYTHONUNBUFFERED=1
+
+
+
+
+
   # 1. API GATEWAY (FastAPI + SQLite)
   backend:
     build: # Costruisce l'immagine del backend usando il Dockerfile nella cartella ./backend
