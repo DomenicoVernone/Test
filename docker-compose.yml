@@ -71,6 +71,22 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
+  llm_service:
+    build:
+      context: ./llm_service
+      dockerfile: Dockerfile
+    container_name: clinical_llm_service
+    networks:
+      - clinical_network
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./llm_service:/app
+      - shared_clinical_data:/shared_data
+    env_file:
+      - ./llm_service/.env
+    environment:
+      - PYTHONUNBUFFERED=1
   # 1. API GATEWAY (FastAPI + SQLite)
   backend:
     build: # Costruisce l'immagine del backend usando il Dockerfile nella cartella ./backend
