@@ -6,7 +6,8 @@
  */
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, MessageSquare, Bot, User as UserIcon, Loader2 } from 'lucide-react';
-import api from '../../services/api'; // Adatta il percorso al tuo client Axios/Fetch
+import { llmApi } from '../../services/api';
+
 
 export default function ChatLLM({ isAnalyzing, theme, prediction, taskId }) {
   
@@ -55,7 +56,7 @@ export default function ChatLLM({ isAnalyzing, theme, prediction, taskId }) {
 
     try {
       // 2. Chiamata API al backend FastAPI (endpoint /chat/)
-      const response = await api.post('/chat/', {
+      const response = await llmApi.post('/chat/', {
         task_id: taskId,
         message: userMessageTesto
       });

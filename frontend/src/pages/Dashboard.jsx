@@ -9,8 +9,8 @@ import Header from '../components/layout/Header';
 import UploadZone from '../components/clinical/UploadZone';
 import ClinicalViewer from '../components/viewers/Viewer';
 import RightSidebar from '../components/layout/RightSidebar';
+import { orchestratorApi } from '../services/api';
 
-import api from '../services/api';
 
 export default function Dashboard() {
   
@@ -76,7 +76,7 @@ export default function Dashboard() {
         formData.append('file', currentFile);
         formData.append('model_name', selectedModel);
         
-        return api.post('/analyze/', formData, {
+        return orchestratorApi.post('/analyze/', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }

@@ -22,7 +22,7 @@ async def run_inference(req: InferRequest):
         orchestrator = InferenceOrchestrator()
         result = await orchestrator.trigger_r_inference(
             task_id=req.task_id,
-            model_name=req.model_name
+            model_name=req.model_name,
         )
         return {"status": "ok", "result": result}
     except Exception as e:

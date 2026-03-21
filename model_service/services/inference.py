@@ -72,41 +72,36 @@ class InferenceOrchestrator:
             
         return rds_files[0]
 
-    async def trigger_r_inference(self, task_id: int, model_name: str) -> dict:
-        """
-        Scarica il modello da MLflow e triggera l'API R in modo completamente asincrono.
-        """
+    async def trigger_r_inference(self, task_id: int, model_name: str, skip_mlflow: bool = False) -> dict:
         try:
-            # 1. Recupero URI da MLflow (Chiamata di rete molto rapida, tollerabile in async puro)
-            model_uri = self.get_champion_uri(model_name)
-            logger.info(f"Task {task_id}: Trovato modello champion con URI -> {model_uri}")
+            if skip_mlflow:
+                # Modalità mock — R legge il CSV già presente, nessun download MLflow
+                logger.info(f"Task {task_id}: skip_mlflow=True, salto download modello.")
+                exact_rds_path = os.path.join(
+                    settings.SHARED_VOLUME_DIR, "models", model_name, "model.rds"
+                )
+            else:
+                model_uri = self.get_champion_uri(model_name)
+                logger.info(f"Task {task_id}: Trovato modello champion -> {model_uri}")
+                exact_rds_path = await asyncio.to_thread(
+                    self._sync_download_and_find_rds,
+                    model_uri,
+                    model_name
+                )
 
-            # 2, 3 e 4. Caching, Download e Ricerca .rds
-            # Offload dell'intero blocco I/O-bound su un worker thread
-            # usando asyncio.to_thread(). L'Event loop attenderà il risultato senza bloccarsi.
-            exact_rds_path = await asyncio.to_thread(
-                self._sync_download_and_find_rds, 
-                model_uri, 
-                model_name
-            )
-            
-            logger.info(f"File modello R esatto trovato in: {exact_rds_path}")
+            logger.info(f"File modello R: {exact_rds_path}")
 
-            # 5. Chiamata asincrona al microservizio R (I/O di Rete non bloccante)
             async with httpx.AsyncClient() as client:
                 payload = {
                     "task_id": str(task_id),
                     "model_name": model_name,
                     "model_dir": exact_rds_path
                 }
-                
                 response = await client.post(self.r_engine_url, json=payload, timeout=60.0)
-                
                 if response.status_code != 200:
                     raise RuntimeError(f"Il motore R ha restituito errore {response.status_code}: {response.text}")
-                    
                 return response.json()
-                
+
         except Exception as e:
             logger.error(f"Errore durante l'inferenza del Task {task_id}: {str(e)}")
             raise e
