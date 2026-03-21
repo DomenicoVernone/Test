@@ -1,22 +1,22 @@
-# Mappa generale dell'architettura "Clinical Twin".
-# Definisce i microservizi, la rete interna isolata e il Volume Condiviso.
+# Architettura "Clinical Twin" — Microservizi
+# Versione: 2.0.0 (refactor microservices + DooD)
 
 version: '3.8'
 
-# Rete isolata per i microservizi del Clinical Twin
 networks:
   clinical_network:
-    driver: bridge # Rete bridge isolata per comunicazione interna tra i container
+    driver: bridge
     name: clinical_twin_net
 
-volumes: # Volume condiviso per dati clinici tra Backend, Inference Engine e Nextflow Worker
+volumes:
   shared_clinical_data:
     name: clinical_twin_shared_data
   clinical_db_data:
     name: clinical_twin_db
 
-# Definizione dei servizi del Clinical Twin
 services:
+
+  # 1. API GATEWAY — Autenticazione e JWT
   api_gateway:
     build:
       context: ./api_gateway
@@ -34,6 +34,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
+  # 2. ORCHESTRATOR — Pipeline asincrona e task management
   orchestrator:
     build:
       context: ./orchestrator
@@ -54,6 +55,7 @@ services:
     depends_on:
       - api_gateway
 
+  # 3. MODEL SERVICE — MLflow + trigger inferenza R
   model_service:
     build:
       context: ./model_service
@@ -70,7 +72,10 @@ services:
       - ./model_service/.env
     environment:
       - PYTHONUNBUFFERED=1
+    depends_on:
+      - inference_engine
 
+  # 4. LLM SERVICE — Assistente AI context-aware
   llm_service:
     build:
       context: ./llm_service
@@ -87,28 +92,8 @@ services:
       - ./llm_service/.env
     environment:
       - PYTHONUNBUFFERED=1
-  # 1. API GATEWAY (FastAPI + SQLite)
-  backend:
-    build: # Costruisce l'immagine del backend usando il Dockerfile nella cartella ./backend
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: clinical_backend
-    networks:
-      - clinical_network
-    ports: 
-      - "8000:8000" 
-    volumes:
-      - ./backend:/app # Hot-reload per Python durante lo sviluppo locale
-      - shared_clinical_data:/shared_data # Monta il volume condiviso per l'accesso ai dati clinici
-    env_file: # Carica le variabili d'ambiente dal file .env nella cartella backend
-      - ./backend/.env
-    environment:
-      - PYTHONUNBUFFERED=1 # Per log in tempo reale
-    depends_on: # Assicura che il backend sia avviato prima dell'inference_engine
-      - inference_engine
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload 
 
-  # 2. INFERENCE ENGINE (Plumber + R)
+  # 5. INFERENCE ENGINE — Motore statistico R (Plumber)
   inference_engine:
     build:
       context: ./inference_engine
@@ -116,21 +101,17 @@ services:
     container_name: inference_engine
     networks:
       - clinical_network
-    # NOTA ARCHITETTURALE (SICUREZZA): 
-    # Esposizione porta abilitata ESCLUSIVAMENTE per debug locale (accesso da Postman/Browser host).
-    # In ambiente di produzione, rimuovere questa direttiva per isolare il motore di calcolo.
-    # Il Backend vi accederà comunque in modo sicuro tramite DNS interno (http://inference_engine:8000).
     ports:
-      - "8004:8000" 
+      - "8004:8000"
     volumes:
-      - ./inference_engine:/app # Hot-reload per R durante lo sviluppo locale
+      - ./inference_engine:/app
       - shared_clinical_data:/shared_data
-    environment: 
+    environment:
       - SHARED_VOLUME_DIR=/shared_data
 
-  # 3. DASHBOARD CLINICA (React + Vite)
+  # 6. FRONTEND — Dashboard clinica React
   frontend:
-    build: 
+    build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: clinical_frontend
@@ -139,24 +120,29 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend:/app # Hot-reload per React durante lo sviluppo locale
-      - /app/node_modules  
+      - ./frontend:/app
+      - /app/node_modules
     environment:
-      - CHOKIDAR_USEPOLLING=true # Per hot-reload affidabile su Docker  
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
-      - backend
+      - api_gateway
+      - orchestrator
+      - llm_service
 
-  # 4. DATA EXTRACTION TIER (Nextflow Orchestrator)
-  nextflow_worker:
-    build: 
-      context: ./nextflow_worker
-      dockerfile: Dockerfile
-    container_name: nextflow_worker
-    networks:
-      - clinical_network
-    ports:
-      - "8002:8002"
-    volumes: # Monta il codice del worker e il volume condiviso per l'accesso ai dati clinici
-      - ./nextflow_worker:/app 
-      - ./data:/app/data  
-      - shared_clinical_data:/shared_data
+  # 7. NEXTFLOW WORKER — Pipeline neuroimaging (DooD)
+  # TODO: da implementare nella prossima sessione
+  # nextflow_worker:
+  #   build:
+  #     context: ./nextflow_worker
+  #     dockerfile: Dockerfile
+  #   container_name: nextflow_worker
+  #   networks:
+  #     - clinical_network
+  #   ports:
+  #     - "8005:8000"
+  #   volumes:
+  #     - ./nextflow_worker:/app
+  #     - shared_clinical_data:/shared_data
+  #     - /var/run/docker.sock:/var/run/docker.sock  # DooD
+  #   environment:
+  #     - SHARED_VOLUME_DIR=/shared_data
