@@ -54,6 +54,22 @@ services:
     depends_on:
       - api_gateway
 
+  model_service:
+    build:
+      context: ./model_service
+      dockerfile: Dockerfile
+    container_name: clinical_model_service
+    networks:
+      - clinical_network
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./model_service:/app
+      - shared_clinical_data:/shared_data
+    env_file:
+      - ./model_service/.env
+    environment:
+      - PYTHONUNBUFFERED=1
 
   # 1. API GATEWAY (FastAPI + SQLite)
   backend:
@@ -89,7 +105,7 @@ services:
     # In ambiente di produzione, rimuovere questa direttiva per isolare il motore di calcolo.
     # Il Backend vi accederà comunque in modo sicuro tramite DNS interno (http://inference_engine:8000).
     ports:
-      - "8001:8000" 
+      - "8004:8000" 
     volumes:
       - ./inference_engine:/app # Hot-reload per R durante lo sviluppo locale
       - shared_clinical_data:/shared_data
