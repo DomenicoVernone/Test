@@ -1,70 +1,32 @@
-# ==========================================
-# FILE: nextflow_worker/Dockerfile
-# VERSIONE: "The Compatibility King" - Python 3.10
-# ==========================================
+FROM eclipse-temurin:17-jdk-jammy
 
-FROM freesurfer/freesurfer:7.2.0
+# Installa dipendenze di sistema + Docker CLI
+RUN apt-get update && apt-get install -y \
+    curl \
+    bash \
+    python3 \
+    python3-pip \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y docker-ce-cli \
+    && rm -rf /var/lib/apt/lists/*
 
-USER root
-
-# 1. FIX REPOS CENTOS 8 (Vault)
-RUN cd /etc/yum.repos.d/ && \
-    sed -i 's/mirrorlist/#mirrorlist/g' CentOS-* && \
-    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' CentOS-* || true
-
-# 2. DIPENDENZE DI SISTEMA
-RUN yum update -y && \
-    yum install -y which wget curl unzip file bzip2 gcc gcc-c++ make mesa-libGL python3 && \
-    yum clean all
-
-# 3. INSTALLAZIONE JAVA 17 MANUALE
-RUN curl -L https://corretto.aws/downloads/latest/amazon-corretto-17-x64-linux-jdk.tar.gz -o java17.tar.gz && \
-    mkdir -p /opt/java17 && \
-    tar -xzf java17.tar.gz -C /opt/java17 --strip-components=1 && \
-    rm java17.tar.gz
-
-ENV JAVA_HOME=/opt/java17
-ENV PATH=$JAVA_HOME/bin:$PATH
-
-# 4. FSL (FMRIB Software Library)
-RUN curl -sSLO https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py && \
-    python3 fslinstaller.py -d /usr/local/fsl -q && \
-    rm fslinstaller.py
-
-ENV FSLDIR=/usr/local/fsl
-ENV PATH=$FSLDIR/bin:$PATH
-ENV FSLOUTPUTTYPE=NIFTI_GZ
-ENV FSLMULTIFILEQUIT=TRUE
-
-# 5. NEXTFLOW
+# Installa Nextflow
 RUN curl -s https://get.nextflow.io | bash && \
     mv nextflow /usr/local/bin/ && \
     chmod +x /usr/local/bin/nextflow
 
-# 6. MINICONDA (Versione Legacy) E PYRADIOMICS (Python 3.10)
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh -O miniconda.sh && \
-    bash miniconda.sh -b -p /opt/conda && \
-    rm miniconda.sh
-
-ENV PATH="/opt/conda/bin:${PATH}"
-
-# Usiamo Python 3.10 invece della 3.12 per compatibilità GLIBC
-RUN conda install -y python=3.10 && \
-    pip install --upgrade pip setuptools wheel && \
-    wget https://github.com/AIM-Harvard/pyradiomics/archive/refs/heads/master.zip && \
-    unzip master.zip && \
-    cd pyradiomics-master && \
-    python -m pip install . && \
-    cd .. && \
-    rm -rf pyradiomics-master master.zip
-
-# 7. FASTAPI E LICENZA
-RUN pip install --no-cache-dir fastapi uvicorn pydantic httpx
-COPY license.txt /usr/local/freesurfer/.license
-
-# 8. APP SETUP
 WORKDIR /app
-COPY . /app
-EXPOSE 8002
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]
+COPY . .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,42 +1,38 @@
 // ==========================================
-// 0. PARAMETRI DI DEFAULT (Previene cartelle "null")
+// 0. PARAMETRI DI DEFAULT
 // ==========================================
-params.outdir = "$PWD/results_fallback"
+params.outdir = "/shared_data/nf_output"
 params.segmenter_folder_output = "${params.outdir}/segmentation"
-params.features_output = "${params.outdir}/csv_interim"
+params.features_output = "${params.outdir}/features"
+params.feat_output = "${params.outdir}/feat"
 params.error_strategy = 'ignore'
-params.maxforks = 4
-params.pyradiomics_jobs = 8
+params.maxforks = 1
+params.pyradiomics_jobs = 4
 params.fastsurfer_device = 'cpu'
-params.fastsurfer_threads = 8
+params.fastsurfer_threads = 4
 params.fastsurfer_3T = false
 
 workflow {
     // ==========================================
-    // 1. INGRESSO DATI (Biforcazione MLOps vs Ricerca)
+    // 1. INGRESSO DATI — Modalità Clinical Twin
     // ==========================================
     if (params.containsKey('image') && params.image) {
-        // MODO CLINICAL TWIN: Singolo paziente dalla Dashboard
         def nifti_file = file(params.image)
-        def subject_id = nifti_file.name.tokenize('.')[0] // Usa il nome del file
+        def subject_id = nifti_file.name.tokenize('.')[0]
         def FTD_group = "clinical_patient"
-        
         subjects_ch = channel.of(tuple(FTD_group, nifti_file, subject_id))
-        
     } else {
-        // MODO RICERCA ORIGINALE: Batch Processing
         subjects_ch = channel
             .fromList(params.dataset)
-            .map { folder -> 
-                file("${folder}/*.nii*") 
+            .map { folder ->
                 def FTD_group = file(folder).name
-                return tuple(file("${folder}/*.nii*"), FTD_group)
-                }
+                return tuple(file("${folder}/*.nii"), FTD_group)
+            }
             .transpose()
-            .map { nifti, FTD_group->
+            .map { nifti, FTD_group ->
                 def filename = nifti.name
                 def subject_id = (filename =~ /^NIFD_([0-9]*_S_[0-9]*)_.*/)
-                .findResult { _match, id -> id }
+                    .findResult { _match, id -> id }
                 return tuple(FTD_group, nifti, subject_id)
             }
     }
@@ -54,34 +50,33 @@ workflow {
     // ==========================================
     if (params.brain_segmenter == "freesurfer") {
         segmenter_out = freesurfer(subjects_ch)
-    } else if (params.brain_segmenter == "fastsurfer"){
+    } else if (params.brain_segmenter == "fastsurfer") {
         segmenter_out = fastsurfer(subjects_ch, file(params.license))
     } else {
-        error("Invalid brain segmenter specified. Use 'freesurfer' or 'fastsurfer'")
+        error("Segmentatore non valido. Usa 'freesurfer' o 'fastsurfer'")
     }
-    
-    // Convertiamo i file MGZ in NIfTI
-    nifti_out = nifti_converter(segmenter_out)
-    
-    // Passiamo ESATTAMENTE i due parametri al creatore di ROI
-    roi = roi_creator(nifti_out, params.labels)
-    
+
+    nifti_out = nifti_converter(segmenter_out, params.segmenter_folder_output)
+
+    roi = roi_creator(nifti_out.combine(labels_file_ch), params.segmenter_folder_output)
+
     csv_out = csv_collector(
         segmenter_out.collect(),
-        roi.collect(), 
-        segmenter_dir_ch, 
-        labels_file_ch, 
-        )
-        
+        roi.collect(),
+        segmenter_dir_ch,
+        labels_file_ch
+    )
+
     feature_extraction(
-        csv_out, 
-        features_ch, 
-        labels_file_ch, 
-        params_file_ch,
-        )
+        csv_out,
+        features_ch,
+        labels_file_ch,
+        params_file_ch
+    )
 }
 
 process freesurfer {
+    container 'clinical-freesurfer'
     errorStrategy params.error_strategy
     publishDir "${params.segmenter_folder_output}/${FTD_group}", mode: 'copy', pattern: "${subject}"
     maxForks params.maxforks
@@ -90,16 +85,18 @@ process freesurfer {
     tuple val(FTD_group), file(nifti), val(subject)
 
     output:
-    tuple val(subject), path("${subject}",  type: 'dir'), val(FTD_group)
+    tuple val(subject), path("${subject}", type: 'dir'), val(FTD_group)
 
     script:
     """
-    export SUBJECTS_DIR=\$PWD   
-    recon-all -subject ${subject} -i ${nifti} -all -cw256 -openmp ${params.fastsurfer_threads}
+    export SUBJECTS_DIR=\$PWD
+    recon-all -subject ${subject} -i ${nifti} -all -cw256
     """
 }
 
 process fastsurfer {
+    container 'deepmi/fastsurfer:cuda-v2.4.2'
+    containerOptions '--gpus all --user $(id -u):$(id -g) --entrypoint ""'
     errorStrategy params.error_strategy
     publishDir "${params.segmenter_folder_output}/${FTD_group}", mode: 'copy', pattern: "${subject}"
     maxForks params.maxforks
@@ -107,15 +104,14 @@ process fastsurfer {
     input:
     tuple val(FTD_group), file(nifti), val(subject)
     file license
- 
+
     output:
     tuple val(subject), path("${subject}", type: 'dir'), val(FTD_group)
- 
+
     script:
     """
     T1_PATH=\$(realpath ${nifti})
     export FS_LICENSE=\$PWD/${license}
-
     run_fastsurfer.sh \\
         --t1 \$T1_PATH \\
         --sid ${subject} \\
@@ -127,85 +123,83 @@ process fastsurfer {
 }
 
 process nifti_converter {
+    container 'clinical-freesurfer'
     errorStrategy params.error_strategy
     publishDir "${params.segmenter_folder_output}/${FTD_group}/${subject}/mri", mode: 'copy'
 
     input:
     tuple val(subject), path(subject_dir), val(FTD_group)
+    val segmenter_folder_output
 
     output:
-    tuple val(FTD_group), val(subject), path("aparc+aseg.nii"), path("nu.nii")
+    tuple val(subject), val(FTD_group), path("nu.nii"), path("aparc+aseg.nii")
 
     script:
     """
     export FS_LICENSE=/app/license.txt
-    
-    # RIPRISTINATO NU.MGZ E APARC COME DA TRAINING
     mri_convert ${subject_dir}/mri/nu.mgz nu.nii
     mri_convert ${subject_dir}/mri/aparc+aseg.mgz aparc+aseg.nii
     """
 }
 
 process roi_creator {
-    label 'cpu_intensive'
-    errorStrategy 'ignore'
-    
+    container 'clinical-fsl'
+    errorStrategy params.error_strategy
+    publishDir "${params.segmenter_folder_output}/${FTD_group}/${subject}/mri", mode: 'copy', pattern: "ROI"
+
     input:
-    tuple val(FTD_group), val(subject_id), path(segmentation_nifti), path(nu_nifti)
-    path labels_file 
+    tuple val(subject), val(FTD_group), path(nu_nii), path(aparc_aseg_nii), path(labels_file)
+    val segmenter_folder_output
 
     output:
-    tuple val(FTD_group), val(subject_id), path("${subject_id}_ROIs/*.nii.gz")
+    tuple val(subject), path("ROI")
 
     script:
     """
-    mkdir -p ${subject_id}_ROIs
-
-    # Pulizia dai caratteri Windows e lettura iterativa sicura
-    tr -d '\\r' < ${labels_file} | tail -n +2 | while IFS=\$'\t' read -r roi_name roi_value || [ -n "\$roi_name" ]; do
-        if [ ! -z "\$roi_name" ] && [ ! -z "\$roi_value" ]; then
-            echo "Creazione ROI: \$roi_name (Valore: \$roi_value)"
-            
-            # Binarizzazione FreeSurfer (usa il file di segmentazione)
-            mri_binarize --i ${segmentation_nifti} \\
-                         --match "\$roi_value" \\
-                         --o ${subject_id}_ROIs/\${roi_name}.nii.gz
+    mkdir -p ROI
+    cd ROI
+    while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
+        if [[ -z "\$label" || "\$label" == "#"* ]]; then
+            continue
         fi
-    done
+        clean_name=\$(echo "\$name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
+        if [[ -z "\$clean_name" ]]; then
+            continue
+        fi
+        fslmaths ../${aparc_aseg_nii} -thr \$label -uthr \$label \${clean_name}.nii.gz
+        if [[ -f "\${clean_name}.nii.gz" ]]; then
+            fslmaths \${clean_name}.nii.gz -bin \${clean_name}.nii.gz
+        fi
+    done < ../${labels_file}
     """
 }
 
 process csv_collector {
+    container 'clinical-pyradiomics'
     errorStrategy params.error_strategy
     publishDir "${params.features_output}", mode: 'copy'
 
     input:
     val(segmenter_out)
     val(roi)
-
     path subjects_dir
     path labels_file
 
     output:
-    path ("*.csv")
+    path("*.csv")
 
     script:
     """
     REAL_SUBJECTS_DIR=\$(readlink -f ${subjects_dir})
-
     while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
         if [[ -z "\$label" || "\$label" == "#"* ]]; then
             continue
         fi
-
         clean_name=\$(echo "\$name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
         if [[ -z "\$clean_name" ]]; then
             continue
         fi
-
         echo "Image,Mask" > \${clean_name}.csv
-        
-        # RIPRISTINATO NU.NII COME DA TRAINING
         find "\$REAL_SUBJECTS_DIR" -name 'nu.nii' -type f | sort > brain_images.txt
         while IFS= read -r image_path; do
             mask_path="\${image_path%/nu.nii}/ROI/\${clean_name}.nii.gz"
@@ -219,10 +213,10 @@ process csv_collector {
 }
 
 process feature_extraction {
-    maxForks params.maxforks
+    container 'clinical-pyradiomics'
     errorStrategy params.error_strategy
     publishDir "${params.outdir}", mode: 'copy', pattern: 'radiomics_features.csv'
-    
+
     input:
     path csv_files
     path features_dir
@@ -230,37 +224,31 @@ process feature_extraction {
     path settings
 
     output:
-    path ("*_feat.csv"), optional: true
-    path ("radiomics_features.csv"), optional: true
+    path("*_feat.csv"), optional: true
+    path("radiomics_features.csv"), optional: true
 
     script:
     """
-    ROI_LIST_PATH="${labels_file}"
-
     while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
         if [[ -z "\$label" || "\$label" == "#"* ]]; then
             continue
         fi
-
         clean_name=\$(echo "\$name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
         if [[ -z "\$clean_name" ]]; then
             continue
         fi
-
         input_csv="\${clean_name}.csv"
         if [[ -f "\${input_csv}" ]]; then
             pyradiomics "\${input_csv}" -o "\${clean_name}_feat.csv" --param "${settings}" -f csv --jobs ${params.pyradiomics_jobs}
         fi
     done < "\${ROI_LIST_PATH}"
 
-    # --- AGGREGAZIONE PYTHON ---
     cat << 'EOF' > aggregate.py
 import pandas as pd
 import glob
 
 all_files = glob.glob('*_feat.csv')
 dfs = []
-
 for f in all_files:
     roi = f.replace('_feat.csv', '')
     try:
@@ -270,16 +258,14 @@ for f in all_files:
         dfs.append(df)
     except Exception:
         pass
-
 if dfs:
     final_df = pd.concat(dfs, axis=1)
     final_df.to_csv('radiomics_features.csv', index=False)
-    print('✅ File radiomics_features.csv generato!')
+    print('✅ radiomics_features.csv generato!')
 else:
     print('❌ Nessun file _feat.csv trovato.')
     open('radiomics_features.csv', 'w').close()
 EOF
-
     python3 aggregate.py
     """
 }

@@ -131,18 +131,18 @@ services:
 
   # 7. NEXTFLOW WORKER — Pipeline neuroimaging (DooD)
   # TODO: da implementare nella prossima sessione
-  # nextflow_worker:
-  #   build:
-  #     context: ./nextflow_worker
-  #     dockerfile: Dockerfile
-  #   container_name: nextflow_worker
-  #   networks:
-  #     - clinical_network
-  #   ports:
-  #     - "8005:8000"
-  #   volumes:
-  #     - ./nextflow_worker:/app
-  #     - shared_clinical_data:/shared_data
-  #     - /var/run/docker.sock:/var/run/docker.sock  # DooD
-  #   environment:
-  #     - SHARED_VOLUME_DIR=/shared_data
+  nextflow_worker:
+    build:
+      context: ./nextflow_worker
+      dockerfile: Dockerfile
+    container_name: nextflow_worker
+    networks:
+      - clinical_network
+    ports:
+      - "8005:8000"
+    volumes:
+      - ./nextflow_worker:/app
+      - shared_clinical_data:/shared_data
+      - /var/run/docker.sock:/var/run/docker.sock  # DooD
+    environment:
+      - SHARED_VOLUME_DIR=/shared_data

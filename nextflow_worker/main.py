@@ -17,17 +17,18 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str):
     os.makedirs(outdir, exist_ok=True)
     
     cmd = [
-        "nextflow", "run", "/app/nextflow/preprocessing.nf",
-        "-resume",
-        "--image", input_path,
-        "--outdir", outdir
+    "nextflow", "run", "/app/nextflow/preprocessing.nf",
+    "-c", "/app/nextflow/nextflow.config",
+    "-resume",
+    "--image", input_path,
+    "--outdir", outdir
     ]
     
     print(f"🔄 Avvio Nextflow per Task {task_id} nella directory del volume condiviso: {outdir}...")
     
     try:
         # cwd=outdir costringe Nextflow a lavorare e mettere il lucchetto qui
-        subprocess.run(cmd, cwd=outdir, check=True)
+        subprocess.run(cmd, cwd="/app", check=True)
         print(f"✅ Task {task_id} completato dal Worker Nextflow!")
         
         TASKS_STATUS[task_id] = "SUCCESS"
