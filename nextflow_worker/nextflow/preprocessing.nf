@@ -90,7 +90,7 @@ process freesurfer {
     script:
     """
     export SUBJECTS_DIR=\$PWD
-    recon-all -subject ${subject} -i ${nifti} -all -cw256
+    recon-all -subject ${subject} -i ${nifti} -all -cw256 -openmp 16
     """
 }
 

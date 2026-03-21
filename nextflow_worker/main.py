@@ -24,6 +24,7 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str):
     # Copia il NIfTI in /tmp dove è accessibile dai container DooD
     tmp_nifti = f"/tmp/nextflow_work/nifti_{task_id}_{os.path.basename(input_path)}"
     shutil.copy2(input_path, tmp_nifti)
+    shutil.copy2("/app/license.txt", "/tmp/freesurfer_license.txt")
 
     cmd = [
         "nextflow", "run", "/app/nextflow/preprocessing.nf",

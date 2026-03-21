@@ -3,7 +3,8 @@ Router per l'Orchestrazione Asincrona.
 Gestisce unicamente le richieste HTTP, delegando l'elaborazione ai background tasks.
 """
 import shutil
-import uuid
+import hashlib
+import io
 import os
 import json
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, BackgroundTasks
@@ -31,12 +32,16 @@ async def upload_nifti_file(
     if not file.filename.endswith(('.nii', '.nii.gz')):
         raise HTTPException(status_code=400, detail="Formato non supportato. Caricare solo .nii o .nii.gz")
 
-    unique_filename = f"{uuid.uuid4()}_{file.filename}"
+    # Usa hash MD5 del contenuto invece di UUID casuale
+    # Così lo stesso file produce sempre lo stesso nome → Nextflow può usare la cache -resume
+    file_content = await file.read()
+    file_hash = hashlib.md5(file_content).hexdigest()[:8]
+    unique_filename = f"{file_hash}_{file.filename}"
     file_path = os.path.join(settings.NIFTI_DIR, unique_filename)
 
     try:
         with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            buffer.write(file_content)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Errore I/O Volume Condiviso: {str(e)}")
 
@@ -52,7 +57,6 @@ async def upload_nifti_file(
     db.commit()
     db.refresh(new_task)
 
-    # Il task in background gestirà SIA Nextflow CHE l'inferenza R
     background_tasks.add_task(
         run_full_pipeline, 
         task_id=new_task.id, 
@@ -89,24 +93,18 @@ async def get_task_status(
     if not task:
         raise HTTPException(status_code=404, detail="Task non trovato o non autorizzato")
 
-    # Se la pipeline (Nextflow + R) è ancora in corso
     if task.status in ["PENDING", "PROCESSING", "ANALYZING_R"]:
         return {"status": task.status, "message": "Elaborazione in corso...", "progress": task.progress}
 
-    # Se il background task ha finito TUTTO con successo
     if task.status == "COMPLETED":
         result_path = os.path.join(settings.RESULTS_DIR, f"result_{task_id}.json")
         
-        # CONTROLLO ANTI-RACE CONDITION DOCKER
         if os.path.exists(result_path):
             with open(result_path, "r") as f:
                 dati_json = json.load(f)
-                # Assicuriamoci di iniettare lo status "COMPLETED" dentro il payload per React
                 dati_json["status"] = "COMPLETED"
                 return dati_json
         else:
-            # Il database ha finito, ma il file system Docker è in ritardo.
-            # Diciamo al frontend che stiamo ancora elaborando, così riproverà tra 1 secondo!
             return {"status": "PROCESSING", "message": "Sincronizzazione disco in corso...", "progress": 99.0}
         
     if task.status == "ERROR":
