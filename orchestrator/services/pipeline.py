@@ -13,7 +13,7 @@ from services.nextflow_runner import NextflowRunner
 
 logger = logging.getLogger(__name__)
 
-USE_MOCK = True
+USE_MOCK = False
 
 async def run_full_pipeline(task_id: int, model_name: str):
     db: Session = SessionLocal()

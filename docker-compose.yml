@@ -144,5 +144,10 @@ services:
       - ./nextflow_worker:/app
       - shared_clinical_data:/shared_data
       - /var/run/docker.sock:/var/run/docker.sock  # DooD
+      - /tmp/nextflow_work:/tmp/nextflow_work
+
     environment:
       - SHARED_VOLUME_DIR=/shared_data
+      - HOST_SHARED_VOLUME_DIR=${HOST_SHARED_VOLUME_DIR:-/shared_data}
+      - NF_OUTDIR=${NF_OUTDIR:-/shared_data/nf_output}
+      - NF_LABELS=${NF_LABELS:-/app/data/external/ROI_labels.tsv}
