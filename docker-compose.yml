@@ -34,8 +34,25 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
-
-
+  orchestrator:
+    build:
+      context: ./orchestrator
+      dockerfile: Dockerfile
+    container_name: clinical_orchestrator
+    networks:
+      - clinical_network
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./orchestrator:/app
+      - clinical_db_data:/shared_db
+      - shared_clinical_data:/shared_data
+    env_file:
+      - ./orchestrator/.env
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - api_gateway
 
 
   # 1. API GATEWAY (FastAPI + SQLite)
