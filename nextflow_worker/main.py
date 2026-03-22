@@ -22,8 +22,9 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str):
     os.makedirs(host_outdir, exist_ok=True)
 
     # Copia il NIfTI in /tmp dove è accessibile dai container DooD
-    tmp_nifti = f"/tmp/nextflow_work/nifti_{task_id}_{os.path.basename(input_path)}"
-    shutil.copy2(input_path, tmp_nifti)
+    tmp_nifti = f"/tmp/nextflow_work/nifti_{os.path.basename(input_path)}"
+    if not os.path.exists(tmp_nifti):
+    	shutil.copy2(input_path, tmp_nifti)
     shutil.copy2("/app/license.txt", "/tmp/freesurfer_license.txt")
 
     cmd = [
@@ -45,10 +46,7 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str):
     except subprocess.CalledProcessError as e:
         print(f"❌ ERRORE: Nextflow fallito per il Task {task_id} con codice {e.returncode}")
         TASKS_STATUS[task_id] = "FAILED"
-    finally:
-        if os.path.exists(tmp_nifti):
-            os.remove(tmp_nifti)
-
+      
 @app.post("/start_preprocessing")
 async def start_preprocessing(task: NextflowTask, background_tasks: BackgroundTasks):
     TASKS_STATUS[task.task_id] = "RUNNING"
