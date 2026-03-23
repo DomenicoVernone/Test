@@ -141,7 +141,7 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       storico_x,
       n_components = 3,
       n_neighbors = n_neigh,
-      min_dist = 0.1,
+      min_dist = 0.01,
       n_threads = 1,
       ret_model = TRUE
     )

@@ -43,7 +43,7 @@ class NextflowRunner:
 
             while True:
                 # Cerca il CSV ovunque nella cartella
-                csv_files = glob.glob(f"{temp_outdir}/**/*.csv", recursive=True)
+                csv_files = glob.glob(f"{temp_outdir}/**/radiomics_features.csv", recursive=True)
                 
                 if csv_files:
                     generated_csv = csv_files[0]
@@ -63,7 +63,7 @@ class NextflowRunner:
                         
                         # Se ha finito ma il file non c'è (Evita il LOOP INFINITO!)
                         if worker_status in ["COMPLETED", "SUCCESS", "FINISHED"]:
-                            csv_files = glob.glob(f"{temp_outdir}/**/*.csv", recursive=True)
+                            csv_files = glob.glob(f"{temp_outdir}/**/radiomics_features.csv", recursive=True)
                             if csv_files:
                                 generated_csv = csv_files[0]
                                 break
