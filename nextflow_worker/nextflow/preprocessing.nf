@@ -13,9 +13,6 @@ params.fastsurfer_threads = 4
 params.fastsurfer_3T = false
 
 workflow {
-    // ==========================================
-    // 1. INGRESSO DATI — Modalità Clinical Twin
-    // ==========================================
     if (params.containsKey('image') && params.image) {
         def nifti_file = file(params.image)
         def subject_id = nifti_file.name.tokenize('.')[0]
@@ -37,17 +34,9 @@ workflow {
             }
     }
 
-    // ==========================================
-    // 2. CARICAMENTO FILE CONFIGURAZIONE
-    // ==========================================
     labels_file_ch = channel.fromPath(params.labels)
-    segmenter_dir_ch = channel.fromPath(params.segmenter_folder_output, type: 'dir')
     params_file_ch = channel.fromPath(params.settings)
-    features_ch = channel.fromPath(params.features_output, type: 'dir')
 
-    // ==========================================
-    // 3. ESECUZIONE PIPELINE
-    // ==========================================
     if (params.brain_segmenter == "freesurfer") {
         segmenter_out = freesurfer(subjects_ch)
     } else if (params.brain_segmenter == "fastsurfer") {
@@ -61,15 +50,13 @@ workflow {
     roi = roi_creator(nifti_out.combine(labels_file_ch), params.segmenter_folder_output)
 
     csv_out = csv_collector(
-        segmenter_out.collect(),
-        roi.collect(),
-        segmenter_dir_ch,
-        labels_file_ch
+        nifti_out.join(roi).combine(labels_file_ch)
     )
 
     feature_extraction(
         csv_out,
-        features_ch,
+        nifti_out.map { subject, FTD_group, nu_nii, aparc_aseg_nii -> nu_nii }.collect(),
+        roi.map { subject, roi_dir -> roi_dir }.collect(),
         labels_file_ch,
         params_file_ch
     )
@@ -180,17 +167,13 @@ process csv_collector {
     publishDir "${params.features_output}", mode: 'copy'
 
     input:
-    val(segmenter_out)
-    val(roi)
-    path subjects_dir
-    path labels_file
+    tuple val(subject), val(FTD_group), path(nu_nii), path(aparc_aseg_nii), path(roi_dir), path(labels_file)
 
     output:
     path("*.csv")
 
     script:
     """
-    REAL_SUBJECTS_DIR=\$(readlink -f ${subjects_dir})
     while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
         if [[ -z "\$label" || "\$label" == "#"* ]]; then
             continue
@@ -199,15 +182,11 @@ process csv_collector {
         if [[ -z "\$clean_name" ]]; then
             continue
         fi
-        echo "Image,Mask" > \${clean_name}.csv
-        find "\$REAL_SUBJECTS_DIR" -name 'nu.nii' -type f | sort > brain_images.txt
-        while IFS= read -r image_path; do
-            mask_path="\${image_path%/nu.nii}/ROI/\${clean_name}.nii.gz"
-            if [[ -f "\${mask_path}" ]]; then
-                echo "\${image_path},\${mask_path}" >> \${clean_name}.csv
-            fi
-        done < brain_images.txt
-        rm -f brain_images.txt
+        mask_path="${roi_dir}/\${clean_name}.nii.gz"
+        if [[ -f "\${mask_path}" ]]; then
+            echo "Image,Mask" > \${clean_name}.csv
+            echo "${nu_nii},\${mask_path}" >> \${clean_name}.csv
+        fi
     done < ${labels_file}
     """
 }
@@ -219,7 +198,8 @@ process feature_extraction {
 
     input:
     path csv_files
-    path features_dir
+    path nu_files
+    path roi_dirs
     path labels_file
     path settings
 
@@ -241,30 +221,38 @@ process feature_extraction {
         if [[ -f "\${input_csv}" ]]; then
             pyradiomics "\${input_csv}" -o "\${clean_name}_feat.csv" --param "${settings}" -f csv --jobs ${params.pyradiomics_jobs}
         fi
-    done < "\${ROI_LIST_PATH}"
+    done < "${labels_file}"
 
     cat << 'EOF' > aggregate.py
-import pandas as pd
+import csv
 import glob
 
 all_files = glob.glob('*_feat.csv')
-dfs = []
-for f in all_files:
-    roi = f.replace('_feat.csv', '')
-    try:
-        df = pd.read_csv(f)
-        cols = [c for c in df.columns if not c.startswith('diagnostics_')]
-        df = df[cols].rename(columns=lambda c: f'{roi}_' + c)
-        dfs.append(df)
-    except Exception:
-        pass
-if dfs:
-    final_df = pd.concat(dfs, axis=1)
-    final_df.to_csv('radiomics_features.csv', index=False)
-    print('✅ radiomics_features.csv generato!')
-else:
+if not all_files:
     print('❌ Nessun file _feat.csv trovato.')
     open('radiomics_features.csv', 'w').close()
+else:
+    rows = {}
+    all_keys = ['Image']
+    for f in sorted(all_files):
+        roi = f.replace('_feat.csv', '')
+        with open(f) as fh:
+            reader = csv.DictReader(fh)
+            for row in reader:
+                img = row.get('Image', '')
+                if img not in rows:
+                    rows[img] = {'Image': img}
+                for k, v in row.items():
+                    if k not in ('Image', 'Mask') and not k.startswith('diagnostics_'):
+                        new_key = f'{roi}_{k}'
+                        rows[img][new_key] = v
+                        if new_key not in all_keys:
+                            all_keys.append(new_key)
+    with open('radiomics_features.csv', 'w', newline='') as out:
+        writer = csv.DictWriter(out, fieldnames=all_keys, extrasaction='ignore')
+        writer.writeheader()
+        writer.writerows(rows.values())
+    print('✅ radiomics_features.csv generato!')
 EOF
     python3 aggregate.py
     """

@@ -4,6 +4,10 @@ import subprocess
 import os
 import shutil
 
+# Copia file statici in /tmp all'avvio
+shutil.copy2("/app/data/external/ROI_labels.tsv", "/tmp/ROI_labels.tsv")
+shutil.copy2("/app/nextflow/configs/pyradiomics.yaml", "/tmp/pyradiomics.yaml")
+
 app = FastAPI()
 
 TASKS_STATUS = {}
@@ -32,7 +36,7 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str):
         "-c", "/app/nextflow/nextflow.config",
         "-resume",
         "--image", tmp_nifti,
-        "--outdir", host_outdir
+        "--outdir", outdir
     ]
 
     print(f"🔄 Avvio Nextflow per Task {task_id}...")
