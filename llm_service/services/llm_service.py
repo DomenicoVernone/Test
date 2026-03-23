@@ -2,6 +2,7 @@
 Servizio LLM Context-Aware Ibrido Avanzato.
 Incrocia la topologia UMAP (JSON) con le feature radiomiche reali (CSV).
 Implementa un calcolo statistico scalabile (Media + Dev. Standard) su modelli dinamici.
+Supporta la memoria conversazionale multi-turno tramite history esplicita.
 """
 import math
 import os
@@ -19,52 +20,55 @@ client = AsyncOpenAI(
 )
 
 def calcola_distanza_3d(p1: Dict[str, float], p2: Dict[str, float]) -> float:
-    return math.sqrt((p2.get('x', 0) - p1.get('x', 0))**2 + (p2.get('y', 0) - p1.get('y', 0))**2 + (p2.get('z', 0) - p1.get('z', 0))**2)
+    return math.sqrt(
+        (p2.get('x', 0) - p1.get('x', 0))**2 +
+        (p2.get('y', 0) - p1.get('y', 0))**2 +
+        (p2.get('z', 0) - p1.get('z', 0))**2
+    )
 
 def normalizza_nome_feature(nome: str) -> str:
     """
-    Normalizza i nomi delle feature per garantire il match tra CSV (generato in Python) 
+    Normalizza i nomi delle feature per garantire il match tra CSV (generato in Python)
     e JSON (generato in R). R sostituisce spesso '-' e ' ' con '.'.
-    Questa funzione converte tutto in minuscolo e rimuove i caratteri speciali comuni.
+    Rimuove tutto tranne lettere e numeri e converte in minuscolo.
+    NOTA: la normalizzazione aggressiva può produrre collisioni su nomi molto simili;
+    questo è un limite noto accettabile data la diversità dei nomi radiomici effettivi.
     """
-    nome_pulito = re.sub(r'[^a-zA-Z0-9]', '', nome) # Rimuove tutto tranne lettere e numeri
+    nome_pulito = re.sub(r'[^a-zA-Z0-9]', '', nome)
     return nome_pulito.lower()
 
 def estrai_dati_paziente(task_id: int) -> dict:
     """Legge il CSV ignorando le colonne non numeriche (es. path immagini)."""
     csv_path = os.path.join(settings.FEATURES_DIR, f"features_{task_id}.csv")
     dati_paziente = {}
-    
+
     if not os.path.exists(csv_path):
         print(f"⚠️ CSV non trovato in {csv_path}")
         return dati_paziente
-    
+
     try:
         with open(csv_path, mode='r') as file:
             reader = csv.reader(file)
             headers = next(reader)
             values = next(reader)
-            
+
             for h, v in zip(headers, values):
                 try:
-                    # Tenta la conversione. Se fallisce (è un percorso stringa), ignora.
                     valore_float = float(v)
-                    # Normalizza la chiave per il dizionario di Python
                     dati_paziente[normalizza_nome_feature(h)] = {
                         "valore": valore_float,
-                        "nome_originale": h 
+                        "nome_originale": h
                     }
                 except ValueError:
                     continue
-                    
+
     except Exception as e:
         print(f"🚨 Errore lettura CSV: {e}")
-        
+
     return dati_paziente
 
 def formatta_nome_display(nome_grezzo: str) -> str:
     """Pulisce i nomi delle feature per renderli leggibili nel testo per l'LLM."""
-    # Es: "Left-Amygdala_original_shape_Elongation" -> "Left Amygdala Shape Elongation"
     pulito = nome_grezzo.replace("original_", "").replace("_", " ").replace("-", " ")
     return pulito
 
@@ -77,24 +81,26 @@ def analizza_spazio_e_statistiche(json_data: Dict[str, Any], task_id: int, k: in
         return "Dati insufficienti per l'analisi RAG (Mancano coordinate spaziali)."
 
     # 1. Distanze e KNN
-    distanze = [{"distanza": calcola_distanza_3d(nuovo_paziente, p), "dati_storici": p} for p in storico]
+    distanze = [
+        {"distanza": calcola_distanza_3d(nuovo_paziente, p), "dati_storici": p}
+        for p in storico
+    ]
     distanze.sort(key=lambda item: item["distanza"])
     vicini_top_k = [item["dati_storici"] for item in distanze[:k]]
-    
-    # Trova l'etichetta dominante nel vicinato
+
+    # Etichetta dominante nel vicinato
     conteggi = {}
     for v in vicini_top_k:
         label = v.get("label", "Sconosciuto")
         conteggi[label] = conteggi.get(label, 0) + 1
-    
+
     if not conteggi:
         return "Errore topologico: Nessuna etichetta (label) trovata nello storico."
-        
+
     label_dominante = max(conteggi, key=conteggi.get)
-    cluster_opposto = [p for p in storico if p.get("label") != label_dominante]
 
     # 2. Riassunto Topologico
-    riassunto = f"[1. TOPOLOGIA SPAZIALE (UMAP)]\n"
+    riassunto = "[1. TOPOLOGIA SPAZIALE (UMAP)]\n"
     riassunto += f"Dei {k} pazienti storici morfologicamente più simili al caso in esame:\n"
     for label, count in conteggi.items():
         totale_vicini = len(vicini_top_k)
@@ -106,43 +112,41 @@ def analizza_spazio_e_statistiche(json_data: Dict[str, Any], task_id: int, k: in
     if not dati_nuovo:
         return riassunto + "\n[ATTENZIONE]: Impossibile estrarre le feature dal file CSV del paziente. L'analisi si baserà solo sulla topologia."
 
-    # Normalizziamo le chiavi del JSON storico per fare il match
     storico_normalizzato = []
     for p in storico:
         p_norm = {normalizza_nome_feature(k): v for k, v in p.items()}
-        # Rimettiamo la label che potrebbe essere stata storpiata dalla normalizzazione
-        p_norm["label_originale"] = p.get("label") 
+        p_norm["label_originale"] = p.get("label")
         storico_normalizzato.append(p_norm)
-        
+
     vicini_norm = [p for p in storico_normalizzato if p.get("label_originale") == label_dominante]
     opposti_norm = [p for p in storico_normalizzato if p.get("label_originale") != label_dominante]
 
-    riassunto += f"[2. CONFRONTO STATISTICO RADIOMICO (Top Feature Discordanza)]\n"
+    riassunto += f"[2. CONFRONTO STATISTICO RADIOMICO (Top Feature per Discordanza)]\n"
     riassunto += f"Confronto tra paziente, media Vicinato ({str(label_dominante).upper()}) e media cluster opposto.\n\n"
 
-    feature_processate = 0
-    feature_analizzate = [] # Per debug e per evitare doppioni
-    
+    feature_analizzate = []
+
     for key_norm, dict_paziente in dati_nuovo.items():
         val_paziente = dict_paziente["valore"]
         nome_originale = dict_paziente["nome_originale"]
-        
-        # Estraiamo i valori storici usando la chiave normalizzata
-        val_vicini = [v[key_norm] for v in vicini_norm if key_norm in v and isinstance(v[key_norm], (int, float))]
-        val_opposti = [v[key_norm] for v in opposti_norm if key_norm in v and isinstance(v[key_norm], (int, float))]
 
-        # Se la feature non esiste nello storico di R, la saltiamo
+        val_vicini = [
+            v[key_norm] for v in vicini_norm
+            if key_norm in v and isinstance(v[key_norm], (int, float))
+        ]
+        val_opposti = [
+            v[key_norm] for v in opposti_norm
+            if key_norm in v and isinstance(v[key_norm], (int, float))
+        ]
+
         if not val_vicini or not val_opposti:
             continue
 
         media_vicini = statistics.mean(val_vicini)
         std_vicini = statistics.stdev(val_vicini) if len(val_vicini) > 1 else 0.0
         media_opposti = statistics.mean(val_opposti)
-
-        # Calcoliamo la distanza in deviazioni standard per capire quanto è un outlier
         z_score = abs(val_paziente - media_vicini) / std_vicini if std_vicini > 0 else 0
-        
-        # Ordiniamo le feature per "anomalia" (z-score), per dare all'LLM solo quelle interessanti
+
         feature_analizzate.append({
             "nome": formatta_nome_display(nome_originale),
             "val_paziente": val_paziente,
@@ -152,7 +156,6 @@ def analizza_spazio_e_statistiche(json_data: Dict[str, Any], task_id: int, k: in
             "z_score": z_score
         })
 
-    # Ordiniamo e prendiamo le top 15 più anomale
     feature_analizzate.sort(key=lambda x: x["z_score"], reverse=True)
     top_features = feature_analizzate[:15]
 
@@ -161,13 +164,30 @@ def analizza_spazio_e_statistiche(json_data: Dict[str, Any], task_id: int, k: in
         riassunto += f"  * Paziente in esame : {f['val_paziente']:.3f}\n"
         riassunto += f"  * Media Cluster ({str(label_dominante).upper()}) : {f['media_vicini']:.3f} (± {f['std_vicini']:.3f})\n"
         riassunto += f"  * Media Sani/Opposti: {f['media_opposti']:.3f}\n"
-        
+
     if not top_features:
-        riassunto += "Nessuna feature radiomica del CSV è stata trovata nei dati storici del JSON. Assicurati che l'Engine R includa le feature nel referto UMAP."
+        riassunto += (
+            "Nessuna feature radiomica del CSV è stata trovata nei dati storici del JSON. "
+            "Assicurati che l'Engine R includa le feature nel referto UMAP."
+        )
 
     return riassunto
 
-async def genera_risposta_medica(task_id: int, messaggio_medico: str) -> str:
+
+async def genera_risposta_medica(
+    task_id: int,
+    messaggio_medico: str,
+    history: List[Dict[str, str]] = []
+) -> str:
+    """
+    Genera una risposta clinica contestualizzata.
+    
+    Il parametro `history` contiene i turni precedenti della conversazione nel formato
+    [{"role": "user"|"assistant", "content": "..."}].
+    Il system prompt con il contesto clinico viene sempre inserito come primo messaggio,
+    garantendo che l'LLM non perda mai il riferimento ai dati del paziente anche in
+    conversazioni multi-turno.
+    """
     risultati_path = os.path.join(settings.RESULTS_DIR, f"result_{task_id}.json")
     if not os.path.exists(risultati_path):
         return "Errore: Dati clinici non ancora disponibili. Attendere la fine dell'analisi."
@@ -196,13 +216,18 @@ ISTRUZIONI:
 4. Concludi ricordando che il medico deve visionare la risonanza grezza NIfTI.
 """
 
+    # Costruzione della sequenza messaggi:
+    # [system] → [history turni precedenti] → [messaggio corrente]
+    # Il contesto clinico è nel system prompt e viene sempre mantenuto in cima,
+    # indipendentemente dalla lunghezza della conversazione.
+    messages = [{"role": "system", "content": system_prompt}]
+    messages.extend(history)
+    messages.append({"role": "user", "content": messaggio_medico})
+
     try:
         response = await client.chat.completions.create(
             model="llama-3.1-8b-instant",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": messaggio_medico}
-            ],
+            messages=messages,
             temperature=0.1,
             max_tokens=600
         )

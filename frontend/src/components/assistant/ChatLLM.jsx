@@ -1,8 +1,8 @@
-// File: frontend/src/components/assistant/ChatLLM.jsx
 /**
  * Componente Assistente Clinico (LLM Context-Aware).
  * Interfaccia di chat per interrogare il modello linguistico.
- * Invia il messaggio e l'ID del task al backend per abilitare lo Spatial RAG.
+ * Invia il messaggio, l'ID del task e la history della conversazione
+ * al backend per abilitare lo Spatial RAG con memoria multi-turno.
  */
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, MessageSquare, Bot, User as UserIcon, Loader2 } from 'lucide-react';
@@ -55,13 +55,25 @@ export default function ChatLLM({ isAnalyzing, theme, prediction, taskId }) {
     setIsLoadingAI(true);
 
     try {
-      // 2. Chiamata API al backend FastAPI (endpoint /chat/)
+      // 2. Costruiamo la history da inviare al backend.
+      // Escludiamo il messaggio di benvenuto (id: 'welcome') e il messaggio
+      // appena aggiunto, che viene passato separatamente nel campo 'message'.
+      // Il backend inserirà la history tra il system prompt e il messaggio corrente.
+      const history = messages
+        .filter(m => m.id !== 'welcome')
+        .map(m => ({
+          role: m.sender === 'user' ? 'user' : 'assistant',
+          content: m.text
+        }));
+
+      // 3. Chiamata API al backend FastAPI (endpoint /chat/)
       const response = await llmApi.post('/chat/', {
         task_id: taskId,
-        message: userMessageTesto
+        message: userMessageTesto,
+        history: history
       });
 
-      // 3. Riceviamo la risposta e la aggiungiamo alla UI
+      // 4. Riceviamo la risposta e la aggiungiamo alla UI
       const aiResponseTesto = response.data.response || "Risposta non valida dal server.";
       const newAIMessage = { id: Date.now().toString() + '-ai', sender: 'ai', text: aiResponseTesto };
       setMessages(prev => [...prev, newAIMessage]);
@@ -86,7 +98,7 @@ export default function ChatLLM({ isAnalyzing, theme, prediction, taskId }) {
   const badgeClass = isDark ? 'bg-blue-900/40 text-blue-400 border border-blue-800/50' : 'bg-blue-50 text-clinical-primary';
   const footerClass = isDark ? 'border-slate-700 bg-slate-800/50' : 'border-slate-100 bg-white';
   const inputClass = isDark ? 'bg-slate-900 border-slate-600 text-white placeholder-slate-500 focus:ring-blue-500' : 'bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400 focus:ring-clinical-primary';
-console.log("🤖 Stato ChatLLM -> taskId:", taskId, " | isAnalyzing:", isAnalyzing);
+
   return (
     <div className={`flex flex-col h-full transition-colors duration-300 ${containerClass}`}>
       
