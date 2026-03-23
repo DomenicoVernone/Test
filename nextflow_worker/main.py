@@ -71,7 +71,7 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
     print(f"   Brain segmenter:  {brain_segmenter}")
 
     try:
-        subprocess.run(cmd, cwd="/app", check=True)
+        subprocess.run(cmd, cwd=work_dir, check=True)
         print(f"✅ Task {task_id} completato!")
         TASKS_STATUS[task_id] = "SUCCESS"
     except subprocess.CalledProcessError as e:
