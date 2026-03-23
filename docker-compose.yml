@@ -43,7 +43,7 @@ services:
     networks:
       - clinical_network
     ports:
-      - "8001:8000"
+      - "127.0.0.1:8001:8000"
     volumes:
       - ./orchestrator:/app
       - clinical_db_data:/shared_db
@@ -64,7 +64,7 @@ services:
     networks:
       - clinical_network
     ports:
-      - "8003:8000"
+      - "127.0.0.1:8003:8000"
     volumes:
       - ./model_service:/app
       - shared_clinical_data:/shared_data
@@ -84,7 +84,7 @@ services:
     networks:
       - clinical_network
     ports:
-      - "8002:8000"
+      - "127.0.0.1:8002:8000"
     volumes:
       - ./llm_service:/app
       - shared_clinical_data:/shared_data
@@ -102,12 +102,14 @@ services:
     networks:
       - clinical_network
     ports:
-      - "8004:8000"
+      - "127.0.0.1:8004:8000"
     volumes:
       - ./inference_engine:/app
       - shared_clinical_data:/shared_data
+      - ./nextflow_worker/data/external/ROI_labels.tsv:/app/roi_labels.tsv:ro
     environment:
       - SHARED_VOLUME_DIR=/shared_data
+      - NF_LABELS=/app/roi_labels.tsv
 
   # 6. FRONTEND — Dashboard clinica React
   frontend:
@@ -139,7 +141,7 @@ services:
     networks:
       - clinical_network
     ports:
-      - "8005:8000"
+      - "127.0.0.1:8005:8000"
     volumes:
       - ./nextflow_worker:/app
       - shared_clinical_data:/shared_data

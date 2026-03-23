@@ -55,64 +55,54 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
     stop("Impossibile dedurre le feature necessarie dal modello.")
   }
 
-  print("🛡️ Allineamento dimensionale: FUZZY MATCHING AVANZATO...")
-  dati_nuovo <- data.frame(
-    matrix(0, nrow = 1, ncol = length(feature_req))
-  )
-  colnames(dati_nuovo) <- feature_req
+  print("🛡️ Allineamento dimensionale: MAPPING DETERMINISTICO da ROI labels...")
 
-  # 1. Rimuoviamo SOLO i suffissi creati da R (es. ".1", ".77") preservando i numeri originali (es. Imc1)
-  nomi_modello_base <- gsub("\\.[0-9]+$", "", feature_req)
-  
-  # 2. Togliamo la punteggiatura per il match con il CSV di Python
-  nomi_modello_puliti <- gsub("[^A-Za-z0-9]", "", nomi_modello_base)
-  nomi_csv_puliti <- gsub("[^A-Za-z0-9]", "", colnames(dati_paziente))
-  
-  nomi_esatti_per_python <- feature_req 
-  colonne_usate <- c() # Registro per evitare di assegnare la stessa colonna del CSV più volte
-  
-  for (i in seq_along(feature_req)) {
-    # 1. Tentativo di Match Esatto
-    idx <- match(nomi_modello_puliti[i], nomi_csv_puliti)
-    
-    # Se il match esatto è stato già usato in precedenza, forziamo il fallback
-    if (!is.na(idx) && (idx %in% colonne_usate)) {
-        idx <- NA 
-    }
-    
-    # 2. Fallback: Fuzzy Match Anti-Duplicazione (Sottostringa)
-    if (is.na(idx)) {
-      # Cerchiamo se c'è una colonna nel CSV di Nextflow che contiene questo nome pulito
-      possibili_match <- grep(nomi_modello_puliti[i], nomi_csv_puliti, ignore.case = TRUE)
-      
-      if (length(possibili_match) > 0) {
-        # Escludiamo le colonne che abbiamo già assegnato a un'altra feature
-        match_disponibili <- setdiff(possibili_match, colonne_usate)
-        
-        if (length(match_disponibili) > 0) {
-          idx <- match_disponibili[1] # Prendiamo il primo match LIBERO
-        } else {
-          idx <- possibili_match[1] # Fallback estremo se tutti sono esauriti
-        }
+  # Carica le ROI labels nello stesso ordine usato durante il training.
+  # Il loop in merge_radiomics.r itera j=1:78 su roi$V3, quindi la prima ROI
+  # genera colonne senza suffisso, la seconda aggiunge ".1", la terza ".2", ecc.
+  # Il suffisso numerico N corrisponde alla ROI all'indice N+1 nel file labels.
+  roi_labels_path <- Sys.getenv("NF_LABELS", unset = "/tmp/ROI_labels.tsv")
+  roi_labels <- read.table(roi_labels_path, header = FALSE, sep = "")
+  roi_names <- roi_labels$V3  # 78 ROI in ordine
+
+  build_roi_mapping <- function(feature_req, roi_names) {
+    mapping <- character(length(feature_req))
+    for (i in seq_along(feature_req)) {
+      fname <- feature_req[i]
+      suffix_match <- regmatches(fname, regexpr("\\.[0-9]+$", fname))
+      if (length(suffix_match) == 0 || suffix_match == "") {
+        roi_idx <- 1  # nessun suffisso = prima ROI (lh-bankssts)
+        base_name <- fname
+      } else {
+        roi_idx <- as.integer(sub("\\.", "", suffix_match)) + 1
+        base_name <- sub("\\.[0-9]+$", "", fname)
+      }
+      if (roi_idx > length(roi_names)) {
+        print(paste("⚠️ Indice ROI fuori range:", roi_idx, "per feature:", fname))
+        mapping[i] <- fname
+      } else {
+        mapping[i] <- paste0(roi_names[roi_idx], "_", base_name)
       }
     }
-    
-    if (!is.na(idx)) {
-      # Registriamo la colonna come "Usata" per i prossimi cicli
-      colonne_usate <- c(colonne_usate, idx)
-      
-      # Copiamo il VERO valore matematico del paziente
-      val <- as.numeric(dati_paziente[1, idx])
-      
-      # Gestione sicurezza: se NA, mettiamo 0
+    return(mapping)
+  }
+
+  csv_column_names <- build_roi_mapping(feature_req, roi_names)
+
+  dati_nuovo <- data.frame(matrix(0, nrow = 1, ncol = length(feature_req)))
+  colnames(dati_nuovo) <- feature_req
+
+  for (i in seq_along(feature_req)) {
+    csv_col <- csv_column_names[i]
+    if (csv_col %in% colnames(dati_paziente)) {
+      val <- as.numeric(dati_paziente[1, csv_col])
       dati_nuovo[1, i] <- ifelse(is.na(val), 0, val)
-      
-      # Registriamo il nome esatto usato dal CSV di Python
-      nomi_esatti_per_python[i] <- colnames(dati_paziente)[idx]
     } else {
-        print(paste("⚠️ Feature non trovata nel CSV:", feature_req[i]))
+      print(paste("⚠️ Colonna non trovata nel CSV:", csv_col))
     }
   }
+
+  nomi_esatti_per_python <- csv_column_names
 
   print("🚀 Esecuzione predizione clinica...")
   predizione <- "Sconosciuto"
@@ -155,8 +145,8 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       n_threads = 1,
       ret_model = TRUE
     )
-    n_storico <- nrow(storico_x) 
-    
+    n_storico <- nrow(storico_x)
+
     storico_coords_base <- data.frame(
       x = umap_mappa$embedding[, 1],
       y = umap_mappa$embedding[, 2],
@@ -166,17 +156,17 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
     )
 
     storico_df <- as.data.frame(storico_x)
-    
+
     if (ncol(storico_df) == length(feature_req)) {
       colnames(storico_df) <- nomi_esatti_per_python
     }
-    
+
     if (".outcome" %in% colnames(storico_df)) {
       storico_df$.outcome <- NULL
     }
-    
+
     storico_coords <- cbind(storico_coords_base, storico_df)
-    
+
     id_reali <- rownames(storico_x)
     if (is.null(id_reali) || all(id_reali == as.character(1:n_storico))) {
       storico_coords$subject_id <- paste0("Paziente_Storico_", 1:n_storico)
@@ -192,7 +182,7 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
 
     dati_nuovo_json <- dati_nuovo
     colnames(dati_nuovo_json) <- nomi_esatti_per_python
-    
+
     nuovo_paz_coords <- c(
       list(
         x = nuovo_paz_emb[1, 1],
