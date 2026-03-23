@@ -29,6 +29,21 @@ async def run_inference(req: InferRequest):
         logger.error(f"Errore inferenza task {req.task_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/model_info/{model_name}")
+async def get_model_info(model_name: str):
+    """
+    Recupera i metadati del modello champion da MLflow.
+    Restituisce i tag associati alla run, tra cui 'brain_segmenter'.
+    Usato dall'orchestrator prima di avviare la pipeline Nextflow.
+    """
+    try:
+        orchestrator = InferenceOrchestrator()
+        info = await orchestrator.get_model_info(model_name)
+        return info
+    except Exception as e:
+        logger.error(f"Errore recupero info modello '{model_name}': {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/", tags=["Health"])
 def health():
     return {"status": "ok", "service": "model_service"}

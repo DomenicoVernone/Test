@@ -31,12 +31,33 @@ async def run_full_pipeline(task_id: int, model_name: str):
         task.progress = 10.0
         db.commit()
 
+        # FASE 0: RECUPERO METADATI MODELLO
+        # Interroga il model_service per ottenere il tag 'brain_segmenter' associato
+        # alla run MLflow del modello champion. Questo garantisce che la pipeline
+        # di preprocessing usi lo stesso segmentatore cerebrale dei dati di training,
+        # evitando disallineamenti sistematici nelle feature estratte.
+        brain_segmenter = "freesurfer"  # default di sicurezza
+        try:
+            async with httpx.AsyncClient() as client:
+                info_response = await client.get(
+                    f"{settings.MODEL_SERVICE_URL}/model_info/{model_name}",
+                    timeout=30.0
+                )
+                if info_response.status_code == 200:
+                    brain_segmenter = info_response.json().get("brain_segmenter", "freesurfer")
+                    logger.info(f"🔬 [PIPELINE] Segmentatore recuperato da MLflow: {brain_segmenter}")
+                else:
+                    logger.warning(f"⚠️ [PIPELINE] model_service ha risposto {info_response.status_code} per model_info. Uso default: freesurfer")
+        except Exception as e:
+            logger.warning(f"⚠️ [PIPELINE] Impossibile recuperare brain_segmenter da model_service: {e}. Uso default: freesurfer")
+
         # FASE 1: ESTRAZIONE FEATURE
         feature_extractor = MockRunner() if USE_MOCK else NextflowRunner()
         await feature_extractor.extract_features(
             task_id=task_id,
             nifti_filename=task.filename,
-            model_name=model_name
+            model_name=model_name,
+            brain_segmenter=brain_segmenter
         )
 
         # FASE 2: INFERENZA — chiamata HTTP a model_service

@@ -27,7 +27,7 @@ class InferenceOrchestrator:
     
     def __init__(self):
         self.client = MlflowClient()
-        self.r_engine_url = settings.R_ENGINE_URL # URL interno del container R per l'inferenza
+        self.r_engine_url = settings.R_ENGINE_URL
 
     def get_champion_uri(self, model_name: str) -> str:
         """Interroga il Model Registry per ottenere l'URI del modello 'champion'."""
@@ -49,8 +49,41 @@ class InferenceOrchestrator:
             logger.error(f"Errore MLflow: {str(e)}")
             raise RuntimeError(f"Errore nel Model Registry: {str(e)}")
 
+    def _sync_get_model_info(self, model_name: str) -> dict:
+        """
+        Recupera i metadati del modello champion da MLflow.
+        Restituisce i tag associati alla run, tra cui 'brain_segmenter'.
+        """
+        filter_string = f"name = '{model_name}'"
+        models = self.client.search_registered_models(filter_string=filter_string)
+
+        if not models:
+            raise ValueError(f"Nessun modello trovato con nome '{model_name}' su DagsHub.")
+
+        model = models[0]
+
+        if 'champion' not in model.aliases:
+            raise ValueError(f"Nessun alias 'champion' trovato per il modello {model.name}.")
+
+        version_number = model.aliases['champion']
+        model_version = self.client.get_model_version(model.name, version_number)
+        run = self.client.get_run(model_version.run_id)
+
+        brain_segmenter = run.data.tags.get("brain_segmenter", "freesurfer")
+        logger.info(f"Modello '{model_name}' — brain_segmenter: {brain_segmenter}")
+
+        return {
+            "model_name": model_name,
+            "brain_segmenter": brain_segmenter,
+            "run_id": model_version.run_id,
+            "tags": run.data.tags
+        }
+
+    async def get_model_info(self, model_name: str) -> dict:
+        """Versione asincrona di _sync_get_model_info."""
+        return await asyncio.to_thread(self._sync_get_model_info, model_name)
+
     def _sync_download_and_find_rds(self, model_uri: str, model_name: str) -> str:
-     
         models_dir = os.path.join(settings.SHARED_VOLUME_DIR, "models")
         download_path = os.path.join(models_dir, model_name)
         
@@ -75,7 +108,6 @@ class InferenceOrchestrator:
     async def trigger_r_inference(self, task_id: int, model_name: str, skip_mlflow: bool = False) -> dict:
         try:
             if skip_mlflow:
-                # Modalità mock — R legge il CSV già presente, nessun download MLflow
                 logger.info(f"Task {task_id}: skip_mlflow=True, salto download modello.")
                 exact_rds_path = os.path.join(
                     settings.SHARED_VOLUME_DIR, "models", model_name, "model.rds"
