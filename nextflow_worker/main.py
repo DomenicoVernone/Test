@@ -4,6 +4,7 @@ import subprocess
 import os
 import shutil
 import hashlib
+import asyncio
 from typing import Optional
 
 # Copia file statici in /tmp all'avvio
@@ -16,6 +17,12 @@ TASKS_STATUS = {}
 
 CONTAINER_BASE = os.getenv("SHARED_VOLUME_DIR", "/shared_data")
 HOST_BASE = os.getenv("HOST_SHARED_VOLUME_DIR", "/shared_data")
+
+# Lock globale per serializzare l'accesso alla GPU MIG.
+# FastSurfer richiede l'intera MIG instance — due esecuzioni concorrenti
+# causano un conflitto sul CUDACachingAllocator di PyTorch.
+# I task FreeSurfer non sono soggetti a questo vincolo e girano liberamente.
+gpu_lock = asyncio.Lock()
 
 
 class NextflowTask(BaseModel):
@@ -81,11 +88,32 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
         TASKS_STATUS[task_id] = "FAILED"
 
 
+async def run_pipeline_with_gpu_lock(task_id: str, input_path: str, outdir: str, brain_segmenter: str):
+    """
+    Wrapper asincrono per la pipeline Nextflow.
+    I task FastSurfer acquisiscono il GPU lock prima di partire — la MIG instance
+    non supporta esecuzioni concorrenti di PyTorch. I task FreeSurfer girano
+    liberamente senza acquisire il lock, mantenendo la parallelizzazione CPU.
+    """
+    if brain_segmenter == "fastsurfer":
+        print(f"⏳ Task {task_id}: in attesa del GPU lock (FastSurfer)...")
+        async with gpu_lock:
+            print(f"🔒 Task {task_id}: GPU lock acquisito.")
+            await asyncio.to_thread(
+                run_nextflow_pipeline, task_id, input_path, outdir, brain_segmenter
+            )
+            print(f"🔓 Task {task_id}: GPU lock rilasciato.")
+    else:
+        await asyncio.to_thread(
+            run_nextflow_pipeline, task_id, input_path, outdir, brain_segmenter
+        )
+
+
 @app.post("/start_preprocessing")
 async def start_preprocessing(task: NextflowTask, background_tasks: BackgroundTasks):
     TASKS_STATUS[task.task_id] = "RUNNING"
     background_tasks.add_task(
-        run_nextflow_pipeline,
+        run_pipeline_with_gpu_lock,
         task.task_id,
         task.input_path,
         task.outdir,
