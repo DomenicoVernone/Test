@@ -1,17 +1,41 @@
+# ========================
 # Sistemi Operativi
+# ========================
 .DS_Store
 Thumbs.db
 
-# Dati Clinici e Modelli 
+# ========================
+# Editor e IDE
+# ========================
+.vscode/
+.idea/
+
+# ========================
+# Python
+# ========================
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+env/
+
+# ========================
+# Dati clinici e modelli
+# ========================
 *.nii
 *.nii.gz
 *.dcm
 *.rds
-dati_sensibili/
-.env
 
-# Database locali
+# ========================
+# Database
+# ========================
 *.db
 *.sqlite3
-backend/data/clinical_twin.db
-backend/data/mlflow.db
+
+# ========================
+# Variabili d'ambiente
+# ========================
+.env
