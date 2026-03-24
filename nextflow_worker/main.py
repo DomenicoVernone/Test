@@ -61,6 +61,8 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
         "--image", tmp_nifti,
         "--outdir", outdir,
         "--brain_segmenter", brain_segmenter,
+        "--fastsurfer_device", "cuda" if brain_segmenter == "fastsurfer" else "cpu",
+        "--fastsurfer_threads", "8",
         "-w", work_dir
     ]
 

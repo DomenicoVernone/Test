@@ -8,9 +8,11 @@ params.feat_output = "${params.outdir}/feat"
 params.error_strategy = 'ignore'
 params.maxforks = 1
 params.pyradiomics_jobs = 4
-params.fastsurfer_device = 'cpu'
-params.fastsurfer_threads = 4
+params.fastsurfer_device = 'cpu' // default sicuro - viene sovrasctitto dalla CLI
+params.fastsurfer_threads = 8
 params.fastsurfer_3T = false
+params.brain_segmenter = 'freesurfer'  // default sicuro
+
 
 workflow {
     if (params.containsKey('image') && params.image) {
@@ -23,7 +25,7 @@ workflow {
             .fromList(params.dataset)
             .map { folder ->
                 def FTD_group = file(folder).name
-                return tuple(file("${folder}/*.nii"), FTD_group)
+                return tuple(file("${folder}/*.nii{,.gz}"), FTD_group)   // Accettiamo sia .nii che .nii.gz     
             }
             .transpose()
             .map { nifti, FTD_group ->

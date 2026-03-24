@@ -142,6 +142,7 @@ services:
       - clinical_network
     ports:
       - "127.0.0.1:8005:8000"
+    runtime: nvidia
     volumes:
       - ./nextflow_worker:/app
       - shared_clinical_data:/shared_data
@@ -153,3 +154,5 @@ services:
       - HOST_SHARED_VOLUME_DIR=${HOST_SHARED_VOLUME_DIR:-/shared_data}
       - NF_OUTDIR=${NF_OUTDIR:-/shared_data/nf_output}
       - NF_LABELS=${NF_LABELS:-/app/data/external/ROI_labels.tsv}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
