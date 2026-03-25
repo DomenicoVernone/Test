@@ -231,7 +231,7 @@ import glob
 
 all_files = glob.glob('*_feat.csv')
 if not all_files:
-    print('❌ Nessun file _feat.csv trovato.')
+    print('Nessun file _feat.csv trovato.')
     open('radiomics_features.csv', 'w').close()
 else:
     rows = {}
@@ -254,7 +254,7 @@ else:
         writer = csv.DictWriter(out, fieldnames=all_keys, extrasaction='ignore')
         writer.writeheader()
         writer.writerows(rows.values())
-    print('✅ radiomics_features.csv generato!')
+    print('radiomics_features.csv generato.')
 EOF
     python3 aggregate.py
     """

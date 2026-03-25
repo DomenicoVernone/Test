@@ -1,3 +1,10 @@
+# api_gateway/main.py
+#
+# Punto di ingresso dell'API Gateway. Configura l'applicazione FastAPI,
+# registra il middleware CORS e monta il router di autenticazione.
+# È l'unico servizio esposto pubblicamente — tutti gli altri sono
+# accessibili solo attraverso questo gateway tramite token JWT.
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.database import engine, Base

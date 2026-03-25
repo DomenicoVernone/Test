@@ -1,7 +1,19 @@
+# File: model_service/core/config.py
+#
+# Configurazione centralizzata tramite pydantic-settings.
+# Le variabili d'ambiente vengono lette dal file .env a runtime.
+#
+# Le credenziali MLflow/DagsHub sono opzionali: se assenti, mlflow
+# opera in modalità locale senza tracking remoto.
+# Le property FEATURES_DIR e RESULTS_DIR restituiscono i path senza
+# creare le directory — la creazione è delegata al lifespan in main.py.
+
 import os
 from typing import Optional
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 class Settings(BaseSettings):
     SHARED_VOLUME_DIR: str = Field(default="/shared_data")
@@ -17,16 +29,13 @@ class Settings(BaseSettings):
 
     @property
     def FEATURES_DIR(self) -> str:
-        path = os.path.join(self.SHARED_VOLUME_DIR, "features")
-        os.makedirs(path, exist_ok=True)
-        return path
+        return os.path.join(self.SHARED_VOLUME_DIR, "features")
 
     @property
     def RESULTS_DIR(self) -> str:
-        path = os.path.join(self.SHARED_VOLUME_DIR, "results")
-        os.makedirs(path, exist_ok=True)
-        return path
+        return os.path.join(self.SHARED_VOLUME_DIR, "results")
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
+
 
 settings = Settings()

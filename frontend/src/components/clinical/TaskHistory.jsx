@@ -71,7 +71,7 @@ export default function TaskHistory({ onTaskCompleted, onTaskClick, theme, refre
     };
 
     const handleCardClick = async (task) => {
-        const baseURL = orchestratorApi.defaults.baseURL || 'http://localhost:8001';
+        const baseURL = orchestratorApi.defaults.baseURL || import.meta.env.VITE_ORCHESTRATOR_URL || 'http://localhost:8001';
         const niftiUrl = `${baseURL}/analyze/nifti/${task.id}/volume.nii.gz`;
 
         if (task.status === 'COMPLETED') {

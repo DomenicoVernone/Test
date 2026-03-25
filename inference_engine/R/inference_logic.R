@@ -1,27 +1,40 @@
-#' Modulo di Inferenza Clinica e Calcolo Topologico (UMAP)
-#'
-#' Contiene esclusivamente la logica di business e la matematica.
-#' Nessuna dipendenza dal layer web (Plumber).
+# File: inference_engine/R/inference_logic.R
+#
+# Logica di inferenza clinica e calcolo topologico UMAP 3D.
+# Questo modulo non ha dipendenze dal layer web (Plumber): contiene
+# esclusivamente matematica e I/O su filesystem.
+#
+# Flusso principale (run_clinical_inference):
+#   1. Carica il modello .rds e il CSV delle feature del paziente
+#   2. Estrae i dati di training storici dal modello per costruire lo spazio UMAP
+#   3. Allinea le colonne CSV alle feature attese dal modello tramite mapping ROI
+#   4. Esegue la predizione (classificazione)
+#   5. Calcola l'embedding UMAP 3D e proietta il nuovo paziente nello spazio storico
+#   6. Restituisce un oggetto lista serializzabile in JSON
 
 library(uwot)
 library(caret)
 library(xgboost)
 
-#' Esegue la pipeline di inferenza e calcola l'UMAP 3D
+
+#' Esegue la pipeline di inferenza e calcola l'embedding UMAP 3D
 #' @param task_id ID del task corrente
 #' @param model_dir Percorso esatto del file .rds scaricato da MLflow
-#' @param csv_file Percorso esatto del file CSV contenente le feature
+#' @param csv_file Percorso esatto del file CSV contenente le feature del paziente
 run_clinical_inference <- function(task_id, model_dir, csv_file) {
-  print(paste("🔍 Caricamento del modello esatto da:", model_dir))
+  message(paste("[INFERENCE] Caricamento modello:", model_dir))
   if (!file.exists(model_dir)) {
     stop(paste("File del modello non trovato:", model_dir))
   }
 
   modello <- readRDS(model_dir)
   dati_paziente <- read.csv(csv_file, check.names = FALSE)
-  print("✅ Artefatto R e dati paziente caricati con successo!")
+  message("[INFERENCE] Modello e dati paziente caricati.")
 
-  print("⚙️ Estrazione dati storici dal modello...")
+  # Estrazione dati storici dal modello.
+  # Il formato dipende dal tipo di modello (caret, ranger, xgboost):
+  # si tenta in ordine trainingData, learn$X, x.
+  message("[INFERENCE] Estrazione dati storici dal modello...")
   storico_x <- NULL
   storico_y <- NULL
   feature_req <- NULL
@@ -55,15 +68,21 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
     stop("Impossibile dedurre le feature necessarie dal modello.")
   }
 
-  print("🛡️ Allineamento dimensionale: MAPPING DETERMINISTICO da ROI labels...")
+  # Mapping deterministico tra feature del modello e colonne del CSV.
+  #
+  # Il CSV e' generato da merge_radiomics.r, che itera le 78 ROI in ordine.
+  # La prima ROI genera colonne senza suffisso numerico; la seconda aggiunge ".1",
+  # la terza ".2", e cosi' via. Il suffisso N corrisponde alla ROI all'indice N+1
+  # nel file labels. Questo mapping ricostruisce il nome CSV corretto per ogni
+  # feature attesa dal modello.
+  message("[INFERENCE] Allineamento feature tramite mapping ROI...")
 
-  # Carica le ROI labels nello stesso ordine usato durante il training.
-  # Il loop in merge_radiomics.r itera j=1:78 su roi$V3, quindi la prima ROI
-  # genera colonne senza suffisso, la seconda aggiunge ".1", la terza ".2", ecc.
-  # Il suffisso numerico N corrisponde alla ROI all'indice N+1 nel file labels.
-  roi_labels_path <- Sys.getenv("NF_LABELS", unset = "/tmp/ROI_labels.tsv")
+  roi_labels_path <- Sys.getenv("NF_LABELS")
+  if (nchar(roi_labels_path) == 0) {
+    stop("Variabile NF_LABELS non definita. Il file ROI labels deve essere fornito dalla pipeline Nextflow.")
+  }  
   roi_labels <- read.table(roi_labels_path, header = FALSE, sep = "")
-  roi_names <- roi_labels$V3  # 78 ROI in ordine
+  roi_names <- roi_labels$V3 # 78 ROI in ordine
 
   build_roi_mapping <- function(feature_req, roi_names) {
     mapping <- character(length(feature_req))
@@ -71,14 +90,14 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       fname <- feature_req[i]
       suffix_match <- regmatches(fname, regexpr("\\.[0-9]+$", fname))
       if (length(suffix_match) == 0 || suffix_match == "") {
-        roi_idx <- 1  # nessun suffisso = prima ROI (lh-bankssts)
+        roi_idx <- 1
         base_name <- fname
       } else {
         roi_idx <- as.integer(sub("\\.", "", suffix_match)) + 1
         base_name <- sub("\\.[0-9]+$", "", fname)
       }
       if (roi_idx > length(roi_names)) {
-        print(paste("⚠️ Indice ROI fuori range:", roi_idx, "per feature:", fname))
+        message(paste("[INFERENCE] Indice ROI fuori range:", roi_idx, "per feature:", fname))
         mapping[i] <- fname
       } else {
         mapping[i] <- paste0(roi_names[roi_idx], "_", base_name)
@@ -98,13 +117,16 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       val <- as.numeric(dati_paziente[1, csv_col])
       dati_nuovo[1, i] <- ifelse(is.na(val), 0, val)
     } else {
-      print(paste("⚠️ Colonna non trovata nel CSV:", csv_col))
+      message(paste("[INFERENCE] Colonna non trovata nel CSV:", csv_col))
     }
   }
 
   nomi_esatti_per_python <- csv_column_names
 
-  print("🚀 Esecuzione predizione clinica...")
+  # Predizione: il comportamento dipende dal tipo di modello.
+  # XGBoost restituisce probabilita' continue; gli altri modelli caret
+  # supportano type="class". Il fallback intercetta modelli non standard.
+  message("[INFERENCE] Esecuzione predizione clinica...")
   predizione <- "Sconosciuto"
 
   tryCatch(
@@ -119,7 +141,7 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       }
     },
     error = function(e) {
-      print("⚠️ Fallita pred. classificazione. Tento predizione standard.")
+      message("[INFERENCE] Predizione con type='class' fallita, tento predizione standard.")
       pred_raw <- predict(modello, newdata = dati_nuovo)
       if (is.list(pred_raw) && !is.null(pred_raw$data$response)) {
         predizione <<- as.character(pred_raw$data$response)
@@ -128,9 +150,12 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
       }
     }
   )
-  print(paste("🎯 Diagnosi calcolata:", predizione))
+  message(paste("[INFERENCE] Diagnosi calcolata:", predizione))
 
-  print("🌀 Calcolo UMAP 3D (Fase di Fit e Transform)...")
+  # UMAP 3D: fit sullo storico, transform sul nuovo paziente.
+  # ret_model=TRUE e' necessario per poter chiamare umap_transform successivamente.
+  # n_threads=1 garantisce riproducibilita' in combinazione con set.seed(42).
+  message("[INFERENCE] Calcolo embedding UMAP 3D...")
   plot_data_list <- NULL
 
   if (!is.null(storico_x) && nrow(storico_x) > 5) {
@@ -140,10 +165,10 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
     umap_mappa <- uwot::umap(
       storico_x,
       n_components = 3,
-      n_neighbors = n_neigh,
-      min_dist = 0.01,
-      n_threads = 1,
-      ret_model = TRUE
+      n_neighbors  = n_neigh,
+      min_dist     = 0.01,
+      n_threads    = 1,
+      ret_model    = TRUE
     )
     n_storico <- nrow(storico_x)
 
@@ -156,11 +181,9 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
     )
 
     storico_df <- as.data.frame(storico_x)
-
     if (ncol(storico_df) == length(feature_req)) {
       colnames(storico_df) <- nomi_esatti_per_python
     }
-
     if (".outcome" %in% colnames(storico_df)) {
       storico_df$.outcome <- NULL
     }
@@ -193,11 +216,11 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
     )
 
     plot_data_list <- list(
-      storico = storico_coords,
+      storico        = storico_coords,
       nuovo_paziente = nuovo_paz_coords
     )
   } else {
-    print("⚠️ Storico insufficiente o mancante. Salto UMAP.")
+    message("[INFERENCE] Storico insufficiente o mancante. UMAP saltato.")
   }
 
   list(

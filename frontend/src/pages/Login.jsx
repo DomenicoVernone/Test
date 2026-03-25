@@ -48,7 +48,7 @@ export default function Login({ theme }) {
             // Reindirizzamento alla Dashboard
             navigate('/dashboard');
         } catch (err) {
-            console.error("🚨 Errore di Login:", err);
+            console.error("Errore di Login:", err);
             // Cattura il messaggio di errore dal backend (401 Unauthorized) o mostra un fallback
             const errorMsg = err.response?.data?.detail || "Impossibile connettersi al server. Riprova più tardi.";
             setError(errorMsg);

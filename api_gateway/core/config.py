@@ -1,21 +1,27 @@
+# api_gateway/core/config.py
+#
+# Configurazione centralizzata del servizio tramite pydantic-settings.
+# Le variabili vengono lette dal file .env — vedere .env.example in root.
+
 import os
 from typing import List
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(BASE_DIR, "data")
-os.makedirs(DATA_DIR, exist_ok=True)
-
 class Settings(BaseSettings):
+    # Percorso del database SQLite — il volume /shared_db è condiviso
+    # con l'orchestrator per permettere la lettura dello stato dei task
     DATABASE_URL: str = Field(
-        default=f"sqlite:///{os.path.join(DATA_DIR, 'clinical_twin.db')}"
+        default="sqlite:////shared_db/clinical_twin.db"
     )
-    SECRET_KEY: str = Field(default="clinical-twin-super-secret-key-change-me")
+    # Chiave per la firma dei token JWT — obbligatoria, nessun default
+    SECRET_KEY: str = Field(...)
     ALGORITHM: str = Field(default="HS256")
+    # Durata del token: 1440 minuti = 24 ore
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=1440)
+    # Origini autorizzate per le richieste CORS dal browser
     CORS_ORIGINS: List[str] = Field(
-        default=["http://localhost:5173", "http://localhost:5174"]
+        default=["http://localhost:5173"]
     )
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")

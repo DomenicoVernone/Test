@@ -1,5 +1,11 @@
-#' Router API Plumber
-#' Gestisce gli endpoint HTTP e il salvataggio su File System (I/O).
+# File: inference_engine/api.R
+#
+# Router HTTP Plumber per l'inference engine R.
+# Responsabilita':
+#   - Ricevere le richieste di inferenza dall'orchestrator Python (via model_service)
+#   - Delegare il calcolo matematico a R/inference_logic.R
+#   - Salvare il risultato JSON nel volume condiviso
+#   - Restituire il risultato all'orchestrator
 
 library(plumber)
 library(jsonlite)
@@ -8,55 +14,51 @@ source("R/inference_logic.R")
 
 volume_dir <- Sys.getenv("SHARED_VOLUME_DIR", unset = "/shared_data")
 
-#* @apiTitle Clinical Twin - Inference Engine Router
+#* @apiTitle Clinical Twin - Inference Engine
 #* @filter logger
 function(req) {
-  print(paste("[LOG API]", req$REQUEST_METHOD, req$PATH_INFO))
+  message(paste("[API]", req$REQUEST_METHOD, req$PATH_INFO))
   plumber::forward()
 }
 
-#* Calcola Inferenza e UMAP 3D
-#* @param task_id L'ID del task
-#* @param model_name Il nome del modello
-#* @param model_dir La cartella nel volume contenente l'artefatto .rds
+#* Esegue inferenza clinica e calcolo UMAP 3D
+#* @param task_id ID del task
+#* @param model_name Nome del modello
+#* @param model_dir Path assoluto del file .rds scaricato da MLflow
 #* @post /infer
 function(res, task_id, model_name, model_dir) {
 
-  file_name <- paste0("features_", task_id, ".csv")
-  csv_file <- file.path(volume_dir, "features", file_name)
+  csv_file <- file.path(volume_dir, "features", paste0("features_", task_id, ".csv"))
 
   tryCatch(
     {
-      # 1. Calcolo matematico
       risultato <- run_clinical_inference(
-        task_id = task_id,
+        task_id  = task_id,
         model_dir = model_dir,
-        csv_file = csv_file
+        csv_file  = csv_file
       )
-       # nolint: trailing_whitespace_linter.
-      # 2. Salvataggio nel Volume
+
       results_dir <- file.path(volume_dir, "results")
       if (!dir.exists(results_dir)) {
         dir.create(results_dir, recursive = TRUE)
       }
-       # nolint: trailing_whitespace_linter, trailing_whitespace_linter, indentation_linter.
-      # FIX: Ora il nome combacia esattamente con quello che Python (analyze.py) cerca! # nolint: line_length_linter.
+
       out_file <- file.path(results_dir, paste0("result_", task_id, ".json"))
-       # nolint: trailing_whitespace_linter, indentation_linter.
       jsonlite::write_json(risultato, out_file, auto_unbox = TRUE)
-      print(paste("✅ Dati UMAP salvati in:", out_file))
-      
-      # Pausa per prevenire la Race Condition di Docker
+      message(paste("[API] Risultato salvato:", out_file))
+
+      # Pausa intenzionale: il model_service Python legge il file JSON immediatamente
+      # dopo la risposta HTTP. Senza questa attesa, la write_json puo' non essere
+      # ancora stata completata dal buffer del filesystem al momento della lettura.
       Sys.sleep(1.5)
-      
+
       risultato
     },
     error = function(e) {
       res$status <- 500
-      print(paste("❌ ERRORE CRITICO API:", e$message))
-
+      message(paste("[API] ERRORE:", e$message))
       list(
-        status = "error",
+        status  = "error",
         message = paste("Errore durante l'inferenza R:", e$message)
       )
     }

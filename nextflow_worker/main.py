@@ -1,17 +1,32 @@
-from fastapi import FastAPI, BackgroundTasks
-from pydantic import BaseModel
-import subprocess
+# File: nextflow_worker/main.py
+#
+# Entry point del microservizio nextflow_worker.
+# Espone due endpoint:
+#   POST /start_preprocessing — avvia la pipeline Nextflow in background
+#   GET  /status/{task_id}    — restituisce lo stato corrente del task
+#
+# Pattern DooD (Docker-out-of-Docker): il container monta il socket Docker
+# dell'host per poter avviare i container Nextflow direttamente sull'host.
+# Questo implica che i path dei volumi nei comandi Nextflow devono essere
+# path dell'host, non del container — da cui HOST_SHARED_VOLUME_DIR.
+#
+# NOTA: TASKS_STATUS e' un dizionario in memoria. Gli stati vengono persi
+# al riavvio del container. Sufficiente per il contesto corrente.
+
+import asyncio
+import hashlib
+import logging
 import os
 import shutil
-import hashlib
-import asyncio
+import subprocess
+from contextlib import asynccontextmanager
 from typing import Optional
 
-# Copia file statici in /tmp all'avvio
-shutil.copy2("/app/data/external/ROI_labels.tsv", "/tmp/ROI_labels.tsv")
-shutil.copy2("/app/nextflow/configs/pyradiomics.yaml", "/tmp/pyradiomics.yaml")
+from fastapi import BackgroundTasks, FastAPI
+from pydantic import BaseModel
 
-app = FastAPI()
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 TASKS_STATUS = {}
 
@@ -19,10 +34,33 @@ CONTAINER_BASE = os.getenv("SHARED_VOLUME_DIR", "/shared_data")
 HOST_BASE = os.getenv("HOST_SHARED_VOLUME_DIR", "/shared_data")
 
 # Lock globale per serializzare l'accesso alla GPU MIG.
-# FastSurfer richiede l'intera MIG instance — due esecuzioni concorrenti
+# FastSurfer richiede l'intera MIG instance: due esecuzioni concorrenti
 # causano un conflitto sul CUDACachingAllocator di PyTorch.
 # I task FreeSurfer non sono soggetti a questo vincolo e girano liberamente.
 gpu_lock = asyncio.Lock()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Copia dei file statici in /tmp al bootstrap del servizio.
+    # nextflow.config monta /tmp/freesurfer_license.txt nel container FreeSurfer
+    # e /tmp/ROI_labels.tsv come fallback per NF_LABELS.
+    try:
+        shutil.copy2("/app/data/external/ROI_labels.tsv", "/tmp/ROI_labels.tsv")
+        shutil.copy2("/app/nextflow/configs/pyradiomics.yaml", "/tmp/pyradiomics.yaml")
+        logger.info("File statici copiati in /tmp.")
+    except FileNotFoundError as e:
+        logger.error(f"File statico mancante al bootstrap: {e}. Verificare la directory data/.")
+    yield
+    logger.info("nextflow_worker in shutdown.")
+
+
+app = FastAPI(
+    title="Clinical Twin — Nextflow Worker",
+    description="Pipeline neuroimaging DooD per la segmentazione cerebrale e l'estrazione di feature radiomiche",
+    version="1.0.0",
+    lifespan=lifespan,
+)
 
 
 class NextflowTask(BaseModel):
@@ -34,23 +72,22 @@ class NextflowTask(BaseModel):
 
 def get_nifti_hash(nifti_path: str) -> str:
     """
-    Calcola un hash deterministico del nome del file NIfTI.
+    Calcola un hash deterministico dal nome del file NIfTI.
     Due task che processano la stessa risonanza ottengono la stessa workDir,
-    permettendo a Nextflow di riutilizzare la cache di FreeSurfer via -resume.
-    Risonanze diverse producono hash diversi e quindi workDir isolate,
-    garantendo la sicurezza in caso di esecuzioni parallele.
+    permettendo a Nextflow di riutilizzare la cache via -resume.
+    Risonanze diverse producono hash diversi e workDir isolate,
+    garantendo sicurezza in caso di esecuzioni parallele.
     """
     return hashlib.md5(os.path.basename(nifti_path).encode()).hexdigest()[:12]
 
 
 def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segmenter: str):
-
     host_outdir = outdir.replace(CONTAINER_BASE, HOST_BASE)
     os.makedirs(host_outdir, exist_ok=True)
 
     # La workDir include l'hash del segmentatore oltre a quello del NIfTI:
-    # se lo stesso file viene rielaborato con un segmentatore diverso, la cache
-    # non viene riutilizzata — comportamento corretto perché l'output cambia.
+    # se lo stesso file viene rielaborato con segmentatore diverso, la cache
+    # non viene riutilizzata — corretto perche' l'output cambia.
     nifti_hash = get_nifti_hash(input_path)
     work_dir = f"/tmp/nextflow_work/cache_{nifti_hash}_{brain_segmenter}"
     os.makedirs(work_dir, exist_ok=True)
@@ -59,6 +96,8 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
     if not os.path.exists(tmp_nifti):
         shutil.copy2(input_path, tmp_nifti)
 
+    # La licenza FreeSurfer viene copiata in /tmp/freesurfer_license.txt
+    # perche' nextflow.config la monta li' nel container via runOptions.
     shutil.copy2("/app/license.txt", "/tmp/freesurfer_license.txt")
 
     cmd = [
@@ -70,39 +109,35 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
         "--brain_segmenter", brain_segmenter,
         "--fastsurfer_device", "cuda" if brain_segmenter == "fastsurfer" else "cpu",
         "--fastsurfer_threads", "8",
-        "-w", work_dir
+        "-w", work_dir,
     ]
 
-    print(f"🔄 Avvio Nextflow per Task {task_id}...")
-    print(f"   Input:            {tmp_nifti}")
-    print(f"   Outdir:           {host_outdir}")
-    print(f"   WorkDir:          {work_dir}")
-    print(f"   Brain segmenter:  {brain_segmenter}")
+    logger.info(f"Task {task_id}: avvio Nextflow — segmentatore={brain_segmenter}, input={tmp_nifti}")
 
     try:
         subprocess.run(cmd, cwd=work_dir, check=True)
-        print(f"✅ Task {task_id} completato!")
+        logger.info(f"Task {task_id}: completato.")
         TASKS_STATUS[task_id] = "SUCCESS"
     except subprocess.CalledProcessError as e:
-        print(f"❌ ERRORE: Nextflow fallito per il Task {task_id} con codice {e.returncode}")
+        logger.error(f"Task {task_id}: Nextflow fallito con codice {e.returncode}.")
         TASKS_STATUS[task_id] = "FAILED"
 
 
 async def run_pipeline_with_gpu_lock(task_id: str, input_path: str, outdir: str, brain_segmenter: str):
     """
     Wrapper asincrono per la pipeline Nextflow.
-    I task FastSurfer acquisiscono il GPU lock prima di partire — la MIG instance
+    I task FastSurfer acquisiscono il GPU lock prima di partire: la MIG instance
     non supporta esecuzioni concorrenti di PyTorch. I task FreeSurfer girano
-    liberamente senza acquisire il lock, mantenendo la parallelizzazione CPU.
+    liberamente senza lock, mantenendo la parallelizzazione CPU.
     """
     if brain_segmenter == "fastsurfer":
-        print(f"⏳ Task {task_id}: in attesa del GPU lock (FastSurfer)...")
+        logger.info(f"Task {task_id}: in attesa del GPU lock (FastSurfer)...")
         async with gpu_lock:
-            print(f"🔒 Task {task_id}: GPU lock acquisito.")
+            logger.info(f"Task {task_id}: GPU lock acquisito.")
             await asyncio.to_thread(
                 run_nextflow_pipeline, task_id, input_path, outdir, brain_segmenter
             )
-            print(f"🔓 Task {task_id}: GPU lock rilasciato.")
+            logger.info(f"Task {task_id}: GPU lock rilasciato.")
     else:
         await asyncio.to_thread(
             run_nextflow_pipeline, task_id, input_path, outdir, brain_segmenter
@@ -117,7 +152,7 @@ async def start_preprocessing(task: NextflowTask, background_tasks: BackgroundTa
         task.task_id,
         task.input_path,
         task.outdir,
-        task.brain_segmenter
+        task.brain_segmenter,
     )
     return {"status": "accepted", "message": f"Nextflow avviato per il task {task.task_id}"}
 

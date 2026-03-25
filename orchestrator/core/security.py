@@ -1,4 +1,10 @@
-import os
+# orchestrator/core/security.py
+#
+# Validazione leggera del token JWT: decodifica e verifica la firma
+# usando la SECRET_KEY condivisa con api_gateway, senza replicare
+# la logica di login. L'autenticazione vera e propria è delegata
+# all'api_gateway — questo servizio si limita a verificare i token.
+
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -8,8 +14,8 @@ from core.database import get_db
 from core.config import settings
 from models.domain import User
 
-TOKEN_URL = os.getenv("AUTH_SERVICE_URL", "http://localhost:8000") + "/login"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=TOKEN_URL)
+# tokenUrl punta all'api_gateway — usato da Swagger UI per il flusso OAuth2
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.AUTH_SERVICE_URL}/login")
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
     credentials_exception = HTTPException(

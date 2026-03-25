@@ -93,7 +93,7 @@ export default function Dashboard() {
       setFiles([]); 
       
     } catch (error) {
-      console.error("🚨 Errore durante l'upload e analisi:", error);
+      console.error("Errore durante l'upload e analisi:", error);
       setUploadStatus('error');
       setIsAnalyzing(false);
     }
@@ -120,7 +120,6 @@ export default function Dashboard() {
   };
 
   const handleHistoryTaskClick = (storicoData) => {
-    console.log("Dati grezzi cliccati dallo storico:", storicoData);
     setFile(null);
     setNiftiUrl(storicoData.niftiUrl);
     setUmapData(storicoData.umapData);

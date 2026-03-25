@@ -60,7 +60,7 @@ const NiiVueCanvas = ({ file, niftiUrl, colorMap = 'gray' }) => {
           }]);
         }
       } catch (error) {
-        console.error("🚨 Errore irreversibile nel caricamento NIfTI:", error);
+        console.error("Errore nel caricamento NIfTI:", error);
       } 
     };
 

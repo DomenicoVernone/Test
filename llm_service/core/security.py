@@ -1,11 +1,18 @@
-import os
+# File: llm_service/core/security.py
+#
+# Validazione JWT per proteggere gli endpoint del servizio.
+# Il token viene verificato localmente usando la SECRET_KEY condivisa con api_gateway:
+# non è necessaria una chiamata HTTP al servizio di autenticazione per ogni request.
+
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+
 from core.config import settings
 
-TOKEN_URL = os.getenv("AUTH_SERVICE_URL", "http://localhost:8000") + "/login"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=TOKEN_URL)
+# tokenUrl è usato solo da Swagger UI per il flusso OAuth2 interattivo
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=settings.AUTH_SERVICE_URL + "/login")
+
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
     credentials_exception = HTTPException(

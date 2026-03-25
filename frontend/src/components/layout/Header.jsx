@@ -7,12 +7,10 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Activity, User, Settings, LogOut } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 
-// IMPORTA IL CUSTOM HOOK
 import { useAuth } from '../../contexts/AuthContext';
 
 const Header = ({ onOpenSettings, theme }) => { 
   
-  // USA L'HOOK: pulito, type-safe e senza re-render anomali
   const { logout, token } = useAuth();
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -28,7 +26,7 @@ const Header = ({ onOpenSettings, theme }) => {
       const decoded = jwtDecode(token);
       return decoded.sub || "Medico";
     } catch (error) {
-      console.error("🚨 Errore decodifica JWT:", error);
+      console.error("Errore decodifica JWT:", error);
       return "Medico";
     }
   }, [token]);

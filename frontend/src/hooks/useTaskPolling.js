@@ -11,7 +11,7 @@ export function useTaskPolling(refreshTrigger, onTaskCompleted) {
             const response = await orchestratorApi.get('/analyze/');
             setTasks(response.data);
         } catch (error) {
-            console.error("🚨 [Hook] Errore nel recupero dello storico:", error);
+            console.error("[useTaskPolling] Errore nel recupero dello storico:", error);
         } finally {
             setIsLoading(false);
         }
@@ -47,7 +47,7 @@ export function useTaskPolling(refreshTrigger, onTaskCompleted) {
                             }
                         }
                     } catch (err) {
-                        console.error(`⚠️ [Hook] Errore polling task ${task.id}:`, err);
+                        console.error(`[useTaskPolling] Errore polling task ${task.id}:`, err);
                     }
                 }
 

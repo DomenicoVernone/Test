@@ -1,6 +1,12 @@
-from sqlalchemy import create_engine, text, event
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+# api_gateway/core/database.py
+#
+# Configurazione del database SQLite tramite SQLAlchemy.
+# Il WAL mode (Write-Ahead Logging) è abilitato su ogni connessione
+# per permettere letture concorrenti mentre un task è in scrittura —
+# necessario dato che orchestrator e api_gateway condividono lo stesso DB.
+
+from sqlalchemy import create_engine, event
+from sqlalchemy.orm import declarative_base, sessionmaker
 from core.config import settings
 
 engine = create_engine(
@@ -11,7 +17,6 @@ engine = create_engine(
     }
 )
 
-# Attiva WAL mode su ogni nuova connessione
 @event.listens_for(engine, "connect")
 def set_wal_mode(dbapi_conn, connection_record):
     cursor = dbapi_conn.cursor()

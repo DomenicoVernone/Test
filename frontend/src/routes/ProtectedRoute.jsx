@@ -15,7 +15,7 @@ export default function ProtectedRoute({ children }) {
   const token = localStorage.getItem('access_token');
 
   if (!token) {
-    console.warn("🛡️ [Security] Accesso negato: Token JWT mancante. Reindirizzamento al Login.");
+    console.warn("[Security] Accesso negato: Token JWT mancante. Reindirizzamento al Login.");
     // Usiamo l'attributo 'state' per ricordare da dove veniva l'utente (utile per redirect futuri)
     // Usiamo 'replace' per impedire che l'utente torni indietro alla route protetta premendo "Indietro" nel browser
     return <Navigate to="/login" state={{ from: location }} replace />;
