@@ -73,10 +73,7 @@ class NextflowTask(BaseModel):
 def get_nifti_hash(nifti_path: str) -> str:
     """
     Calcola un hash deterministico dal nome del file NIfTI.
-    Due task che processano la stessa risonanza ottengono la stessa workDir,
-    permettendo a Nextflow di riutilizzare la cache via -resume.
-    Risonanze diverse producono hash diversi e workDir isolate,
-    garantendo sicurezza in caso di esecuzioni parallele.
+    Usato come componente della workDir per isolare le esecuzioni.
     """
     return hashlib.md5(os.path.basename(nifti_path).encode()).hexdigest()[:12]
 
@@ -85,11 +82,12 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
     host_outdir = outdir.replace(CONTAINER_BASE, HOST_BASE)
     os.makedirs(host_outdir, exist_ok=True)
 
-    # La workDir include l'hash del segmentatore oltre a quello del NIfTI:
-    # se lo stesso file viene rielaborato con segmentatore diverso, la cache
-    # non viene riutilizzata — corretto perche' l'output cambia.
+    # La workDir include hash NIfTI, segmentatore e task_id.
+    # Questo garantisce che ogni task abbia una directory isolata,
+    # evitando conflitti sul lock di sessione Nextflow in caso di
+    # esecuzioni parallele sullo stesso file con lo stesso segmentatore.
     nifti_hash = get_nifti_hash(input_path)
-    work_dir = f"/tmp/nextflow_work/cache_{nifti_hash}_{brain_segmenter}"
+    work_dir = f"/tmp/nextflow_work/cache_{nifti_hash}_{brain_segmenter}_{task_id}"
     os.makedirs(work_dir, exist_ok=True)
 
     tmp_nifti = f"{work_dir}/nifti_{os.path.basename(input_path)}"
