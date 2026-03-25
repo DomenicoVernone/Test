@@ -71,7 +71,7 @@ export default function UmapPlot({ data, selectedModel, theme }) {
   }
 
   // Selezioniamo solo le prime 3 feature per non ingombrare visivamente il tooltip
-  const featuresToDisplay = availableFeatures.slice(0, 3);
+  const featuresToDisplay = availableFeatures.slice(0, 5);
 
   // Funzione helper per rendere leggibili i nomi delle feature
   const formatFeatureName = (name) => {

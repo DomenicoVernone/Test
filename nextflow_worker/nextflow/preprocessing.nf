@@ -9,7 +9,7 @@ params.error_strategy = 'ignore'
 params.maxforks = 1
 params.pyradiomics_jobs = 4
 params.fastsurfer_device = 'cpu' // default sicuro - viene sovrasctitto dalla CLI
-params.fastsurfer_threads = 8
+params.fastsurfer_threads = 4
 params.fastsurfer_3T = false
 params.brain_segmenter = 'freesurfer'  // default sicuro
 
