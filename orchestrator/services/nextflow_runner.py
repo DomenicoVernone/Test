@@ -109,5 +109,8 @@ class NextflowRunner:
         final_csv_path = os.path.join(settings.FEATURES_DIR, final_csv_name)
         shutil.move(generated_csv, final_csv_path)
 
+        # Pulizia della directory temporanea del task.
+        shutil.rmtree(temp_outdir, ignore_errors=True)
+
         logger.info(f"[INFO] Estrazione completata. CSV salvato in: {final_csv_path}")
         return final_csv_path
