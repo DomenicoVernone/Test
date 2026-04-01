@@ -42,14 +42,16 @@ gpu_lock = asyncio.Lock()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Copia dei file statici in /tmp al bootstrap del servizio.
-    # nextflow.config monta /tmp/freesurfer_license.txt nel container FreeSurfer
-    # e /tmp/ROI_labels.tsv come fallback per NF_LABELS.
+    # Copia dei file statici al bootstrap del servizio.
+    # ROI_labels.tsv viene copiato sia in /tmp (fallback per NF_LABELS in nextflow.config)
+    # che nel volume condiviso (per inference_engine, che lo legge tramite NF_LABELS).
+    # pyradiomics.yaml viene copiato in /tmp come fallback per NF_SETTINGS.
     try:
         shutil.copy2("/app/data/external/ROI_labels.tsv", "/tmp/ROI_labels.tsv")
+        shutil.copy2("/app/data/external/ROI_labels.tsv", "/shared_data/ROI_labels.tsv")
         shutil.copy2("/app/nextflow/configs/pyradiomics.yaml", "/tmp/pyradiomics.yaml")
-        logger.info("File statici copiati in /tmp.")
-    except FileNotFoundError as e:
+        logger.info("File statici copiati in /tmp e nel volume condiviso.")
+    except OSError as e:
         logger.error(f"File statico mancante al bootstrap: {e}. Verificare la directory data/.")
     yield
     logger.info("nextflow_worker in shutdown.")

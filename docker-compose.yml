@@ -105,11 +105,10 @@ services:
     volumes:
       - ./inference_engine:/app
       - shared_clinical_data:/shared_data
-      - ./nextflow_worker/data/external/ROI_labels.tsv:/app/roi_labels.tsv:ro
     environment:
       - SHARED_VOLUME_DIR=/shared_data
-      - NF_LABELS=/app/roi_labels.tsv
-
+      - NF_LABELS=/shared_data/ROI_labels.tsv
+      
   # 6. FRONTEND — Dashboard clinica React
   frontend:
     build:
