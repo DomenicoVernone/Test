@@ -105,7 +105,7 @@ docker build -t clinical-fsl -f nextflow_worker/fsl.dockerfile nextflow_worker/
 docker build -t clinical-pyradiomics -f nextflow_worker/pyradiomics.dockerfile nextflow_worker/
 ```
 
-Questo passaggio va ripetuto solo se i Dockerfile vengono modificati. La build di `clinical-pyradiomics` compila xgboost da sorgente e richiede diversi minuti.
+Questo passaggio va ripetuto solo se i Dockerfile vengono modificati.
 
 ### 6. Avvia lo stack
 
