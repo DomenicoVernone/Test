@@ -1,12 +1,12 @@
 <style>
 
-.section-box {
+.info-box {
 
-&#x20; border-left: 5px solid #3f51b5;
+&#x20; border-left: 6px solid #2962ff;
 
-&#x20; background: #f5f7ff;
+&#x20; background: #eef3ff;
 
-&#x20; padding: 12px 16px;
+&#x20; padding: 14px;
 
 &#x20; margin: 18px 0;
 
@@ -16,19 +16,19 @@
 
 
 
-.pipeline-box {
+.pipeline-flow {
 
-&#x20; background: #f1f3f4;
-
-&#x20; border-radius: 8px;
+&#x20; background: #f4f6fa;
 
 &#x20; padding: 14px;
 
-&#x20; font-family: monospace;
-
 &#x20; text-align: center;
 
-&#x20; font-size: 16px;
+&#x20; font-family: monospace;
+
+&#x20; border-radius: 8px;
+
+&#x20; font-size: 15px;
 
 &#x20; margin: 20px 0;
 
@@ -36,11 +36,11 @@
 
 
 
-.code-path {
+.code-inline {
 
-&#x20; background: #eeeeee;
+&#x20; background: #ececec;
 
-&#x20; padding: 4px 8px;
+&#x20; padding: 3px 8px;
 
 &#x20; border-radius: 4px;
 
@@ -54,11 +54,11 @@
 
 &#x20; display: inline-block;
 
-&#x20; padding: 4px 10px;
-
-&#x20; background: #3f51b5;
+&#x20; background: #2962ff;
 
 &#x20; color: white;
+
+&#x20; padding: 4px 10px;
 
 &#x20; border-radius: 5px;
 
@@ -66,63 +66,73 @@
 
 }
 
+
+
+.section-title {
+
+&#x20; margin-top: 40px;
+
+&#x20; border-bottom: 2px solid #e0e0e0;
+
+&#x20; padding-bottom: 5px;
+
+}
+
+
+
+table {
+
+&#x20; border-collapse: collapse;
+
+&#x20; width: 100%;
+
+&#x20; margin-top: 15px;
+
+}
+
+
+
+th {
+
+&#x20; background: #f2f2f2;
+
+}
+
+
+
+th, td {
+
+&#x20; padding: 10px;
+
+&#x20; border: 1px solid #ddd;
+
+}
+
 </style>
 
 
 
-\# Pipeline Nextflow
+
+
+<h1>Pipeline Nextflow</h1>
 
 
 
-<div class="section-box">
+<div class="info-box">
 
-La pipeline <strong>Nextflow</strong> rappresenta il nucleo computazionale del sistema ClinicalTwin per il preprocessing neuroimaging e l’estrazione delle feature radiomiche da immagini MRI strutturali in formato <strong>NIfTI</strong>.
+La pipeline <strong>Nextflow</strong> rappresenta il nucleo computazionale del sistema ClinicalTwin per il preprocessing neuroimaging e l’estrazione automatizzata delle feature radiomiche da immagini MRI strutturali in formato <strong>NIfTI</strong>.
 
 </div>
 
 
 
-Essa implementa un workflow automatizzato composto da:
+
+
+<h2 class="section-title">Workflow computazionale</h2>
 
 
 
-<ul>
-
-<li>segmentazione anatomica cerebrale</li>
-
-<li>generazione delle ROI</li>
-
-<li>conversione volumi segmentati</li>
-
-<li>estrazione feature radiomiche</li>
-
-<li>costruzione dataset CSV</li>
-
-</ul>
-
-
-
-Pipeline eseguita dal servizio:
-
-
-
-<span class="badge">nextflow\_worker</span>
-
-
-
-tramite architettura <strong>Docker-out-of-Docker (DooD)</strong>.
-
-
-
-\---
-
-
-
-\# Workflow computazionale
-
-
-
-<div class="pipeline-box">
+<div class="pipeline-flow">
 
 MRI → FreeSurfer / FastSurfer → ROI extraction → NIfTI conversion → Radiomics extraction → CSV dataset
 
@@ -134,19 +144,17 @@ Workflow implementato nel file:
 
 
 
-<span class="code-path">
+<div class="code-inline">
 
 nextflow\_worker/nextflow/preprocessing.nf
 
-</span>
+</div>
 
 
 
-\---
 
 
-
-\# Struttura della pipeline
+<h2 class="section-title">Struttura della pipeline</h2>
 
 
 
@@ -166,7 +174,7 @@ nextflow\_worker/nextflow/preprocessing.nf
 
 <td><strong>freesurfer</strong></td>
 
-<td>Segmentazione anatomica</td>
+<td>Segmentazione anatomica cerebrale</td>
 
 </tr>
 
@@ -196,7 +204,7 @@ nextflow\_worker/nextflow/preprocessing.nf
 
 <td><strong>csv\_collector</strong></td>
 
-<td>Aggregazione feature</td>
+<td>Aggregazione feature radiomiche</td>
 
 </tr>
 
@@ -206,19 +214,19 @@ nextflow\_worker/nextflow/preprocessing.nf
 
 <td><strong>feature\_extraction</strong></td>
 
-<td>Estrazione radiomica</td>
+<td>Estrazione radiomica tramite PyRadiomics</td>
 
 </tr>
+
+
 
 </table>
 
 
 
-\---
 
 
-
-\# Segmentazione anatomica
+<h2 class="section-title">Segmentazione anatomica</h2>
 
 
 
@@ -228,9 +236,9 @@ Segmentatori disponibili:
 
 <ul>
 
-<li><strong>FreeSurfer</strong></li>
+<li>FreeSurfer</li>
 
-<li><strong>FastSurfer</strong></li>
+<li>FastSurfer</li>
 
 </ul>
 
@@ -240,11 +248,11 @@ Configurazione segmentatore:
 
 
 
-<span class="code-path">
+<div class="code-inline">
 
 nextflow\_worker/nextflow/configs/nextflow.config
 
-</span>
+</div>
 
 
 
@@ -254,7 +262,7 @@ Parametro:
 
 <pre>
 
-params.brain\_segmenter = freesurfer
+params.brain\_segmenter = "freesurfer"
 
 </pre>
 
@@ -276,23 +284,21 @@ Output generati:
 
 
 
-\---
+
+
+<h2 class="section-title">Generazione ROI</h2>
 
 
 
-\# Generazione ROI
+File configurazione ROI:
 
 
 
-File di configurazione ROI:
-
-
-
-<span class="code-path">
+<div class="code-inline">
 
 nextflow\_worker/data/external/ROI\_labels.tsv
 
-</span>
+</div>
 
 
 
@@ -304,7 +310,7 @@ Contiene:
 
 <li>etichette FreeSurfer</li>
 
-<li>ID numerici</li>
+<li>identificatori numerici</li>
 
 <li>mapping anatomico</li>
 
@@ -312,11 +318,11 @@ Contiene:
 
 
 
-Totale ROI utilizzate:
+Numero totale ROI:
 
 
 
-<div class="pipeline-box">
+<div class="pipeline-flow">
 
 78 regioni cerebrali
 
@@ -324,11 +330,9 @@ Totale ROI utilizzate:
 
 
 
-\---
 
 
-
-\# Conversione volumi segmentati
+<h2 class="section-title">Conversione volumi segmentati</h2>
 
 
 
@@ -340,7 +344,7 @@ Processo:
 
 
 
-Operazioni principali:
+Operazioni:
 
 
 
@@ -356,7 +360,7 @@ Operazioni principali:
 
 
 
-Output prodotto:
+Output:
 
 
 
@@ -368,11 +372,9 @@ ROI\_mask.nii.gz
 
 
 
-\---
 
 
-
-\# Estrazione feature radiomiche
+<h2 class="section-title">Estrazione feature radiomiche</h2>
 
 
 
@@ -388,15 +390,13 @@ Configurazione:
 
 
 
-<span class="code-path">
+<div class="code-inline">
 
 nextflow\_worker/data/external/pyradiomics.yaml
 
-</span>
+</div>
 
 
-
-Feature estratte:
 
 
 
@@ -420,6 +420,8 @@ Feature estratte:
 
 
 
+
+
 <h3>Shape features</h3>
 
 
@@ -435,6 +437,8 @@ Feature estratte:
 <li>sphericity</li>
 
 </ul>
+
+
 
 
 
@@ -458,15 +462,13 @@ Feature estratte:
 
 
 
-\---
+
+
+<h2 class="section-title">Generazione dataset CSV</h2>
 
 
 
-\# Generazione dataset CSV
-
-
-
-Aggregazione feature tramite:
+Processo:
 
 
 
@@ -494,7 +496,7 @@ Contiene:
 
 <li>feature per ciascuna ROI</li>
 
-<li>dataset tabellare ML-ready</li>
+<li>dataset compatibile con pipeline ML</li>
 
 <li>input diretto per model\_service</li>
 
@@ -502,11 +504,9 @@ Contiene:
 
 
 
-\---
 
 
-
-\# Parametri configurabili
+<h2 class="section-title">Parametri configurabili</h2>
 
 
 
@@ -514,11 +514,11 @@ File configurazione:
 
 
 
-<span class="code-path">
+<div class="code-inline">
 
 nextflow\_worker/nextflow/configs/nextflow.config
 
-</span>
+</div>
 
 
 
@@ -592,23 +592,19 @@ nextflow\_worker/nextflow/configs/nextflow.config
 
 </tr>
 
+
+
 </table>
 
 
 
-\---
+
+
+<h2 class="section-title">Architettura Docker-out-of-Docker</h2>
 
 
 
-\# Architettura Docker-out-of-Docker
-
-
-
-Pipeline basata su:
-
-
-
-<div class="pipeline-box">
+<div class="pipeline-flow">
 
 Docker-out-of-Docker (DooD)
 
@@ -626,7 +622,7 @@ Significa che:
 
 <li>i container pipeline girano sull’host Docker</li>
 
-<li>le immagini devono essere pre-costruite</li>
+<li>le immagini devono essere pre-costruite localmente</li>
 
 </ul>
 
@@ -640,7 +636,11 @@ Build immagini richieste:
 
 docker build -t clinical-freesurfer -f nextflow\_worker/freesurfer.dockerfile nextflow\_worker/
 
+
+
 docker build -t clinical-fsl -f nextflow\_worker/fsl.dockerfile nextflow\_worker/
+
+
 
 docker build -t clinical-pyradiomics -f nextflow\_worker/pyradiomics.dockerfile nextflow\_worker/
 
@@ -648,11 +648,9 @@ docker build -t clinical-pyradiomics -f nextflow\_worker/pyradiomics.dockerfile 
 
 
 
-\---
 
 
-
-\# Output della pipeline
+<h2 class="section-title">Output della pipeline</h2>
 
 
 
@@ -692,13 +690,15 @@ docker build -t clinical-pyradiomics -f nextflow\_worker/pyradiomics.dockerfile 
 
 <td>Nextflow logs</td>
 
-<td>tracciamento esecuzione</td>
+<td>tracciamento esecuzione pipeline</td>
 
 </tr>
+
+
 
 </table>
 
 
 
-Il dataset CSV viene successivamente utilizzato dal <strong>model\_service</strong> per la classificazione nello spazio latente UMAP.
+Il dataset CSV viene successivamente utilizzato dal <strong>model\_service</strong> per la classificazione diagnostica nello spazio latente <strong>UMAP</strong>.
 
