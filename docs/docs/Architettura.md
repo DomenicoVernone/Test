@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
+
 <meta charset="UTF-8">
 <title>Clinical Twin – System Architecture</title>
 
@@ -42,6 +44,16 @@ h2 {
     font-size: 26px;
 }
 
+/* ===== SERVICE BOX ===== */
+
+.service-box {
+    background: white;
+    padding: 18px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+}
+
 /* ===== CODE BLOCK ===== */
 
 .codeblock {
@@ -50,6 +62,7 @@ h2 {
     border-radius: 6px;
     font-family: monospace;
     margin: 15px 0;
+    white-space: pre-line;
 }
 
 /* ===== TABLE ===== */
@@ -57,7 +70,7 @@ h2 {
 table {
     border-collapse: collapse;
     width: 100%;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 th, td {
@@ -73,7 +86,6 @@ th {
 
 .arch-image {
     text-align: center;
-    margin: 30px 0;
 }
 
 .arch-image img {
@@ -88,8 +100,34 @@ th {
     margin-top: 10px;
 }
 
+/* ===== NAV BUTTONS ===== */
+
+.nav-buttons {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.button {
+    background: #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: black;
+}
+
+/* ===== FOOTER ===== */
+
+.footer {
+    margin-top: 50px;
+    font-size: 14px;
+    color: gray;
+}
+
 </style>
+
 </head>
+
 
 <body>
 
@@ -101,6 +139,9 @@ Docs » System Architecture
 
 <h1>System Architecture</h1>
 
+
+<div class="service-box">
+
 <p>
 Clinical Twin è progettato come una piattaforma modulare basata su
 microservizi containerizzati orchestrati tramite Docker Compose.
@@ -108,8 +149,12 @@ L’architettura separa chiaramente preprocessing neuroimaging, inferenza
 statistica, gestione modelli e interfaccia clinica.
 </p>
 
+</div>
+
 
 <h2>Panoramica generale</h2>
+
+<div class="service-box">
 
 <p>
 Il diagramma seguente rappresenta la struttura logica dei microservizi e
@@ -123,15 +168,18 @@ Figura: Architettura a microservizi della piattaforma Clinical Twin
 </div>
 </div>
 
-
 <p>Flusso operativo principale:</p>
 
 <div class="codeblock">
 MRI → Segmentazione → Estrazione radiomica → Inferenza KNN → Embedding UMAP → Dashboard clinica
 </div>
 
+</div>
+
 
 <h2>Architettura a microservizi</h2>
+
+<div class="service-box">
 
 <table>
 
@@ -193,8 +241,12 @@ MRI → Segmentazione → Estrazione radiomica → Inferenza KNN → Embedding U
 
 </table>
 
+</div>
+
 
 <h2>Pipeline neuroimaging</h2>
+
+<div class="service-box">
 
 <ul>
 <li>preprocessing MRI volumetrica</li>
@@ -203,8 +255,12 @@ MRI → Segmentazione → Estrazione radiomica → Inferenza KNN → Embedding U
 <li>feature radiomiche PyRadiomics</li>
 </ul>
 
+</div>
+
 
 <h2>Motore di inferenza</h2>
+
+<div class="service-box">
 
 <p>
 Il servizio inference_engine implementa classificazione KNN e proiezione
@@ -217,8 +273,12 @@ UMAP 3D per rappresentare il paziente nello spazio latente diagnostico.
 <li>supporto decisionale interpretabile</li>
 </ul>
 
+</div>
+
 
 <h2>Assistente AI context-aware</h2>
+
+<div class="service-box">
 
 <ul>
 <li>interpretazione feature radiomiche</li>
@@ -226,6 +286,10 @@ UMAP 3D per rappresentare il paziente nello spazio latente diagnostico.
 <li>supporto explainability clinica</li>
 <li>memoria conversazionale multi-turno</li>
 </ul>
+
+</div>
+
+
 
 </div>
 

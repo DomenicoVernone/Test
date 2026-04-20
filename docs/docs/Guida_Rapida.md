@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
+
 <meta charset="UTF-8">
 <title>Clinical Twin – Quickstart</title>
 
@@ -11,46 +13,7 @@
 body {
     margin: 0;
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    display: flex;
     background: #f5f6f7;
-}
-
-/* ===== SIDEBAR ===== */
-
-.sidebar {
-    width: 300px;
-    height: 100vh;
-    background: linear-gradient(#2f6f95, #244f6a);
-    color: white;
-    position: fixed;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.sidebar h2 {
-    margin-top: 0;
-}
-
-.sidebar input {
-    width: 100%;
-    padding: 8px;
-    border-radius: 6px;
-    border: none;
-    margin: 15px 0;
-}
-
-.sidebar ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-.sidebar li {
-    padding: 6px 0;
-    opacity: 0.9;
-}
-
-.sidebar li.active {
-    font-weight: bold;
 }
 
 /* ===== CONTENT ===== */
@@ -81,6 +44,16 @@ h2 {
     font-size: 26px;
 }
 
+/* ===== SERVICE BLOCK ===== */
+
+.service-box {
+    background: white;
+    padding: 18px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+}
+
 /* ===== CODE BLOCK ===== */
 
 .codeblock {
@@ -89,6 +62,7 @@ h2 {
     border-radius: 6px;
     font-family: monospace;
     margin: 15px 0;
+    white-space: pre-line;
 }
 
 /* ===== NAV BUTTONS ===== */
@@ -116,15 +90,11 @@ h2 {
 }
 
 </style>
+
 </head>
 
+
 <body>
-
-<!-- ===== SIDEBAR ===== -->
-
-
-
-<!-- ===== MAIN CONTENT ===== -->
 
 <div class="content">
 
@@ -142,6 +112,8 @@ magnetica cerebrale utilizzando Clinical Twin dopo l’installazione dello stack
 
 <h2>1. Avvia lo stack Docker</h2>
 
+<div class="service-box">
+
 <div class="codeblock">
 docker compose up -d --build
 </div>
@@ -150,19 +122,25 @@ docker compose up -d --build
 Attendere il completamento dell’avvio dei microservizi prima di procedere.
 </p>
 
+</div>
+
 
 <h2>2. Accedi alla dashboard</h2>
 
-<p>
-Aprire il browser all’indirizzo:
-</p>
+<div class="service-box">
+
+<p>Aprire il browser all’indirizzo:</p>
 
 <div class="codeblock">
 http://localhost:5173
 </div>
 
+</div>
+
 
 <h2>3. Crea il primo utente</h2>
+
+<div class="service-box">
 
 <p>
 Se è il primo avvio del sistema, creare un utente tramite Swagger UI:
@@ -172,20 +150,20 @@ Se è il primo avvio del sistema, creare un utente tramite Swagger UI:
 http://localhost:8000/docs
 </div>
 
-<p>
-Eseguire la richiesta:
-</p>
+<p>Eseguire la richiesta:</p>
 
 <div class="codeblock">
 POST /signup
 </div>
 
+</div>
+
 
 <h2>4. Carica una risonanza magnetica</h2>
 
-<p>
-Dopo il login nella dashboard:
-</p>
+<div class="service-box">
+
+<p>Dopo il login nella dashboard:</p>
 
 <ul>
 <li>aprire la sezione upload</li>
@@ -193,12 +171,14 @@ Dopo il login nella dashboard:
 <li>avviare l’analisi</li>
 </ul>
 
+</div>
+
 
 <h2>5. Avvia la pipeline di segmentazione</h2>
 
-<p>
-Il sistema eseguirà automaticamente:
-</p>
+<div class="service-box">
+
+<p>Il sistema eseguirà automaticamente:</p>
 
 <ul>
 <li>preprocessing MRI</li>
@@ -208,12 +188,14 @@ Il sistema eseguirà automaticamente:
 <li>proiezione nello spazio latente UMAP</li>
 </ul>
 
+</div>
+
 
 <h2>6. Visualizza i risultati</h2>
 
-<p>
-Al termine dell’elaborazione saranno disponibili:
-</p>
+<div class="service-box">
+
+<p>Al termine dell’elaborazione saranno disponibili:</p>
 
 <ul>
 <li>segmentazione delle ROI cerebrali</li>
@@ -223,12 +205,14 @@ Al termine dell’elaborazione saranno disponibili:
 <li>spiegazione tramite assistente AI</li>
 </ul>
 
+</div>
+
 
 <h2>7. Interroga l’assistente AI</h2>
 
-<p>
-Utilizzare il pannello laterale dell’assistente per:
-</p>
+<div class="service-box">
+
+<p>Utilizzare il pannello laterale dell’assistente per:</p>
 
 <ul>
 <li>interpretare i risultati radiomici</li>
@@ -236,9 +220,12 @@ Utilizzare il pannello laterale dell’assistente per:
 <li>ottenere supporto diagnostico contestuale</li>
 </ul>
 
+</div>
+
 
 
 </div>
 
 </body>
+
 </html>

@@ -306,21 +306,6 @@ Contiene la documentazione tecnica del progetto:
 </div>
 
 
-<div class="nav-buttons">
-
-<a class="button">⬅ Previous</a>
-<a class="button">Next ➡</a>
-
-</div>
-
-
-<div class="footer">
-
-© 2025 Clinical Twin Documentation  
-Built with custom HTML/CSS (ReadTheDocs-style layout)
-
-</div>
-
 </div>
 
 </body>

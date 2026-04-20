@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
+
 <meta charset="UTF-8">
 <title>Clinical Twin – Testing</title>
 
@@ -11,46 +13,7 @@
 body {
     margin: 0;
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    display: flex;
     background: #f5f6f7;
-}
-
-/* ===== SIDEBAR ===== */
-
-.sidebar {
-    width: 300px;
-    height: 100vh;
-    background: linear-gradient(#2f6f95, #244f6a);
-    color: white;
-    position: fixed;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.sidebar h2 {
-    margin-top: 0;
-}
-
-.sidebar input {
-    width: 100%;
-    padding: 8px;
-    border-radius: 6px;
-    border: none;
-    margin: 15px 0;
-}
-
-.sidebar ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-.sidebar li {
-    padding: 6px 0;
-    opacity: 0.9;
-}
-
-.sidebar li.active {
-    font-weight: bold;
 }
 
 /* ===== CONTENT ===== */
@@ -81,7 +44,7 @@ h2 {
     font-size: 26px;
 }
 
-/* ===== SERVICE BLOCK ===== */
+/* ===== SERVICE BOX ===== */
 
 .service-box {
     background: white;
@@ -99,6 +62,7 @@ h2 {
     border-radius: 6px;
     font-family: monospace;
     margin: 15px 0;
+    white-space: pre-line;
 }
 
 /* ===== NAV BUTTONS ===== */
@@ -126,14 +90,11 @@ h2 {
 }
 
 </style>
+
 </head>
 
+
 <body>
-
-<!-- ===== SIDEBAR ===== -->
-
-
-<!-- ===== MAIN CONTENT ===== -->
 
 <div class="content">
 
@@ -143,14 +104,21 @@ Docs » Testing
 
 <h1>Testing</h1>
 
+
+<div class="service-box">
+
 <p>
 Clinical Twin include una serie di test funzionali e di integrazione per
 verificare il corretto funzionamento dei microservizi, della pipeline
 neuroimaging e del motore di inferenza diagnostica.
 </p>
 
+</div>
+
 
 <h2>Verifica stato microservizi</h2>
+
+<div class="service-box">
 
 <p>
 Dopo l’avvio dello stack Docker è possibile controllare la disponibilità
@@ -165,8 +133,12 @@ curl http://localhost:8003/docs
 curl http://localhost:8004
 </div>
 
+</div>
+
 
 <h2>Test autenticazione</h2>
+
+<div class="service-box">
 
 <p>
 Verificare la creazione di un nuovo utente tramite Swagger UI:
@@ -187,6 +159,8 @@ POST /login
 <p>
 Se l’autenticazione ha successo viene restituito un token JWT valido.
 </p>
+
+</div>
 
 
 <h2>Test pipeline neuroimaging</h2>
@@ -209,6 +183,8 @@ Caricare una MRI T1-weighted tramite dashboard e verificare:
 
 <h2>Test estrazione radiomica</h2>
 
+<div class="service-box">
+
 <p>
 Durante l’esecuzione della pipeline devono essere generati i seguenti output:
 </p>
@@ -219,15 +195,19 @@ Radiomics features extracted
 pyradiomics.yaml applied
 </div>
 
+</div>
+
 
 <h2>Test inferenza diagnostica</h2>
+
+<div class="service-box">
 
 <p>
 Il servizio inference_engine restituisce una predizione diagnostica
 basata su classificazione KNN.
 </p>
 
-Esempio output:
+<p>Esempio output:</p>
 
 <div class="codeblock">
 {
@@ -237,8 +217,12 @@ Esempio output:
 }
 </div>
 
+</div>
+
 
 <h2>Test proiezione UMAP</h2>
+
+<div class="service-box">
 
 <p>
 Verificare la corretta generazione delle coordinate nello spazio latente:
@@ -249,8 +233,12 @@ UMAP projection computed
 3D embedding available
 </div>
 
+</div>
+
 
 <h2>Test dashboard clinica</h2>
+
+<div class="service-box">
 
 <p>
 Dalla dashboard React verificare:
@@ -263,8 +251,12 @@ Dalla dashboard React verificare:
 <li>storico task eseguiti</li>
 </ul>
 
+</div>
+
 
 <h2>Test assistente AI</h2>
+
+<div class="service-box">
 
 <p>
 Verificare la connessione al servizio LLM tramite richiesta testuale:
@@ -278,6 +270,8 @@ Explain why this patient is close to svPPA cluster
 L’assistente deve restituire una risposta coerente con il contesto
 radiomico e la posizione nello spazio latente.
 </p>
+
+</div>
 
 
 <h2>Test end-to-end</h2>
@@ -300,20 +294,6 @@ Se tutte le fasi vengono completate senza errori, la pipeline Clinical Twin
 </div>
 
 
-<div class="nav-buttons">
-
-<a class="button">⬅ Previous</a>
-<a class="button">Next ➡</a>
-
-</div>
-
-
-<div class="footer">
-
-© 2025 Clinical Twin Documentation  
-Built with custom HTML/CSS (ReadTheDocs-style layout)
-
-</div>
 
 </div>
 
