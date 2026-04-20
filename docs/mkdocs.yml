@@ -5,3 +5,9 @@ theme:
 
 nav:
   - Home: index.md
+  - Architecture: architecture.md
+  - Pipeline: pipeline.md
+  - Installation: installation.md
+  - Usage: usage.md
+  - Testing: testing.md
+  - Dataset: dataset.md
