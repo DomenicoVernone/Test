@@ -1,96 +1,250 @@
-Pipeline Nextflow
+<style>
 
-Panoramica generale
+.section-box {
 
+&#x20; border-left: 5px solid #3f51b5;
 
+&#x20; background: #f5f7ff;
 
-La pipeline Nextflow costituisce il nucleo computazionale del sistema ClinicalTwin per il preprocessing neuroimaging e l’estrazione delle feature radiomiche a partire da immagini MRI strutturali in formato NIfTI.
+&#x20; padding: 12px 16px;
 
+&#x20; margin: 18px 0;
 
+&#x20; border-radius: 6px;
 
-Essa implementa un workflow completamente automatizzato che comprende:
-
-
-
-segmentazione anatomica cerebrale
-
-generazione delle regioni di interesse (ROI)
-
-conversione dei volumi segmentati
-
-estrazione delle feature radiomiche
-
-costruzione del dataset finale per classificazione
+}
 
 
 
-La pipeline è eseguita dal servizio nextflow\_worker tramite architettura Docker-out-of-Docker (DooD).
+.pipeline-box {
+
+&#x20; background: #f1f3f4;
+
+&#x20; border-radius: 8px;
+
+&#x20; padding: 14px;
+
+&#x20; font-family: monospace;
+
+&#x20; text-align: center;
+
+&#x20; font-size: 16px;
+
+&#x20; margin: 20px 0;
+
+}
 
 
 
-Workflow computazionale
+.code-path {
+
+&#x20; background: #eeeeee;
+
+&#x20; padding: 4px 8px;
+
+&#x20; border-radius: 4px;
+
+&#x20; font-family: monospace;
+
+}
 
 
 
-Il flusso operativo della pipeline è il seguente:
+.badge {
+
+&#x20; display: inline-block;
+
+&#x20; padding: 4px 10px;
+
+&#x20; background: #3f51b5;
+
+&#x20; color: white;
+
+&#x20; border-radius: 5px;
+
+&#x20; font-size: 12px;
+
+}
+
+</style>
 
 
+
+\# Pipeline Nextflow
+
+
+
+<div class="section-box">
+
+La pipeline <strong>Nextflow</strong> rappresenta il nucleo computazionale del sistema ClinicalTwin per il preprocessing neuroimaging e l’estrazione delle feature radiomiche da immagini MRI strutturali in formato <strong>NIfTI</strong>.
+
+</div>
+
+
+
+Essa implementa un workflow automatizzato composto da:
+
+
+
+<ul>
+
+<li>segmentazione anatomica cerebrale</li>
+
+<li>generazione delle ROI</li>
+
+<li>conversione volumi segmentati</li>
+
+<li>estrazione feature radiomiche</li>
+
+<li>costruzione dataset CSV</li>
+
+</ul>
+
+
+
+Pipeline eseguita dal servizio:
+
+
+
+<span class="badge">nextflow\_worker</span>
+
+
+
+tramite architettura <strong>Docker-out-of-Docker (DooD)</strong>.
+
+
+
+\---
+
+
+
+\# Workflow computazionale
+
+
+
+<div class="pipeline-box">
 
 MRI → FreeSurfer / FastSurfer → ROI extraction → NIfTI conversion → Radiomics extraction → CSV dataset
 
+</div>
 
 
-Ogni fase è implementata come processo indipendente nel file:
+
+Workflow implementato nel file:
 
 
+
+<span class="code-path">
 
 nextflow\_worker/nextflow/preprocessing.nf
 
-Struttura della pipeline
+</span>
 
 
 
-La pipeline Nextflow è composta dai seguenti moduli principali:
+\---
 
 
 
-Processo	Funzione
-
-freesurfer	Segmentazione anatomica
-
-nifti\_converter	Conversione volumi segmentati
-
-roi\_creator	Creazione maschere ROI
-
-csv\_collector	Aggregazione feature
-
-feature\_extraction	Estrazione radiomica
+\# Struttura della pipeline
 
 
 
-Ogni processo è containerizzato tramite immagini Docker dedicate.
+<table>
+
+<tr>
+
+<th>Processo</th>
+
+<th>Funzione</th>
+
+</tr>
 
 
 
-Segmentazione anatomica
+<tr>
+
+<td><strong>freesurfer</strong></td>
+
+<td>Segmentazione anatomica</td>
+
+</tr>
 
 
 
-La segmentazione cerebrale viene eseguita utilizzando uno dei due segmentatori disponibili:
+<tr>
+
+<td><strong>nifti\_converter</strong></td>
+
+<td>Conversione volumi segmentati</td>
+
+</tr>
 
 
 
-FreeSurfer
+<tr>
 
-FastSurfer
+<td><strong>roi\_creator</strong></td>
+
+<td>Creazione maschere ROI</td>
+
+</tr>
 
 
 
-Il segmentatore attivo è configurabile tramite:
+<tr>
+
+<td><strong>csv\_collector</strong></td>
+
+<td>Aggregazione feature</td>
+
+</tr>
 
 
+
+<tr>
+
+<td><strong>feature\_extraction</strong></td>
+
+<td>Estrazione radiomica</td>
+
+</tr>
+
+</table>
+
+
+
+\---
+
+
+
+\# Segmentazione anatomica
+
+
+
+Segmentatori disponibili:
+
+
+
+<ul>
+
+<li><strong>FreeSurfer</strong></li>
+
+<li><strong>FastSurfer</strong></li>
+
+</ul>
+
+
+
+Configurazione segmentatore:
+
+
+
+<span class="code-path">
 
 nextflow\_worker/nextflow/configs/nextflow.config
+
+</span>
 
 
 
@@ -98,61 +252,91 @@ Parametro:
 
 
 
+<pre>
+
 params.brain\_segmenter = freesurfer
 
-
-
-Output della segmentazione:
-
-
-
-volumetrie corticali
-
-strutture sottocorticali
-
-parcellazione anatomica standardizzata
-
-Generazione ROI
+</pre>
 
 
 
-Le regioni di interesse sono definite tramite:
+Output generati:
 
 
+
+<ul>
+
+<li>volumetrie corticali</li>
+
+<li>strutture sottocorticali</li>
+
+<li>parcellazione anatomica standardizzata</li>
+
+</ul>
+
+
+
+\---
+
+
+
+\# Generazione ROI
+
+
+
+File di configurazione ROI:
+
+
+
+<span class="code-path">
 
 nextflow\_worker/data/external/ROI\_labels.tsv
 
-
-
-Il file contiene:
-
-
-
-etichette FreeSurfer
-
-identificatori numerici
-
-mapping anatomico
+</span>
 
 
 
-Numero totale ROI:
+Contiene:
 
 
+
+<ul>
+
+<li>etichette FreeSurfer</li>
+
+<li>ID numerici</li>
+
+<li>mapping anatomico</li>
+
+</ul>
+
+
+
+Totale ROI utilizzate:
+
+
+
+<div class="pipeline-box">
 
 78 regioni cerebrali
 
-
-
-Le ROI costituiscono l’input per l’estrazione delle feature radiomiche.
-
-
-
-Conversione volumi segmentati
+</div>
 
 
 
-Il processo nifti\_converter trasforma i volumi segmentati nel formato compatibile con PyRadiomics.
+\---
+
+
+
+\# Conversione volumi segmentati
+
+
+
+Processo:
+
+
+
+<span class="badge">nifti\_converter</span>
 
 
 
@@ -160,35 +344,55 @@ Operazioni principali:
 
 
 
-selezione ROI
+<ul>
 
-generazione maschere binarie
+<li>selezione ROI</li>
 
-normalizzazione formato
+<li>generazione maschere binarie</li>
+
+<li>normalizzazione formato</li>
+
+</ul>
 
 
 
-Output:
+Output prodotto:
 
 
+
+<pre>
 
 ROI\_mask.nii.gz
 
-
-
-per ciascuna regione anatomica.
-
-
-
-Estrazione feature radiomiche
+</pre>
 
 
 
-L’estrazione radiomica è eseguita tramite PyRadiomics utilizzando il file di configurazione:
+\---
 
 
+
+\# Estrazione feature radiomiche
+
+
+
+Estrazione eseguita tramite:
+
+
+
+<span class="badge">PyRadiomics</span>
+
+
+
+Configurazione:
+
+
+
+<span class="code-path">
 
 nextflow\_worker/data/external/pyradiomics.yaml
+
+</span>
 
 
 
@@ -196,73 +400,77 @@ Feature estratte:
 
 
 
-First-order statistics
+<h3>First-order statistics</h3>
 
 
 
-Descrivono la distribuzione dell’intensità voxel:
+<ul>
+
+<li>mean</li>
+
+<li>variance</li>
+
+<li>skewness</li>
+
+<li>kurtosis</li>
+
+<li>entropy</li>
+
+</ul>
 
 
 
-mean
-
-variance
-
-skewness
-
-kurtosis
-
-entropy
-
-Shape features
+<h3>Shape features</h3>
 
 
 
-Descrivono la morfologia della ROI:
+<ul>
+
+<li>volume</li>
+
+<li>surface area</li>
+
+<li>compactness</li>
+
+<li>sphericity</li>
+
+</ul>
 
 
 
-volume
-
-surface area
-
-compactness
-
-sphericity
-
-Texture features
+<h3>Texture features</h3>
 
 
 
-Derivate da matrici statistiche spaziali:
+<ul>
+
+<li>GLCM</li>
+
+<li>GLRLM</li>
+
+<li>GLSZM</li>
+
+<li>NGTDM</li>
+
+<li>GLDM</li>
+
+</ul>
 
 
 
-GLCM
-
-GLRLM
-
-GLSZM
-
-NGTDM
-
-GLDM
+\---
 
 
 
-Queste feature rappresentano biomarcatori quantitativi della struttura cerebrale.
+\# Generazione dataset CSV
 
 
 
-Generazione dataset CSV
+Aggregazione feature tramite:
 
 
 
-Le feature radiomiche vengono aggregate nel processo:
-
-
-
-csv\_collector
+<span class="badge">csv\_collector</span>
 
 
 
@@ -270,95 +478,165 @@ Output finale:
 
 
 
+<pre>
+
 radiomics\_features.csv
 
-
-
-Il file contiene:
-
-
-
-feature per ciascuna ROI
-
-struttura tabellare compatibile con pipeline ML
-
-input diretto per model\_service
-
-Parametri configurabili
+</pre>
 
 
 
-I parametri principali della pipeline sono definiti in:
+Contiene:
 
 
+
+<ul>
+
+<li>feature per ciascuna ROI</li>
+
+<li>dataset tabellare ML-ready</li>
+
+<li>input diretto per model\_service</li>
+
+</ul>
+
+
+
+\---
+
+
+
+\# Parametri configurabili
+
+
+
+File configurazione:
+
+
+
+<span class="code-path">
 
 nextflow\_worker/nextflow/configs/nextflow.config
 
-
-
-Parametri principali:
-
-
-
-Parametro	Descrizione
-
-maxforks	numero massimo processi paralleli
-
-fastsurfer\_threads	thread CPU FastSurfer
-
-fastsurfer\_device	device (cpu / cuda)
-
-fastsurfer\_3T	ottimizzazione scanner 3T
-
-pyradiomics\_jobs	parallelismo estrazione feature
-
-brain\_segmenter	segmentatore selezionato
+</span>
 
 
 
-Questa configurazione consente l’adattamento della pipeline a diversi ambienti hardware.
+<table>
+
+<tr>
+
+<th>Parametro</th>
+
+<th>Descrizione</th>
+
+</tr>
 
 
 
-Architettura Docker-out-of-Docker
+<tr>
+
+<td>maxforks</td>
+
+<td>numero massimo processi paralleli</td>
+
+</tr>
 
 
 
-La pipeline utilizza il paradigma:
+<tr>
+
+<td>fastsurfer\_threads</td>
+
+<td>thread CPU FastSurfer</td>
+
+</tr>
 
 
+
+<tr>
+
+<td>fastsurfer\_device</td>
+
+<td>cpu / cuda</td>
+
+</tr>
+
+
+
+<tr>
+
+<td>fastsurfer\_3T</td>
+
+<td>ottimizzazione scanner 3T</td>
+
+</tr>
+
+
+
+<tr>
+
+<td>pyradiomics\_jobs</td>
+
+<td>parallelismo estrazione feature</td>
+
+</tr>
+
+
+
+<tr>
+
+<td>brain\_segmenter</td>
+
+<td>segmentatore selezionato</td>
+
+</tr>
+
+</table>
+
+
+
+\---
+
+
+
+\# Architettura Docker-out-of-Docker
+
+
+
+Pipeline basata su:
+
+
+
+<div class="pipeline-box">
 
 Docker-out-of-Docker (DooD)
 
-
-
-In questo approccio:
-
-
-
-Nextflow gira dentro il container nextflow\_worker
-
-i processi della pipeline vengono eseguiti dal Docker host
-
-le immagini pipeline devono essere pre-costruite localmente
+</div>
 
 
 
-Immagini richieste:
+Significa che:
 
 
 
-clinical-freesurfer
+<ul>
 
-clinical-fsl
+<li>Nextflow gira dentro <strong>nextflow\_worker</strong></li>
 
-clinical-pyradiomics
+<li>i container pipeline girano sull’host Docker</li>
+
+<li>le immagini devono essere pre-costruite</li>
+
+</ul>
 
 
 
-Costruzione:
+Build immagini richieste:
 
 
+
+<pre>
 
 docker build -t clinical-freesurfer -f nextflow\_worker/freesurfer.dockerfile nextflow\_worker/
 
@@ -366,23 +644,61 @@ docker build -t clinical-fsl -f nextflow\_worker/fsl.dockerfile nextflow\_worker
 
 docker build -t clinical-pyradiomics -f nextflow\_worker/pyradiomics.dockerfile nextflow\_worker/
 
-Output della pipeline
+</pre>
 
 
 
-Al termine dell’elaborazione, la pipeline produce:
+\---
 
 
 
-Output	Descrizione
-
-ROI masks	maschere anatomiche segmentate
-
-radiomics\_features.csv	dataset feature radiomiche
-
-log Nextflow	tracciamento esecuzione
+\# Output della pipeline
 
 
 
-Il dataset CSV viene successivamente utilizzato dal model\_service per la classificazione diagnostica nello spazio latente UMAP.
+<table>
+
+<tr>
+
+<th>Output</th>
+
+<th>Descrizione</th>
+
+</tr>
+
+
+
+<tr>
+
+<td>ROI masks</td>
+
+<td>maschere anatomiche segmentate</td>
+
+</tr>
+
+
+
+<tr>
+
+<td>radiomics\_features.csv</td>
+
+<td>dataset feature radiomiche</td>
+
+</tr>
+
+
+
+<tr>
+
+<td>Nextflow logs</td>
+
+<td>tracciamento esecuzione</td>
+
+</tr>
+
+</table>
+
+
+
+Il dataset CSV viene successivamente utilizzato dal <strong>model\_service</strong> per la classificazione nello spazio latente UMAP.
 
