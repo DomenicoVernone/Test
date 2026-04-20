@@ -4,7 +4,7 @@ theme:
   name: material
 
 nav:
-  - Introduzione: Introduzione.md
+  - Introduzione: index.md
 
   - Architettura:
       - Architettura Clinical Twin: Architettura.md
