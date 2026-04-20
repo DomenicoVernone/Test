@@ -4,10 +4,26 @@ theme:
   name: material
 
 nav:
-  - Home: index.md
-  - Architecture: architecture.md
-  - Pipeline: pipeline.md
-  - Installation: installation.md
-  - Usage: usage.md
-  - Testing: testing.md
-  - Dataset: dataset.md
+  - Introduction: index.md
+
+  - System Overview:
+      - Architecture: architecture.md
+      - Project Structure: project_structure.md
+
+  - Neuroimaging Pipeline:
+      - Pipeline Overview: pipeline.md
+      - Nextflow Workflow: nextflow.md
+      - Dataset: dataset.md
+
+  - Machine Learning:
+      - Models: models.md
+      - LLM Assistant: llm.md
+
+  - API Documentation:
+      - REST API: api.md
+
+  - Deployment:
+      - Installation: installation.md
+      - Usage: usage.md
+      - Testing: testing.md
+      - Troubleshooting: troubleshooting.md

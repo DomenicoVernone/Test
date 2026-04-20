@@ -1,48 +1,28 @@
 Testing
 
-Panoramica della strategia di test
+
+
+Questa sezione descrive le procedure di verifica funzionale dei principali componenti della piattaforma ClinicalTwin, al fine di garantire il corretto funzionamento dello stack applicativo e della pipeline di analisi neuroimaging.
 
 
 
-La piattaforma ClinicalTwin integra una strategia di testing multilivello finalizzata a garantire il corretto funzionamento dei servizi containerizzati, della pipeline neuroimaging, del modulo di classificazione diagnostica e dell’interfaccia utente clinica.
+Le attività di testing includono:
 
 
 
-Le attività di verifica comprendono:
+verifica dei container Docker
+
+test della pipeline Nextflow
+
+validazione del classificatore diagnostico
+
+test della dashboard clinica
+
+Verifica dei container Docker
 
 
 
-validazione dell’avvio dei container Docker;
-
-verifica dell’esecuzione della pipeline Nextflow;
-
-test del servizio di inferenza diagnostica;
-
-test funzionali della dashboard web.
-
-
-
-Questo approccio consente di assicurare affidabilità, riproducibilità e integrità dell’intero workflow computazionale 🧪
-
-
-
-Test dei container Docker
-
-
-
-Il primo livello di verifica riguarda il corretto avvio dei servizi containerizzati che costituiscono l’infrastruttura della piattaforma.
-
-
-
-L’avvio del sistema viene eseguito tramite:
-
-
-
-docker compose up --build
-
-
-
-Una volta completata l’inizializzazione, è possibile verificare lo stato dei container mediante:
+Dopo l’avvio dello stack applicativo, verificare che tutti i servizi risultino attivi:
 
 
 
@@ -50,15 +30,7 @@ docker compose ps
 
 
 
-Tutti i servizi devono risultare nello stato:
-
-
-
-Up
-
-
-
-In particolare, devono essere attivi:
+Devono risultare in stato running i seguenti container:
 
 
 
@@ -70,13 +42,15 @@ nextflow\_worker
 
 model\_service
 
+inference\_engine
+
 llm\_service
 
 frontend
 
 
 
-Eventuali anomalie possono essere analizzate consultando i log:
+Per controllare eventuali errori nei log:
 
 
 
@@ -84,55 +58,51 @@ docker compose logs -f
 
 
 
-Questa fase garantisce la corretta inizializzazione dell’infrastruttura distribuita ⚙️
+Oppure per un singolo servizio:
 
 
+
+docker compose logs -f orchestrator
 
 Test della pipeline Nextflow
 
 
 
-Il secondo livello di testing riguarda la validazione della pipeline di preprocessing neuroimaging gestita dal servizio nextflow\_worker.
+La pipeline neuroimaging può essere verificata caricando una MRI cerebrale in formato NIfTI (.nii o .nii.gz) tramite la dashboard.
 
 
 
-Il test consiste nel caricamento di un’immagine MRI in formato NIfTI tramite la dashboard oppure tramite endpoint API.
+Procedura:
 
 
 
-Durante l’esecuzione devono essere completati correttamente i seguenti step:
+accedere alla dashboard clinica
+
+caricare un file MRI
+
+avviare l’elaborazione
+
+monitorare lo stato del task
 
 
 
-avvio del workflow Nextflow
-
-segmentazione anatomica tramite FreeSurfer
-
-generazione delle ROI cerebrali
-
-estrazione delle feature radiomiche
-
-produzione del dataset CSV finale
+Durante l’esecuzione devono essere completate le seguenti fasi:
 
 
 
-Lo stato della pipeline può essere monitorato tramite:
+MRI → FreeSurfer → ROI extraction → Radiomics → CSV generation
 
 
 
-GET /status/{task\_id}
+Lo stato del workflow può essere monitorato nei log del servizio:
 
 
 
-oppure attraverso i log del container:
+docker compose logs -f nextflow\_worker
 
 
 
-docker compose logs nextflow\_worker
-
-
-
-Il completamento senza errori della pipeline conferma la corretta configurazione degli strumenti di neuroimaging 🔬
+Il completamento della pipeline produce un dataset radiomico in formato CSV utilizzato dal classificatore.
 
 
 
@@ -140,93 +110,139 @@ Test del classificatore diagnostico
 
 
 
-Il terzo livello di testing riguarda la verifica del servizio model\_service, responsabile dell’inferenza diagnostica.
+Il servizio model\_service recupera automaticamente il modello champion registrato su MLflow tramite DagsHub.
 
 
 
-Una volta completata l’estrazione delle feature radiomiche, il sistema invia automaticamente il dataset al classificatore supervisionato.
+Per verificare il corretto funzionamento del classificatore:
 
 
 
-Il servizio restituisce:
+eseguire una pipeline completa
+
+attendere la fase di inferenza
+
+verificare la restituzione della predizione
 
 
 
-classe predetta (bvFTD oppure HC)
+Output atteso:
+
+
+
+classe diagnostica (bvFTD oppure HC)
 
 coordinate nello spazio latente UMAP
 
-informazioni sul modello utilizzato
+probabilità associata alla classificazione
 
 
 
-Il corretto funzionamento del classificatore può essere verificato controllando:
+Eventuali errori possono essere verificati tramite:
 
 
 
-risposta dell’endpoint di inferenza
-
-presenza della predizione nel task registrato
-
-aggiornamento dello stato del workflow
+docker compose logs -f model\_service
 
 
 
-Questa fase garantisce l’integrazione corretta tra preprocessing radiomico e modello predittivo 📊
+oppure:
 
 
+
+docker compose logs -f inference\_engine
 
 Test della dashboard clinica
 
 
 
-L’ultimo livello di testing riguarda la verifica funzionale dell’interfaccia utente sviluppata in React.
+Il frontend React consente la visualizzazione interattiva dei risultati.
 
 
 
-L’accesso alla dashboard avviene tramite:
+Verificare:
 
 
 
-http://localhost:3000
+Upload MRI
 
 
 
-Le principali operazioni da verificare includono:
+Caricamento corretto file:
 
 
 
-registrazione di un nuovo utente
+. nii
 
-autenticazione tramite login
+. nii.gz
 
-caricamento di immagini MRI in formato NIfTI
-
-visualizzazione dello stato delle analisi
-
-consultazione dello storico dei task
-
-visualizzazione della proiezione UMAP tridimensionale
-
-interazione con l’assistente LLM
+Visualizzazione multiplanare
 
 
 
-Il corretto funzionamento della dashboard conferma l’integrazione tra frontend e servizi backend del sistema 🌐
+Controllare la corretta visualizzazione delle sezioni:
 
 
 
-Validazione end-to-end della pipeline
+assiale
+
+coronale
+
+sagittale
 
 
 
-Il test completo del sistema consiste nell’esecuzione di un workflow end-to-end:
+tramite viewer NiiVue
 
 
 
-Upload MRI → preprocessing → estrazione feature → classificazione → visualizzazione risultati
+Proiezione spazio latente UMAP
 
 
 
-Il completamento dell’intero processo senza errori rappresenta la verifica finale della corretta configurazione della piattaforma ClinicalTwin e della sua operatività in ambiente locale 🧠
+Dopo l’inferenza, verificare la comparsa:
+
+
+
+embedding tridimensionale
+
+posizione del paziente
+
+confronto con dataset di riferimento
+
+Assistente AI clinico
+
+
+
+Testare l’assistente LLM verificando:
+
+
+
+risposta a query contestuali
+
+interpretazione della predizione
+
+supporto alla navigazione dello spazio latente
+
+Verifica completa del sistema
+
+
+
+Il sistema è considerato correttamente funzionante quando:
+
+
+
+tutti i container risultano attivi ✅
+
+la pipeline Nextflow termina senza errori
+
+viene generato il dataset radiomico
+
+il classificatore restituisce una predizione
+
+la dashboard visualizza correttamente UMAP e MRI
+
+
+
+In queste condizioni la piattaforma ClinicalTwin è pronta per l’utilizzo in ambiente di ricerca clinica sperimentale.
 

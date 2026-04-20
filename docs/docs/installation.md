@@ -1,38 +1,74 @@
 Installazione
 
-Requisiti di sistema
+
+
+Questa sezione descrive la procedura completa per installare ed eseguire ClinicalTwin in ambiente locale utilizzando Docker Compose. Al termine della procedura sarà disponibile un’istanza funzionante della piattaforma con pipeline neuroimaging automatizzata e dashboard clinica interattiva.
 
 
 
-La piattaforma ClinicalTwin è distribuita come sistema containerizzato basato su Docker Compose, che consente l’esecuzione coordinata dei microservizi necessari alla pipeline neuroimaging.
+Requisiti
 
 
 
-Prima dell’installazione è necessario verificare la presenza dei seguenti prerequisiti:
+Prima dell’installazione assicurarsi che siano disponibili i seguenti componenti:
 
 
 
-Docker ≥ 24.x
+Requisiti software
 
-Docker Compose ≥ 2.x
+Docker
+
+Docker Compose
 
 Git
 
-almeno 16 GB di RAM consigliati (per esecuzione FreeSurfer)
-
-sistema operativo Linux, macOS oppure Windows con Docker Desktop attivo
 
 
+Verifica installazione:
 
-Per workflow completi con segmentazione FreeSurfer è raccomandata la disponibilità di CPU multi-core e spazio disco ≥ 20 GB 📦
 
 
+docker --version
+
+docker compose version
+
+git --version
+
+Requisiti opzionali
+
+GPU NVIDIA (necessaria solo per FastSurfer)
+
+WSL2 con supporto CUDA (solo Windows + GPU)
+
+
+
+In assenza di GPU il sistema utilizza automaticamente FreeSurfer CPU.
+
+
+
+Licenza FreeSurfer
+
+
+
+Scaricare gratuitamente la licenza da:
+
+
+
+https://surfer.nmr.mgh.harvard.edu/registration.html
+
+
+
+e copiarla in:
+
+
+
+nextflow\_worker/license.txt
 
 Clonazione del repository
 
 
 
-Il primo passo consiste nel clonare il repository del progetto:
+Scaricare il progetto:
 
 
 
@@ -40,131 +76,227 @@ git clone https://github.com/DomenicoVernone/Test.git
 
 cd Test
 
-
-
-Questo comando scarica l’intera struttura del sistema ClinicalTwin sul computer locale.
-
-
-
-Configurazione delle variabili d’ambiente
+Configurazione variabili d’ambiente
 
 
 
-Prima dell’avvio dei servizi è necessario configurare le variabili di ambiente utilizzate dai container.
+Ogni microservizio utilizza un file .env.
 
 
 
-Copiare il file di esempio:
+Creare i file di configurazione:
 
 
 
 cp .env.example .env
 
+cp api\_gateway/.env.example api\_gateway/.env
 
+cp orchestrator/.env.example orchestrator/.env
 
-e modificarne i parametri principali, in particolare:
+cp model\_service/.env.example model\_service/.env
 
+cp llm\_service/.env.example llm\_service/.env
 
+cp frontend/.env.example frontend/.env
 
-directory condivisa per i volumi MRI
 
-configurazione GPU (se disponibile)
 
-parametri di rete tra i servizi
+Configurare le variabili principali:
 
 
 
-Questa fase consente al sistema di adattarsi all’ambiente locale di esecuzione ⚙️
+Variabile	Servizio	Descrizione
 
+SECRET\_KEY	api\_gateway, orchestrator, llm\_service	Chiave JWT condivisa
 
+GROQ\_API\_KEY	llm\_service	API key Groq
 
-Build dei container Docker
+MLFLOW\_TRACKING\_URI	model\_service	URL MLflow su DagsHub
 
+MLFLOW\_TRACKING\_USERNAME	model\_service	Username DagsHub
 
+DAGSHUB\_TOKEN	model\_service	Token DagsHub
 
-ClinicalTwin utilizza immagini Docker personalizzate per i moduli di preprocessing neuroimaging.
+REPO\_OWNER	model\_service	Proprietario repository
 
+REPO\_NAME	model\_service	Nome repository
 
+Configurazione dataset pipeline
 
-Per costruire i container eseguire:
 
 
+La pipeline Nextflow richiede file statici non inclusi nel repository.
 
-docker compose up --build
 
 
+Creare la struttura:
 
-Il comando esegue automaticamente:
 
 
+nextflow\_worker/data/
 
-build delle immagini Docker personalizzate;
+└── external/
 
-inizializzazione dei servizi backend;
+&#x20;   ├── ROI\_labels.tsv
 
-avvio della pipeline orchestrata;
+&#x20;   └── pyradiomics.yaml
 
-configurazione della rete interna tra container.
 
 
+Questi file contengono:
 
-Durante la prima esecuzione il processo può richiedere diversi minuti a causa della compilazione delle immagini FreeSurfer, FSL e PyRadiomics.
 
 
+etichette delle 78 ROI cerebrali
 
-Avvio della piattaforma
+parametri di estrazione radiomica PyRadiomics
 
 
 
-Una volta completata la build, il sistema avvia automaticamente i seguenti servizi:
+Senza questi file la pipeline non può essere eseguita.
 
 
 
-API Gateway (autenticazione utenti)
+Build immagini Docker pipeline
 
-Orchestrator (gestione task MRI)
 
-Nextflow Worker (pipeline neuroimaging)
 
-Model Service (inferenza diagnostica)
+La pipeline utilizza Docker-out-of-Docker (DooD). Le immagini devono essere costruite sull’host prima dell’avvio dello stack.
 
-LLM Assistant (supporto interpretativo)
 
-Frontend web clinico
 
+Eseguire:
 
 
-L’interfaccia utente è accessibile tramite browser all’indirizzo:
 
+docker build -t clinical-freesurfer -f nextflow\_worker/freesurfer.dockerfile nextflow\_worker/
 
+docker build -t clinical-fsl -f nextflow\_worker/fsl.dockerfile nextflow\_worker/
 
-http://localhost:3000
+docker build -t clinical-pyradiomics -f nextflow\_worker/pyradiomics.dockerfile nextflow\_worker/
 
 
 
-Da qui è possibile autenticarsi, caricare immagini MRI e monitorare l’avanzamento delle analisi 🧠
+Questo passaggio è necessario solo al primo avvio o dopo modifiche ai Dockerfile.
 
 
 
-Verifica del corretto funzionamento
+Avvio dello stack applicativo
 
 
 
-Per verificare che il sistema sia operativo:
+Avviare tutti i microservizi:
 
 
 
-accedere al frontend;
+docker compose up -d --build
 
-registrare un nuovo utente;
 
-caricare un file MRI in formato .nii o .nii.gz;
 
-monitorare lo stato del task di preprocessing;
+Servizi avviati automaticamente:
 
-visualizzare la predizione diagnostica generata dal modello.
 
 
+api\_gateway
 
-Se tutti i servizi risultano attivi, ClinicalTwin è pronto per l’utilizzo sperimentale e la validazione della pipeline neuroimaging.
+orchestrator
+
+nextflow\_worker
+
+model\_service
+
+inference\_engine
+
+llm\_service
+
+frontend
+
+Accesso alla dashboard
+
+
+
+Aprire il browser:
+
+
+
+http://localhost:5173
+
+
+
+Interfacce disponibili:
+
+
+
+Servizio	URL
+
+Frontend	http://localhost:5173
+
+
+
+Swagger API Gateway	http://localhost:8000/docs
+
+
+
+Swagger Orchestrator	http://localhost:8001/docs
+
+Creazione primo utente
+
+
+
+La registrazione non è disponibile tramite interfaccia grafica.
+
+
+
+Creare un utente tramite Swagger:
+
+
+
+http://localhost:8000/docs
+
+
+
+Eseguire endpoint:
+
+
+
+POST /signup
+
+
+
+Inserendo:
+
+
+
+username
+
+password
+
+
+
+Dopo la registrazione sarà possibile accedere alla dashboard.
+
+
+
+Verifica installazione
+
+
+
+Per verificare il corretto funzionamento del sistema:
+
+
+
+accedere alla dashboard
+
+caricare una MRI in formato NIfTI
+
+avviare la pipeline
+
+controllare lo stato elaborazione
+
+visualizzare embedding UMAP
+
+
+
+Se tutti i servizi risultano attivi, l’installazione è completata correttamente. ✅
 
