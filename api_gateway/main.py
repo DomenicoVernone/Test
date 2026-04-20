@@ -4,6 +4,7 @@
 # registra il middleware CORS e monta il router di autenticazione.
 # È l'unico servizio esposto pubblicamente — tutti gli altri sono
 # accessibili solo attraverso questo gateway tramite token JWT.
+#test
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
