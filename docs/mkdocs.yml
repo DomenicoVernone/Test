@@ -4,23 +4,23 @@ theme:
   name: material
 
 nav:
-  - Introduzione: Introduzione.md
+  - Introduzione: docs/Introduzione.md
 
   - Architettura:
-      - Architettura Clinical Twin: Architettura.md
-      - Panoramica Microservizi: Microservizi.md
-      - Struttura del Progetto: Struttura_del_Progetto.md
+      - Architettura Clinical Twin: docs/Architettura.md
+      - Panoramica Microservizi: docs/Microservizi.md
+      - Struttura del Progetto: docs/Struttura_del_Progetto.md
 
   - Setup Ambiente:
-      - Installazione: Installazione.md
-      - Configurazione: Configurazione.md
+      - Installazione: docs/Installazione.md
+      - Configurazione: docs/Configurazione.md
 
-  - Pipeline Neuroimaging: pipeline.md
+  - Pipeline Neuroimaging: docs/pipeline.md
 
   - Guida Rapida: Guida_Rapida.md
 
-  - Riferimento API: api.md
+  - Riferimento API: docs/api.md
 
-  - Deployment: Deployment.md
+  - Deployment: docs/Deployment.md
 
-  - Testing: testing.md
+  - Testing: docs/testing.md
