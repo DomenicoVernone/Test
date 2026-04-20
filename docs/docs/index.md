@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Clinical Twin – Introduction</title>
+<title>Clinical Twin – Introduzione</title>
 
 <style>
 
@@ -105,52 +105,53 @@ ul {
 <div class="content">
 
 <div class="breadcrumb">
-Docs » Introduction
+Docs » Introduzione
 </div>
 
-<h1>Introduction</h1>
+<h1>Introduzione</h1>
 
 
-<h2>Description</h2>
+<h2>Descrizione</h2>
 
 <div class="service-box">
 
 <p>
-Clinical Twin is a clinical decision-support platform designed for the
-differential diagnosis of Frontotemporal Dementia (FTD) variants using
-radiomic analysis of structural brain MRI scans.
+Clinical Twin è una piattaforma di supporto alle decisioni cliniche progettata
+per la diagnosi differenziale delle varianti di Demenza Frontotemporale (FTD)
+attraverso l’analisi radiomica di risonanze magnetiche cerebrali strutturali.
 </p>
 
 <p>
-The system integrates an automated neuroimaging pipeline based on
-FreeSurfer / FastSurfer and PyRadiomics, a statistical inference engine
-implemented in R, a context-aware AI assistant powered by Spatial RAG,
-and an interactive React dashboard for multiplanar visualization and
-exploration of the latent diagnostic space generated through UMAP.
+Il sistema integra una pipeline automatizzata di neuroimaging basata su
+FreeSurfer / FastSurfer e PyRadiomics, un motore di inferenza statistica
+implementato in R, un assistente AI context-aware basato su Spatial RAG
+e una dashboard interattiva sviluppata in React per la visualizzazione
+multiplanare delle immagini e l’esplorazione dello spazio diagnostico latente
+generato tramite UMAP.
 </p>
 
 </div>
 
 
-<h2>Features</h2>
+<h2>Funzionalità principali</h2>
 
 <div class="service-box">
 
 <ul>
-<li>Automated MRI segmentation using FreeSurfer or FastSurfer</li>
-<li>Radiomic feature extraction with PyRadiomics</li>
-<li>KNN-based statistical inference engine implemented in R</li>
-<li>3D latent space projection using UMAP</li>
-<li>Spatial RAG clinical assistant for explainability support</li>
-<li>Interactive multiplanar MRI viewer (NiiVue integration)</li>
-<li>Microservice architecture orchestrated with Docker Compose</li>
-<li>Model versioning and tracking via MLflow and DagsHub</li>
+<li>Segmentazione automatica MRI tramite FreeSurfer o FastSurfer</li>
+<li>Estrazione di feature radiomiche con PyRadiomics</li>
+<li>Motore di inferenza statistica basato su KNN implementato in R</li>
+<li>Proiezione nello spazio latente 3D tramite UMAP</li>
+<li>Assistente clinico Spatial RAG per supporto all’interpretabilità</li>
+<li>Viewer MRI multiplanare interattivo (integrazione NiiVue)</li>
+<li>Architettura a microservizi orchestrata con Docker Compose</li>
+<li>Versionamento e tracciamento modelli tramite MLflow e DagsHub</li>
 </ul>
 
 </div>
 
 
-<h2>Source Code</h2>
+<h2>Codice sorgente</h2>
 
 <div class="service-box">
 
@@ -163,20 +164,20 @@ https://github.com/carlosto033/Tesi-FTD
 </div>
 
 
-<h2>Add the FreeSurfer license</h2>
+<h2>Aggiunta della licenza FreeSurfer</h2>
 
 <div class="service-box">
 
 <p>
-FreeSurfer richiede un file di licenza valido per eseguire la pipeline di segmentazione.
-Scaricare la licenza da:
+FreeSurfer richiede un file di licenza valido per eseguire la pipeline di
+segmentazione neuroimaging. Scaricare la licenza da:
 </p>
 
 <div class="codeblock">
 https://surfer.nmr.mgh.harvard.edu/registration.html
 </div>
 
-<p>Dopo il download:</p>
+<p>Dopo il download eseguire:</p>
 
 <div class="codeblock">
 cp /path/to/license.txt nextflow_worker/license.txt
@@ -189,7 +190,7 @@ Senza questo file la pipeline di segmentazione non può essere avviata.
 </div>
 
 
-<h2>Contributions</h2>
+<h2>Contributi</h2>
 
 <div class="service-box">
 
@@ -199,12 +200,12 @@ Sono benvenuti contributi relativi a:
 </p>
 
 <ul>
-<li>radiomics workflows</li>
-<li>neuroimaging pipelines</li>
-<li>explainable AI in clinical environments</li>
+<li>workflow radiomici</li>
+<li>pipeline di neuroimaging</li>
+<li>explainable AI in ambito clinico</li>
 </ul>
 
-<p>Issue tracker:</p>
+<p>Segnalazione issue:</p>
 
 <div class="codeblock">
 https://github.com/carlosto033/Tesi-FTD/issues

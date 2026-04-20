@@ -162,7 +162,7 @@ il flusso dei dati all’interno della pipeline Clinical Twin.
 </p>
 
 <div class="arch-image">
-<img src="architecture.png" alt="Clinical Twin architecture diagram">
+<img src="assets/architecture.png" alt="Clinical Twin architecture diagram">
 <div class="caption">
 Figura: Architettura a microservizi della piattaforma Clinical Twin
 </div>
