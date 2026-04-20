@@ -1,0 +1,7 @@
+site_name: ClinicalTwin FTD Pipeline Documentation
+
+theme:
+  name: material
+
+nav:
+  - Home: index.md
