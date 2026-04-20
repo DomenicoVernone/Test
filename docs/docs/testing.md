@@ -14,7 +14,25 @@
 
 }
 
+
+
+.code {
+
+&#x20; font-family: monospace;
+
+&#x20; background: #eeeeee;
+
+&#x20; padding: 10px;
+
+&#x20; border-radius: 6px;
+
+&#x20; white-space: pre;
+
+}
+
 </style>
+
+
 
 
 
@@ -22,11 +40,37 @@
 
 
 
+
+
 <div class="testbox">
 
-Questa sezione descrive le procedure di verifica funzionale della piattaforma ClinicalTwin.
+
+
+Questa sezione descrive le procedure di verifica funzionale dei principali componenti della piattaforma ClinicalTwin, al fine di garantire il corretto funzionamento dello stack applicativo e della pipeline di analisi neuroimaging.
+
+
+
+Le attività di testing includono:
+
+
+
+<ul>
+
+<li>verifica dei container Docker</li>
+
+<li>test della pipeline Nextflow</li>
+
+<li>validazione del classificatore diagnostico</li>
+
+<li>test della dashboard clinica</li>
+
+</ul>
+
+
 
 </div>
+
+
 
 
 
@@ -34,15 +78,19 @@ Questa sezione descrive le procedure di verifica funzionale della piattaforma Cl
 
 
 
-<pre>
+Dopo l’avvio dello stack applicativo, verificare che tutti i servizi risultino attivi:
+
+
+
+<div class="code">
 
 docker compose ps
 
-</pre>
+</div>
 
 
 
-Verificare stato:
+Devono risultare in stato <strong>running</strong> i seguenti container:
 
 
 
@@ -66,7 +114,37 @@ Verificare stato:
 
 
 
+Per controllare eventuali errori nei log:
+
+
+
+<div class="code">
+
+docker compose logs -f
+
+</div>
+
+
+
+Oppure per un singolo servizio:
+
+
+
+<div class="code">
+
+docker compose logs -f orchestrator
+
+</div>
+
+
+
+
+
 <h2>Test pipeline Nextflow</h2>
+
+
+
+La pipeline neuroimaging può essere verificata caricando una MRI cerebrale in formato NIfTI tramite la dashboard clinica.
 
 
 
@@ -76,17 +154,69 @@ Procedura:
 
 <ul>
 
-<li>caricare MRI</li>
+<li>accedere alla dashboard clinica</li>
 
-<li>avviare pipeline</li>
+<li>caricare un file MRI (.nii oppure .nii.gz)</li>
 
-<li>monitorare task</li>
+<li>avviare l’elaborazione</li>
+
+<li>monitorare lo stato del task</li>
 
 </ul>
 
 
 
+Durante l’esecuzione devono essere completate le seguenti fasi:
+
+
+
+<div class="code">
+
+MRI → FreeSurfer → ROI extraction → Radiomics → CSV generation
+
+</div>
+
+
+
+Lo stato del workflow può essere monitorato nei log:
+
+
+
+<div class="code">
+
+docker compose logs -f nextflow\_worker
+
+</div>
+
+
+
+Il completamento della pipeline produce un dataset radiomico in formato CSV utilizzato dal classificatore.
+
+
+
+
+
 <h2>Test classificatore</h2>
+
+
+
+Il servizio <strong>model\_service</strong> recupera automaticamente il modello champion registrato su MLflow tramite DagsHub.
+
+
+
+Per verificare il corretto funzionamento del classificatore:
+
+
+
+<ul>
+
+<li>eseguire una pipeline completa</li>
+
+<li>attendere la fase di inferenza</li>
+
+<li>verificare la restituzione della predizione</li>
+
+</ul>
 
 
 
@@ -96,17 +226,47 @@ Output atteso:
 
 <ul>
 
-<li>classe diagnostica</li>
+<li>classe diagnostica (bvFTD oppure HC)</li>
 
-<li>probabilità</li>
+<li>probabilità associata alla classificazione</li>
 
-<li>embedding UMAP</li>
+<li>coordinate nello spazio latente UMAP</li>
 
 </ul>
 
 
 
+Eventuali errori possono essere verificati tramite:
+
+
+
+<div class="code">
+
+docker compose logs -f model\_service
+
+</div>
+
+
+
+oppure:
+
+
+
+<div class="code">
+
+docker compose logs -f inference\_engine
+
+</div>
+
+
+
+
+
 <h2>Test dashboard</h2>
+
+
+
+Il frontend React consente la visualizzazione interattiva dei risultati clinici.
 
 
 
@@ -116,13 +276,37 @@ Verificare:
 
 <ul>
 
-<li>viewer multiplanare</li>
+<li>upload corretto file MRI (.nii / .nii.gz)</li>
 
-<li>visualizzazione UMAP</li>
+<li>visualizzazione multiplanare tramite viewer NiiVue</li>
 
-<li>assistente AI</li>
+<li>visualizzazione embedding tridimensionale UMAP</li>
+
+<li>posizione del paziente nello spazio latente</li>
+
+<li>confronto con dataset di riferimento</li>
+
+<li>funzionamento assistente AI clinico</li>
 
 </ul>
+
+
+
+Testare l’assistente LLM verificando:
+
+
+
+<ul>
+
+<li>risposta a query contestuali</li>
+
+<li>interpretazione della predizione diagnostica</li>
+
+<li>supporto alla navigazione dello spazio latente</li>
+
+</ul>
+
+
 
 
 
@@ -130,19 +314,25 @@ Verificare:
 
 
 
-Sistema operativo se:
+Il sistema è considerato correttamente funzionante quando:
 
 
 
 <ul>
 
-<li>pipeline completata</li>
+<li>tutti i container risultano attivi</li>
 
-<li>dataset generato</li>
+<li>la pipeline Nextflow termina senza errori</li>
 
-<li>predizione disponibile</li>
+<li>viene generato il dataset radiomico</li>
 
-<li>UMAP visualizzato</li>
+<li>il classificatore restituisce una predizione</li>
+
+<li>la dashboard visualizza correttamente MRI e UMAP</li>
 
 </ul>
+
+
+
+In queste condizioni la piattaforma ClinicalTwin è pronta per l’utilizzo in ambiente di ricerca clinica sperimentale.
 

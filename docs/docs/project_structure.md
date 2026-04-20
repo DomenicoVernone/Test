@@ -22,9 +22,19 @@
 
 &#x20; font-family: monospace;
 
-&#x20; padding: 6px;
+&#x20; padding: 10px;
 
 &#x20; border-radius: 4px;
+
+&#x20; white-space: pre;
+
+}
+
+
+
+.block {
+
+&#x20; margin-top: 18px;
 
 }
 
@@ -32,19 +42,65 @@
 
 
 
-<h1>Struttura del Progetto</h1>
+
+
+<h1>Struttura del progetto</h1>
+
+
+
+
+
+<h2>Panoramica generale</h2>
 
 
 
 <div class="section">
 
-ClinicalTwin è organizzato come architettura a microservizi containerizzati distribuiti tramite Docker Compose.
+
+
+Il progetto ClinicalTwin è organizzato secondo un’architettura modulare a microservizi containerizzati, in cui ogni componente applicativo è isolato in una directory dedicata e distribuito tramite Docker.
+
+
+
+La struttura del repository riflette la separazione tra:
+
+
+
+<ul>
+
+<li>servizi backend</li>
+
+<li>pipeline neuroimaging</li>
+
+<li>motore statistico</li>
+
+<li>assistente AI</li>
+
+<li>frontend clinico</li>
+
+<li>documentazione</li>
+
+<li>configurazione del deployment</li>
+
+</ul>
+
+
+
+Questa organizzazione facilita la manutenzione del codice, l’estensione della piattaforma e la riproducibilità della pipeline radiomica.
+
+
 
 </div>
 
 
 
-<h2>Struttura repository</h2>
+
+
+<h2>Struttura ad alto livello</h2>
+
+
+
+La struttura principale del repository è la seguente:
 
 
 
@@ -53,6 +109,8 @@ ClinicalTwin è organizzato come architettura a microservizi containerizzati dis
 Tesi-FTD/
 
 ├── docker-compose.yml
+
+├── .env.example
 
 ├── docs/
 
@@ -74,17 +132,139 @@ Tesi-FTD/
 
 
 
-<h2>API Gateway</h2>
+Ogni directory rappresenta un microservizio indipendente del sistema ClinicalTwin.
 
 
 
-Responsabilità:
+
+
+<h2>docker-compose.yml</h2>
+
+
+
+Il file:
+
+
+
+<pre class="code">docker-compose.yml</pre>
+
+
+
+definisce l’orchestrazione dell’intero stack applicativo.
+
+
+
+Specifica:
 
 
 
 <ul>
 
-<li>autenticazione utenti</li>
+<li>servizi containerizzati</li>
+
+<li>porte esposte</li>
+
+<li>volumi condivisi</li>
+
+<li>dipendenze tra container</li>
+
+<li>variabili d’ambiente</li>
+
+</ul>
+
+
+
+Consente l’avvio completo della piattaforma tramite:
+
+
+
+<pre class="code">docker compose up --build</pre>
+
+
+
+
+
+<h2>Directory docs/</h2>
+
+
+
+La directory:
+
+
+
+<pre class="code">docs/</pre>
+
+
+
+contiene la documentazione tecnica del progetto utilizzata da Read the Docs.
+
+
+
+Include:
+
+
+
+<ul>
+
+<li>descrizione architettura</li>
+
+<li>pipeline neuroimaging</li>
+
+<li>configurazione dataset</li>
+
+<li>installazione</li>
+
+<li>testing</li>
+
+<li>API REST</li>
+
+</ul>
+
+
+
+Supporta sia utenti clinici sia sviluppatori.
+
+
+
+
+
+<h2>api\_gateway/</h2>
+
+
+
+Implementa il servizio di autenticazione basato su FastAPI e token JWT.
+
+
+
+Struttura:
+
+
+
+<pre class="code">
+
+api\_gateway/
+
+├── main.py
+
+├── core/
+
+├── models/
+
+└── routers/
+
+</pre>
+
+
+
+Responsabilità principali:
+
+
+
+<ul>
+
+<li>registrazione utenti</li>
+
+<li>autenticazione login</li>
 
 <li>generazione token JWT</li>
 
@@ -94,121 +274,359 @@ Responsabilità:
 
 
 
-<h2>Orchestrator</h2>
+Costituisce il punto di ingresso sicuro alla piattaforma.
 
 
 
-Coordina:
+
+
+<h2>orchestrator/</h2>
+
+
+
+Contiene il servizio responsabile del coordinamento della pipeline neuroimaging.
+
+
+
+Struttura:
+
+
+
+<pre class="code">
+
+orchestrator/
+
+├── main.py
+
+├── core/
+
+├── models/
+
+├── routers/
+
+└── services/
+
+</pre>
+
+
+
+Responsabilità principali:
 
 
 
 <ul>
 
-<li>task MRI</li>
+<li>gestione task MRI</li>
 
-<li>pipeline Nextflow</li>
+<li>monitoraggio stato elaborazioni</li>
 
-<li>model\_service</li>
+<li>comunicazione con nextflow\_worker</li>
+
+<li>invocazione model\_service</li>
+
+<li>restituzione risultati al frontend</li>
 
 </ul>
 
 
 
-<h2>Model Service</h2>
+Rappresenta il nodo centrale del workflow applicativo.
 
 
 
-Gestisce:
+
+
+<h2>model\_service/</h2>
+
+
+
+Gestisce l’integrazione con MLflow Model Registry tramite DagsHub.
+
+
+
+Struttura:
+
+
+
+<pre class="code">
+
+model\_service/
+
+├── main.py
+
+├── core/
+
+└── services/
+
+</pre>
+
+
+
+Responsabilità principali:
 
 
 
 <ul>
 
-<li>download modelli MLflow</li>
+<li>recupero modello champion</li>
 
 <li>versionamento modelli</li>
 
-<li>inferenza radiomica</li>
+<li>gestione inferenza radiomica</li>
+
+<li>interfacciamento con inference\_engine</li>
 
 </ul>
 
 
 
-<h2>Inference Engine</h2>
+Consente aggiornamenti dinamici del classificatore senza modificare la pipeline.
 
 
 
-Implementa:
+
+
+<h2>inference\_engine/</h2>
+
+
+
+Implementa il motore statistico della piattaforma in linguaggio R tramite framework Plumber.
+
+
+
+Struttura:
+
+
+
+<pre class="code">
+
+inference\_engine/
+
+├── api.R
+
+└── R/
+
+</pre>
+
+
+
+Responsabilità principali:
 
 
 
 <ul>
 
-<li>KNN classification</li>
+<li>classificazione KNN</li>
 
-<li>UMAP embedding</li>
+<li>calcolo embedding UMAP 3D</li>
+
+<li>restituzione coordinate spazio latente</li>
+
+<li>integrazione con model\_service</li>
 
 </ul>
 
 
 
-<h2>LLM Service</h2>
+Esegue la fase decisionale della pipeline diagnostica.
 
 
 
-Supporta:
+
+
+<h2>llm\_service/</h2>
+
+
+
+Implementa l’assistente clinico context-aware basato su modelli linguistici.
+
+
+
+Struttura:
+
+
+
+<pre class="code">
+
+llm\_service/
+
+├── main.py
+
+├── core/
+
+├── routers/
+
+└── services/
+
+</pre>
+
+
+
+Responsabilità principali:
 
 
 
 <ul>
 
-<li>interpretazione predizioni</li>
+<li>interpretazione risultati diagnostici</li>
 
-<li>Spatial RAG</li>
+<li>supporto decisionale assistito</li>
 
-<li>memoria conversazionale</li>
+<li>integrazione Spatial RAG</li>
+
+<li>gestione memoria conversazionale multi-turno</li>
 
 </ul>
 
 
 
-<h2>Nextflow Worker</h2>
+Fornisce spiegazioni contestualizzate delle predizioni radiomiche.
 
 
 
-Responsabile di:
+
+
+<h2>nextflow\_worker/</h2>
+
+
+
+Contiene la pipeline automatizzata di preprocessing neuroimaging.
+
+
+
+Struttura:
+
+
+
+<pre class="code">
+
+nextflow\_worker/
+
+├── main.py
+
+├── nextflow/
+
+├── data/
+
+├── freesurfer.dockerfile
+
+├── fsl.dockerfile
+
+└── pyradiomics.dockerfile
+
+</pre>
+
+
+
+Responsabilità principali:
 
 
 
 <ul>
 
-<li>segmentazione FreeSurfer</li>
+<li>segmentazione anatomica (FreeSurfer / FastSurfer)</li>
 
-<li>ROI extraction</li>
+<li>generazione ROI cerebrali</li>
 
-<li>radiomics extraction</li>
+<li>estrazione feature radiomiche</li>
+
+<li>generazione dataset CSV</li>
 
 </ul>
 
 
 
-<h2>Frontend</h2>
+Utilizza il paradigma Docker-out-of-Docker (DooD).
 
 
 
-Funzioni:
+
+
+<h2>frontend/</h2>
+
+
+
+Contiene l’interfaccia utente clinica sviluppata con React e Vite.
+
+
+
+Struttura:
+
+
+
+<pre class="code">
+
+frontend/
+
+├── src/
+
+├── components/
+
+├── pages/
+
+├── services/
+
+└── contexts/
+
+</pre>
+
+
+
+Responsabilità principali:
 
 
 
 <ul>
 
-<li>upload MRI</li>
+<li>upload immagini MRI</li>
 
-<li>viewer multiplanare</li>
+<li>monitoraggio pipeline</li>
 
-<li>visualizzazione UMAP</li>
+<li>visualizzazione UMAP 3D</li>
 
-<li>assistente AI</li>
+<li>rendering volumetrico MRI tramite NiiVue</li>
+
+<li>interazione con assistente AI</li>
 
 </ul>
+
+
+
+Costituisce il punto di accesso principale per l’utente finale.
+
+
+
+
+
+<h2>Flusso operativo tra moduli</h2>
+
+
+
+Workflow completo:
+
+
+
+<pre class="code">
+
+Frontend
+
+→ API Gateway
+
+→ Orchestrator
+
+→ Nextflow Worker
+
+→ Model Service
+
+→ Inference Engine
+
+→ Dashboard visualization
+
+→ LLM Assistant
+
+</pre>
+
+
+
+Questa struttura garantisce separazione funzionale tra acquisizione dati, preprocessing radiomico, inferenza statistica e supporto interpretativo clinico.
 
