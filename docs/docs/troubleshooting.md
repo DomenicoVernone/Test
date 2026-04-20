@@ -232,47 +232,7 @@ docker compose up --build
 
 
 
-<h2>Pipeline Nextflow bloccata</h2>
 
-
-
-Errore tipico:
-
-
-
-<div class="code">
-
-process > freesurfer (1) \[0%]
-
-</div>
-
-
-
-Cause possibili:
-
-
-
-<strong>1️⃣ immagini Docker pipeline non costruite</strong>
-
-
-
-Eseguire:
-
-
-
-<div class="code">
-
-docker build -t clinical-freesurfer -f nextflow\_worker/freesurfer.dockerfile nextflow\_worker/
-
-
-
-docker build -t clinical-fsl -f nextflow\_worker/fsl.dockerfile nextflow\_worker/
-
-
-
-docker build -t clinical-pyradiomics -f nextflow\_worker/pyradiomics.dockerfile nextflow\_worker/
-
-</div>
 
 
 

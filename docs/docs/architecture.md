@@ -28,9 +28,7 @@
 ClinicalTwin è progettato secondo un’architettura a microservizi containerizzati orchestrati tramite Docker Compose, con l’obiettivo di garantire modularità, riproducibilità computazionale e separazione delle responsabilità tra i diversi componenti della pipeline di analisi neuroimaging.
 </p>
 
-<p>
-Il sistema integra servizi dedicati alla gestione dell’autenticazione, orchestrazione delle elaborazioni, preprocessing MRI automatizzato, inferenza statistica, gestione dei modelli di classificazione e visualizzazione interattiva dei risultati clinici. Questa organizzazione consente l’esecuzione asincrona delle pipeline radiomiche e facilita l’estensione futura della piattaforma con nuovi moduli diagnostici.
-</p>
+
 
 <p>
 Ogni servizio opera in modo indipendente all’interno di un container Docker, comunicando tramite API REST interne alla rete applicativa.

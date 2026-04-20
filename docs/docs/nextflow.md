@@ -1,704 +1,375 @@
 <style>
 
-.info-box {
-
-&#x20; border-left: 6px solid #2962ff;
-
-&#x20; background: #eef3ff;
-
-&#x20; padding: 14px;
-
-&#x20; margin: 18px 0;
-
-&#x20; border-radius: 6px;
-
+:root {
+  --primary: #2962ff;
+  --secondary: #1a3fb8;
+  --background-soft: #eef3ff;
+  --flow-bg: #f4f6fa;
+  --code-bg: #ececec;
+  --text-main: #1f2937;
+  --text-soft: #4b5563;
 }
 
-
-
-.pipeline-flow {
-
-&#x20; background: #f4f6fa;
-
-&#x20; padding: 14px;
-
-&#x20; text-align: center;
-
-&#x20; font-family: monospace;
-
-&#x20; border-radius: 8px;
-
-&#x20; font-size: 15px;
-
-&#x20; margin: 20px 0;
-
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  line-height: 1.65;
+  color: var(--text-main);
+  max-width: 1100px;
+  margin: auto;
+  padding: 30px;
 }
 
-
-
-.code-inline {
-
-&#x20; background: #ececec;
-
-&#x20; padding: 3px 8px;
-
-&#x20; border-radius: 4px;
-
-&#x20; font-family: monospace;
-
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 18px;
 }
-
-
-
-.badge {
-
-&#x20; display: inline-block;
-
-&#x20; background: #2962ff;
-
-&#x20; color: white;
-
-&#x20; padding: 4px 10px;
-
-&#x20; border-radius: 5px;
-
-&#x20; font-size: 12px;
-
-}
-
-
 
 .section-title {
-
-&#x20; margin-top: 40px;
-
-&#x20; border-bottom: 2px solid #e0e0e0;
-
-&#x20; padding-bottom: 5px;
-
+  margin-top: 40px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 6px;
+  color: var(--secondary);
 }
 
+.info-box {
+  border-left: 6px solid var(--primary);
+  background: var(--background-soft);
+  padding: 20px;
+  margin: 26px 0;
+  border-radius: 8px;
+}
 
+.pipeline-flow {
+  background: var(--flow-bg);
+  padding: 16px;
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  border-radius: 8px;
+  font-size: 15px;
+  margin: 22px 0;
+}
+
+.code-inline {
+  background: var(--code-bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.badge {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+}
 
 table {
-
-&#x20; border-collapse: collapse;
-
-&#x20; width: 100%;
-
-&#x20; margin-top: 15px;
-
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 16px;
 }
-
-
 
 th {
-
-&#x20; background: #f2f2f2;
-
+  background: #f2f2f2;
 }
 
-
-
 th, td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
 
-&#x20; padding: 10px;
+.note {
+  margin-top: 10px;
+  color: var(--text-soft);
+}
 
-&#x20; border: 1px solid #ddd;
+ul {
+  margin-top: 8px;
+}
 
+li {
+  margin-bottom: 5px;
 }
 
 </style>
 
-
-
-
-
 <h1>Pipeline Nextflow</h1>
-
-
 
 <div class="info-box">
 
 La pipeline <strong>Nextflow</strong> rappresenta il nucleo computazionale del sistema ClinicalTwin per il preprocessing neuroimaging e l’estrazione automatizzata delle feature radiomiche da immagini MRI strutturali in formato <strong>NIfTI</strong>.
 
+Coordina l’esecuzione orchestrata dei moduli di segmentazione anatomica, generazione ROI ed estrazione radiomica garantendo riproducibilità, parallelizzazione controllata e portabilità dell’intero workflow computazionale.
+
 </div>
-
-
-
-
 
 <h2 class="section-title">Workflow computazionale</h2>
 
+Workflow implementato nel file:
 
+<span class="code-inline">
+nextflow_worker/nextflow/preprocessing.nf
+</span>
 
 <div class="pipeline-flow">
 
-MRI → FreeSurfer / FastSurfer → ROI extraction → NIfTI conversion → Radiomics extraction → CSV dataset
+MRI → FreeSurfer / FastSurfer → ROI Masks → Radiomics Extraction → CSV Dataset
 
 </div>
-
-
-
-Workflow implementato nel file:
-
-
-
-<div class="code-inline">
-
-nextflow\_worker/nextflow/preprocessing.nf
-
-</div>
-
-
-
-
 
 <h2 class="section-title">Struttura della pipeline</h2>
 
-
-
 <table>
 
 <tr>
-
 <th>Processo</th>
-
 <th>Funzione</th>
-
 </tr>
 
-
-
 <tr>
-
 <td><strong>freesurfer</strong></td>
-
-<td>Segmentazione anatomica cerebrale</td>
-
+<td>segmentazione anatomica cerebrale automatizzata</td>
 </tr>
-
-
 
 <tr>
-
-<td><strong>nifti\_converter</strong></td>
-
-<td>Conversione volumi segmentati</td>
-
+<td><strong>nifti_converter</strong></td>
+<td>conversione dei volumi segmentati in maschere ROI</td>
 </tr>
-
-
 
 <tr>
-
-<td><strong>roi\_creator</strong></td>
-
-<td>Creazione maschere ROI</td>
-
+<td><strong>roi_creator</strong></td>
+<td>costruzione maschere binarie regionali</td>
 </tr>
-
-
 
 <tr>
-
-<td><strong>csv\_collector</strong></td>
-
-<td>Aggregazione feature radiomiche</td>
-
+<td><strong>feature_extraction</strong></td>
+<td>estrazione feature radiomiche tramite PyRadiomics</td>
 </tr>
-
-
 
 <tr>
-
-<td><strong>feature\_extraction</strong></td>
-
-<td>Estrazione radiomica tramite PyRadiomics</td>
-
+<td><strong>csv_collector</strong></td>
+<td>aggregazione dataset strutturato finale</td>
 </tr>
-
-
 
 </table>
-
-
-
-
 
 <h2 class="section-title">Segmentazione anatomica</h2>
 
-
-
 Segmentatori disponibili:
 
-
-
 <ul>
-
 <li>FreeSurfer</li>
-
-<li>FastSurfer</li>
-
+<li>FastSurfer (GPU-enabled)</li>
 </ul>
-
-
 
 Configurazione segmentatore:
 
-
-
-<div class="code-inline">
-
-nextflow\_worker/nextflow/configs/nextflow.config
-
-</div>
-
-
+<span class="code-inline">
+nextflow_worker/nextflow/configs/nextflow.config
+</span>
 
 Parametro:
 
-
-
 <pre>
-
-params.brain\_segmenter = "freesurfer"
-
+params.brain_segmenter = "freesurfer"
 </pre>
-
-
 
 Output generati:
 
-
-
 <ul>
-
-<li>volumetrie corticali</li>
-
-<li>strutture sottocorticali</li>
-
+<li>volumetrie corticali regionali</li>
+<li>strutture sottocorticali segmentate</li>
 <li>parcellazione anatomica standardizzata</li>
-
 </ul>
-
-
-
-
 
 <h2 class="section-title">Generazione ROI</h2>
 
-
-
 File configurazione ROI:
 
-
-
-<div class="code-inline">
-
-nextflow\_worker/data/external/ROI\_labels.tsv
-
-</div>
-
-
+<span class="code-inline">
+nextflow_worker/data/external/ROI_labels.tsv
+</span>
 
 Contiene:
 
-
-
 <ul>
-
 <li>etichette FreeSurfer</li>
-
-<li>identificatori numerici</li>
-
-<li>mapping anatomico</li>
-
+<li>identificatori numerici regionali</li>
+<li>mapping anatomico standardizzato</li>
 </ul>
-
-
 
 Numero totale ROI:
 
-
-
 <div class="pipeline-flow">
 
-78 regioni cerebrali
+78 regioni cerebrali segmentate automaticamente
 
 </div>
-
-
-
-
 
 <h2 class="section-title">Conversione volumi segmentati</h2>
 
-
-
 Processo:
 
+<span class="badge">nifti_converter</span>
 
-
-<span class="badge">nifti\_converter</span>
-
-
-
-Operazioni:
-
-
+Operazioni principali:
 
 <ul>
-
-<li>selezione ROI</li>
-
-<li>generazione maschere binarie</li>
-
-<li>normalizzazione formato</li>
-
+<li>selezione automatica ROI target</li>
+<li>generazione maschere binarie regionali</li>
+<li>normalizzazione formato NIfTI</li>
 </ul>
 
-
-
-Output:
-
-
+Output prodotto:
 
 <pre>
-
-ROI\_mask.nii.gz
-
+ROI_mask.nii.gz
 </pre>
-
-
-
-
 
 <h2 class="section-title">Estrazione feature radiomiche</h2>
 
-
-
 Estrazione eseguita tramite:
-
-
 
 <span class="badge">PyRadiomics</span>
 
-
-
 Configurazione:
 
+<span class="code-inline">
+nextflow_worker/data/external/pyradiomics.yaml
+</span>
 
-
-<div class="code-inline">
-
-nextflow\_worker/data/external/pyradiomics.yaml
-
-</div>
-
-
-
-
-
-<h3>First-order statistics</h3>
-
-
+Categorie principali di feature estratte:
 
 <ul>
-
-<li>mean</li>
-
-<li>variance</li>
-
-<li>skewness</li>
-
-<li>kurtosis</li>
-
-<li>entropy</li>
-
+<li>shape descriptors (volume, surface, compactness)</li>
+<li>first-order statistics (mean, variance, skewness)</li>
+<li>texture features (GLCM, GLRLM, GLSZM)</li>
+<li>intensity distribution metrics</li>
 </ul>
-
-
-
-
-
-<h3>Shape features</h3>
-
-
-
-<ul>
-
-<li>volume</li>
-
-<li>surface area</li>
-
-<li>compactness</li>
-
-<li>sphericity</li>
-
-</ul>
-
-
-
-
-
-<h3>Texture features</h3>
-
-
-
-<ul>
-
-<li>GLCM</li>
-
-<li>GLRLM</li>
-
-<li>GLSZM</li>
-
-<li>NGTDM</li>
-
-<li>GLDM</li>
-
-</ul>
-
-
-
-
 
 <h2 class="section-title">Generazione dataset CSV</h2>
 
-
-
 Processo:
 
-
-
-<span class="badge">csv\_collector</span>
-
-
+<span class="badge">csv_collector</span>
 
 Output finale:
 
-
-
 <pre>
-
-radiomics\_features.csv
-
+radiomics_features.csv
 </pre>
-
-
 
 Contiene:
 
-
-
 <ul>
-
-<li>feature per ciascuna ROI</li>
-
+<li>feature radiomiche per ciascuna ROI</li>
 <li>dataset compatibile con pipeline ML</li>
-
-<li>input diretto per model\_service</li>
-
+<li>input diretto per model_service</li>
 </ul>
-
-
-
-
 
 <h2 class="section-title">Parametri configurabili</h2>
 
-
-
 File configurazione:
 
-
-
-<div class="code-inline">
-
-nextflow\_worker/nextflow/configs/nextflow.config
-
-</div>
-
-
+<span class="code-inline">
+nextflow_worker/nextflow/configs/nextflow.config
+</span>
 
 <table>
 
 <tr>
-
 <th>Parametro</th>
-
 <th>Descrizione</th>
-
 </tr>
 
-
-
 <tr>
-
 <td>maxforks</td>
-
-<td>numero massimo processi paralleli</td>
-
+<td>numero massimo processi paralleli Nextflow</td>
 </tr>
 
-
-
 <tr>
-
-<td>fastsurfer\_threads</td>
-
-<td>thread CPU FastSurfer</td>
-
+<td>fastsurfer_threads</td>
+<td>thread CPU per FastSurfer</td>
 </tr>
 
-
-
 <tr>
-
-<td>fastsurfer\_device</td>
-
-<td>cpu / cuda</td>
-
+<td>fastsurfer_device</td>
+<td>selezione device: cpu oppure cuda</td>
 </tr>
 
-
-
 <tr>
-
-<td>fastsurfer\_3T</td>
-
-<td>ottimizzazione scanner 3T</td>
-
+<td>fastsurfer_3T</td>
+<td>ottimizzazione pipeline per scanner 3T</td>
 </tr>
 
-
-
 <tr>
-
-<td>pyradiomics\_jobs</td>
-
+<td>pyradiomics_jobs</td>
 <td>parallelismo estrazione feature</td>
-
 </tr>
-
-
 
 <tr>
-
-<td>brain\_segmenter</td>
-
-<td>segmentatore selezionato</td>
-
+<td>brain_segmenter</td>
+<td>segmentatore selezionato (freesurfer / fastsurfer)</td>
 </tr>
-
-
 
 </table>
 
-
-
-
-
-<h2 class="section-title">Architettura Docker-out-of-Docker</h2>
-
-
+<h2 class="section-title">Architettura Docker-out-of-Docker (DooD)</h2>
 
 <div class="pipeline-flow">
 
-Docker-out-of-Docker (DooD)
+Nextflow (container) → Docker Host → Pipeline Containers
 
 </div>
 
-
-
-Significa che:
-
-
+Questo significa che:
 
 <ul>
-
-<li>Nextflow gira dentro <strong>nextflow\_worker</strong></li>
-
-<li>i container pipeline girano sull’host Docker</li>
-
-<li>le immagini devono essere pre-costruite localmente</li>
-
+<li>Nextflow viene eseguito nel container <strong>nextflow_worker</strong></li>
+<li>i container scientifici vengono eseguiti direttamente sul Docker host</li>
+<li>le immagini devono essere pre-costruite localmente prima dell’avvio dello stack</li>
 </ul>
-
-
 
 Build immagini richieste:
 
-
-
 <pre>
 
-docker build -t clinical-freesurfer -f nextflow\_worker/freesurfer.dockerfile nextflow\_worker/
+docker build -t clinical-freesurfer -f nextflow_worker/freesurfer.dockerfile nextflow_worker/
 
+docker build -t clinical-fsl -f nextflow_worker/fsl.dockerfile nextflow_worker/
 
-
-docker build -t clinical-fsl -f nextflow\_worker/fsl.dockerfile nextflow\_worker/
-
-
-
-docker build -t clinical-pyradiomics -f nextflow\_worker/pyradiomics.dockerfile nextflow\_worker/
+docker build -t clinical-pyradiomics -f nextflow_worker/pyradiomics.dockerfile nextflow_worker/
 
 </pre>
 
-
-
-
-
 <h2 class="section-title">Output della pipeline</h2>
-
-
 
 <table>
 
 <tr>
-
 <th>Output</th>
-
 <th>Descrizione</th>
-
 </tr>
 
-
-
 <tr>
-
 <td>ROI masks</td>
-
-<td>maschere anatomiche segmentate</td>
-
+<td>maschere anatomiche segmentate regionalmente</td>
 </tr>
 
-
-
 <tr>
-
-<td>radiomics\_features.csv</td>
-
-<td>dataset feature radiomiche</td>
-
+<td>radiomics_features.csv</td>
+<td>dataset feature radiomiche per inferenza diagnostica</td>
 </tr>
 
-
-
 <tr>
-
 <td>Nextflow logs</td>
-
-<td>tracciamento esecuzione pipeline</td>
-
+<td>tracciamento completo esecuzione pipeline</td>
 </tr>
-
-
 
 </table>
 
-
-
-Il dataset CSV viene successivamente utilizzato dal <strong>model\_service</strong> per la classificazione diagnostica nello spazio latente <strong>UMAP</strong>.
-
+<p class="note">
+Il dataset CSV generato viene successivamente utilizzato dal <strong>model_service</strong> per la classificazione diagnostica e la proiezione del soggetto nello spazio latente <strong>UMAP</strong>.
+</p>

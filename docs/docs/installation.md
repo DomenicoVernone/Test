@@ -274,27 +274,6 @@ Senza questi file la pipeline non può essere eseguita.
 
 
 
-<h2>Build immagini pipeline</h2>
-
-
-
-La pipeline utilizza Docker-out-of-Docker (DooD). Le immagini devono essere costruite sull’host prima dell’avvio dello stack.
-
-
-
-Eseguire:
-
-
-
-<div class="code">
-
-docker build -t clinical-freesurfer -f nextflow\_worker/freesurfer.dockerfile nextflow\_worker/
-
-docker build -t clinical-fsl -f nextflow\_worker/fsl.dockerfile nextflow\_worker/
-
-docker build -t clinical-pyradiomics -f nextflow\_worker/pyradiomics.dockerfile nextflow\_worker/
-
-</div>
 
 
 
