@@ -12,11 +12,11 @@ nav:
 
   - System Overview:
       - System Architecture: architecture.md
-      - Microservices Overview: microservices.md
+      - Microservices Overview: Microservices.md
       - Project Structure: project_structure.md
 
   - Neuroimaging Pipeline:
-      - Pipeline Workflow: pipeline_workflow.md
+      - Pipeline Workflow: pipeline.md
 
   - Configuration:
       - Environment Setup: configuration.md
@@ -25,10 +25,7 @@ nav:
       - System Testing: testing.md
 
   - API Documentation:
-      - REST API Reference: api_reference.md
+      - REST API Reference: api.md
 
   - Deployment:
-      - Deployment Guide: deployment.md
-
-  - Future Work:
-      - Roadmap: future_work.md
+      - Deployment Guide: Deployment.md
