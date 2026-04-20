@@ -15,12 +15,12 @@ nav:
       - Installazione: Installazione.md
       - Configurazione: Configurazione.md
 
-  - Pipeline Neuroimaging: Pipeline.md
+  - Pipeline Neuroimaging: pipeline.md
 
   - Guida Rapida: Guida_Rapida.md
 
-  - Riferimento API: Api.md
+  - Riferimento API: api.md
 
   - Deployment: Deployment.md
 
-  - Testing: Testing.md
+  - Testing: testing.md
