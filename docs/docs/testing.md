@@ -1,338 +1,340 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Clinical Twin – Testing</title>
+
 <style>
 
-.testbox {
+/* ===== GLOBAL ===== */
 
-&#x20; border-left: 6px solid #4caf50;
-
-&#x20; background: #edf7ed;
-
-&#x20; padding: 14px;
-
-&#x20; margin: 16px 0;
-
-&#x20; border-radius: 6px;
-
+body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    display: flex;
+    background: #f5f6f7;
 }
 
+/* ===== SIDEBAR ===== */
 
+.sidebar {
+    width: 300px;
+    height: 100vh;
+    background: linear-gradient(#2f6f95, #244f6a);
+    color: white;
+    position: fixed;
+    padding: 20px;
+    box-sizing: border-box;
+}
 
-.code {
+.sidebar h2 {
+    margin-top: 0;
+}
 
-&#x20; font-family: monospace;
+.sidebar input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    margin: 15px 0;
+}
 
-&#x20; background: #eeeeee;
+.sidebar ul {
+    list-style: none;
+    padding-left: 0;
+}
 
-&#x20; padding: 10px;
+.sidebar li {
+    padding: 6px 0;
+    opacity: 0.9;
+}
 
-&#x20; border-radius: 6px;
+.sidebar li.active {
+    font-weight: bold;
+}
 
-&#x20; white-space: pre;
+/* ===== CONTENT ===== */
 
+.content {
+    margin-left: 320px;
+    padding: 40px;
+    max-width: 900px;
+}
+
+/* ===== BREADCRUMB ===== */
+
+.breadcrumb {
+    color: #6c6c6c;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* ===== HEADINGS ===== */
+
+h1 {
+    font-size: 36px;
+    margin-bottom: 25px;
+}
+
+h2 {
+    margin-top: 40px;
+    font-size: 26px;
+}
+
+/* ===== SERVICE BLOCK ===== */
+
+.service-box {
+    background: white;
+    padding: 18px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+}
+
+/* ===== CODE BLOCK ===== */
+
+.codeblock {
+    background: #eeeeee;
+    padding: 14px;
+    border-radius: 6px;
+    font-family: monospace;
+    margin: 15px 0;
+}
+
+/* ===== NAV BUTTONS ===== */
+
+.nav-buttons {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.button {
+    background: #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: black;
+}
+
+/* ===== FOOTER ===== */
+
+.footer {
+    margin-top: 50px;
+    font-size: 14px;
+    color: gray;
 }
 
 </style>
+</head>
+
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+
+<div class="sidebar">
+
+<h2>🏠 Clinical Twin</h2>
+
+<input placeholder="Search docs">
+
+<ul>
+<li>Introduction</li>
+<li>Installation</li>
+<li>Quickstart</li>
+<li>System Architecture</li>
+<li>Pipeline Workflow</li>
+<li>Microservices Overview</li>
+<li>Configuration</li>
+<li class="active">Testing</li>
+</ul>
+
+</div>
 
 
+<!-- ===== MAIN CONTENT ===== -->
 
+<div class="content">
 
+<div class="breadcrumb">
+Docs » Testing
+</div>
 
 <h1>Testing</h1>
 
+<p>
+Clinical Twin include una serie di test funzionali e di integrazione per
+verificare il corretto funzionamento dei microservizi, della pipeline
+neuroimaging e del motore di inferenza diagnostica.
+</p>
 
 
+<h2>Verifica stato microservizi</h2>
+
+<p>
+Dopo l’avvio dello stack Docker è possibile controllare la disponibilità
+dei servizi tramite endpoint di health-check.
+</p>
+
+<div class="codeblock">
+curl http://localhost:8000/docs
+curl http://localhost:8001/docs
+curl http://localhost:8002/docs
+curl http://localhost:8003/docs
+curl http://localhost:8004
+</div>
 
 
-<div class="testbox">
+<h2>Test autenticazione</h2>
+
+<p>
+Verificare la creazione di un nuovo utente tramite Swagger UI:
+</p>
+
+<div class="codeblock">
+POST /signup
+</div>
+
+<p>
+Successivamente eseguire il login:
+</p>
+
+<div class="codeblock">
+POST /login
+</div>
+
+<p>
+Se l’autenticazione ha successo viene restituito un token JWT valido.
+</p>
 
 
+<h2>Test pipeline neuroimaging</h2>
 
-Questa sezione descrive le procedure di verifica funzionale dei principali componenti della piattaforma ClinicalTwin, al fine di garantire il corretto funzionamento dello stack applicativo e della pipeline di analisi neuroimaging.
+<div class="service-box">
 
-
-
-Le attività di testing includono:
-
-
+<p>
+Caricare una MRI T1-weighted tramite dashboard e verificare:
+</p>
 
 <ul>
-
-<li>verifica dei container Docker</li>
-
-<li>test della pipeline Nextflow</li>
-
-<li>validazione del classificatore diagnostico</li>
-
-<li>test della dashboard clinica</li>
-
+<li>avvio task asincrono</li>
+<li>segmentazione FreeSurfer / FastSurfer</li>
+<li>estrazione ROI</li>
+<li>estrazione feature radiomiche</li>
 </ul>
-
-
 
 </div>
 
 
+<h2>Test estrazione radiomica</h2>
+
+<p>
+Durante l’esecuzione della pipeline devono essere generati i seguenti output:
+</p>
+
+<div class="codeblock">
+ROI_labels.tsv loaded
+Radiomics features extracted
+pyradiomics.yaml applied
+</div>
 
 
+<h2>Test inferenza diagnostica</h2>
 
-<h2>Test container Docker</h2>
+<p>
+Il servizio inference_engine restituisce una predizione diagnostica
+basata su classificazione KNN.
+</p>
+
+Esempio output:
+
+<div class="codeblock">
+{
+  "prediction": "bvFTD",
+  "confidence": 0.81,
+  "neighbors": [...]
+}
+</div>
 
 
+<h2>Test proiezione UMAP</h2>
 
-Dopo l’avvio dello stack applicativo, verificare che tutti i servizi risultino attivi:
+<p>
+Verificare la corretta generazione delle coordinate nello spazio latente:
+</p>
+
+<div class="codeblock">
+UMAP projection computed
+3D embedding available
+</div>
 
 
+<h2>Test dashboard clinica</h2>
 
-<div class="code">
+<p>
+Dalla dashboard React verificare:
+</p>
 
-docker compose ps
+<ul>
+<li>visualizzazione multiplanare MRI (NiiVue)</li>
+<li>posizione nello spazio UMAP</li>
+<li>classe diagnostica stimata</li>
+<li>storico task eseguiti</li>
+</ul>
+
+
+<h2>Test assistente AI</h2>
+
+<p>
+Verificare la connessione al servizio LLM tramite richiesta testuale:
+</p>
+
+<div class="codeblock">
+Explain why this patient is close to svPPA cluster
+</div>
+
+<p>
+L’assistente deve restituire una risposta coerente con il contesto
+radiomico e la posizione nello spazio latente.
+</p>
+
+
+<h2>Test end-to-end</h2>
+
+<div class="service-box">
+
+<p>
+Scenario completo di validazione:
+</p>
+
+<div class="codeblock">
+Upload MRI → Segmentazione → Radiomics → Inferenza → UMAP → Dashboard → Explainability AI
+</div>
+
+<p>
+Se tutte le fasi vengono completate senza errori, la pipeline Clinical Twin
+è correttamente configurata.
+</p>
 
 </div>
 
 
+<div class="nav-buttons">
 
-Devono risultare in stato <strong>running</strong> i seguenti container:
-
-
-
-<ul>
-
-<li>api\_gateway</li>
-
-<li>orchestrator</li>
-
-<li>nextflow\_worker</li>
-
-<li>model\_service</li>
-
-<li>inference\_engine</li>
-
-<li>llm\_service</li>
-
-<li>frontend</li>
-
-</ul>
-
-
-
-Per controllare eventuali errori nei log:
-
-
-
-<div class="code">
-
-docker compose logs -f
+<a class="button">⬅ Previous</a>
+<a class="button">Next ➡</a>
 
 </div>
 
 
+<div class="footer">
 
-Oppure per un singolo servizio:
-
-
-
-<div class="code">
-
-docker compose logs -f orchestrator
+© 2025 Clinical Twin Documentation  
+Built with custom HTML/CSS (ReadTheDocs-style layout)
 
 </div>
 
-
-
-
-
-<h2>Test pipeline Nextflow</h2>
-
-
-
-La pipeline neuroimaging può essere verificata caricando una MRI cerebrale in formato NIfTI tramite la dashboard clinica.
-
-
-
-Procedura:
-
-
-
-<ul>
-
-<li>accedere alla dashboard clinica</li>
-
-<li>caricare un file MRI (.nii oppure .nii.gz)</li>
-
-<li>avviare l’elaborazione</li>
-
-<li>monitorare lo stato del task</li>
-
-</ul>
-
-
-
-Durante l’esecuzione devono essere completate le seguenti fasi:
-
-
-
-<div class="code">
-
-MRI → FreeSurfer → ROI extraction → Radiomics → CSV generation
-
 </div>
 
-
-
-Lo stato del workflow può essere monitorato nei log:
-
-
-
-<div class="code">
-
-docker compose logs -f nextflow\_worker
-
-</div>
-
-
-
-Il completamento della pipeline produce un dataset radiomico in formato CSV utilizzato dal classificatore.
-
-
-
-
-
-<h2>Test classificatore</h2>
-
-
-
-Il servizio <strong>model\_service</strong> recupera automaticamente il modello champion registrato su MLflow tramite DagsHub.
-
-
-
-Per verificare il corretto funzionamento del classificatore:
-
-
-
-<ul>
-
-<li>eseguire una pipeline completa</li>
-
-<li>attendere la fase di inferenza</li>
-
-<li>verificare la restituzione della predizione</li>
-
-</ul>
-
-
-
-Output atteso:
-
-
-
-<ul>
-
-<li>classe diagnostica (bvFTD oppure HC)</li>
-
-<li>probabilità associata alla classificazione</li>
-
-<li>coordinate nello spazio latente UMAP</li>
-
-</ul>
-
-
-
-Eventuali errori possono essere verificati tramite:
-
-
-
-<div class="code">
-
-docker compose logs -f model\_service
-
-</div>
-
-
-
-oppure:
-
-
-
-<div class="code">
-
-docker compose logs -f inference\_engine
-
-</div>
-
-
-
-
-
-<h2>Test dashboard</h2>
-
-
-
-Il frontend React consente la visualizzazione interattiva dei risultati clinici.
-
-
-
-Verificare:
-
-
-
-<ul>
-
-<li>upload corretto file MRI (.nii / .nii.gz)</li>
-
-<li>visualizzazione multiplanare tramite viewer NiiVue</li>
-
-<li>visualizzazione embedding tridimensionale UMAP</li>
-
-<li>posizione del paziente nello spazio latente</li>
-
-<li>confronto con dataset di riferimento</li>
-
-<li>funzionamento assistente AI clinico</li>
-
-</ul>
-
-
-
-Testare l’assistente LLM verificando:
-
-
-
-<ul>
-
-<li>risposta a query contestuali</li>
-
-<li>interpretazione della predizione diagnostica</li>
-
-<li>supporto alla navigazione dello spazio latente</li>
-
-</ul>
-
-
-
-
-
-<h2>Verifica completa sistema</h2>
-
-
-
-Il sistema è considerato correttamente funzionante quando:
-
-
-
-<ul>
-
-<li>tutti i container risultano attivi</li>
-
-<li>la pipeline Nextflow termina senza errori</li>
-
-<li>viene generato il dataset radiomico</li>
-
-<li>il classificatore restituisce una predizione</li>
-
-<li>la dashboard visualizza correttamente MRI e UMAP</li>
-
-</ul>
-
-
-
-In queste condizioni la piattaforma ClinicalTwin è pronta per l’utilizzo in ambiente di ricerca clinica sperimentale.
-
+</body>
+</html>

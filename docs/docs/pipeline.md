@@ -1,237 +1,331 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Clinical Twin – Pipeline Workflow</title>
+
 <style>
 
-:root {
-  --primary: #3f51b5;
-  --secondary: #1e3a8a;
-  --background-soft: #eef2ff;
-  --flow-bg: #f5f6fa;
-  --code-bg: #eeeeee;
-  --text-main: #1f2937;
-  --text-soft: #4b5563;
-}
+/* ===== GLOBAL ===== */
 
 body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  line-height: 1.65;
-  color: var(--text-main);
-  max-width: 1100px;
-  margin: auto;
-  padding: 30px;
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    display: flex;
+    background: #f5f6f7;
 }
 
+/* ===== SIDEBAR ===== */
+
+.sidebar {
+    width: 300px;
+    height: 100vh;
+    background: linear-gradient(#2f6f95, #244f6a);
+    color: white;
+    position: fixed;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+}
+
+.sidebar input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    margin: 15px 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.sidebar li {
+    padding: 6px 0;
+    opacity: 0.9;
+}
+
+.sidebar li.active {
+    font-weight: bold;
+}
+
+/* ===== CONTENT ===== */
+
+.content {
+    margin-left: 320px;
+    padding: 40px;
+    max-width: 900px;
+}
+
+/* ===== BREADCRUMB ===== */
+
+.breadcrumb {
+    color: #6c6c6c;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* ===== HEADINGS ===== */
+
 h1 {
-  font-size: 2.2rem;
-  margin-bottom: 18px;
+    font-size: 36px;
+    margin-bottom: 25px;
 }
 
 h2 {
-  margin-top: 36px;
-  margin-bottom: 12px;
-  color: var(--secondary);
+    margin-top: 40px;
+    font-size: 26px;
 }
 
-.box {
-  border-left: 6px solid var(--primary);
-  background: var(--background-soft);
-  padding: 20px;
-  border-radius: 8px;
-  margin: 26px 0;
+/* ===== CODE BLOCK ===== */
+
+.codeblock {
+    background: #eeeeee;
+    padding: 14px;
+    border-radius: 6px;
+    font-family: monospace;
+    margin: 15px 0;
 }
 
-.flow {
-  background: var(--flow-bg);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  text-align: center;
-  padding: 16px;
-  border-radius: 8px;
-  margin: 22px 0;
-  font-size: 1rem;
-  letter-spacing: 0.4px;
+/* ===== NAV BUTTONS ===== */
+
+.nav-buttons {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
 }
 
-.code {
-  background: var(--code-bg);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-family: monospace;
+.button {
+    background: #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: black;
 }
 
-.section-note {
-  margin-top: 12px;
-  color: var(--text-soft);
-}
+/* ===== FOOTER ===== */
 
-ul {
-  margin-top: 8px;
-}
-
-li {
-  margin-bottom: 5px;
-}
-
-.highlight {
-  font-weight: 600;
-  color: var(--secondary);
+.footer {
+    margin-top: 50px;
+    font-size: 14px;
+    color: gray;
 }
 
 </style>
+</head>
 
-<h1>Pipeline Neuroimaging</h1>
+<body>
 
-<div class="box">
+<!-- ===== SIDEBAR ===== -->
 
-<p>
-La pipeline neuroimaging implementata in <strong>ClinicalTwin</strong> consente la trasformazione automatizzata di immagini MRI strutturali T1-pesate in rappresentazioni quantitative utilizzabili per la classificazione diagnostica tra
-<strong>behavioral variant Frontotemporal Dementia (bvFTD)</strong> e
-<strong>Healthy Controls (HC)</strong>.
-</p>
+<div class="sidebar">
 
-<p>
-Il workflow computazionale costruisce progressivamente un vettore strutturato di biomarcatori radiomici interpretabili, riproducibili e compatibili con modelli di machine learning supervisionati.
-</p>
+<h2>🏠 Clinical Twin</h2>
+
+<input placeholder="Search docs">
+
+<ul>
+<li>Introduction</li>
+<li>Installation</li>
+<li>Quickstart</li>
+<li>System Architecture</li>
+<li class="active">Pipeline Workflow</li>
+<li>Microservices Overview</li>
+</ul>
 
 </div>
 
-<h2>Workflow computazionale</h2>
 
-<div class="flow">
+<!-- ===== MAIN CONTENT ===== -->
 
-MRI → FreeSurfer → ROI Extraction → Radiomics Features → CSV Dataset → Machine Learning → UMAP Projection
+<div class="content">
+
+<div class="breadcrumb">
+Docs » Pipeline Workflow
+</div>
+
+<h1>Pipeline Workflow</h1>
+
+<p>
+La pipeline di Clinical Twin implementa un workflow automatizzato di analisi
+radiomica su risonanze magnetiche cerebrali T1-weighted finalizzato alla
+diagnosi differenziale delle varianti di Frontotemporal Dementia (FTD).
+</p>
+
+<p>
+L’intero processo è orchestrato dal microservizio <b>orchestrator</b> e
+eseguito tramite <b>Nextflow</b> all’interno del servizio
+<b>nextflow_worker</b>.
+</p>
+
+
+<h2>Panoramica della pipeline</h2>
+
+<div class="codeblock">
+MRI → Preprocessing → Segmentazione → Estrazione ROI → Radiomics → Inferenza KNN → Embedding UMAP → Dashboard
+</div>
+
+
+<h2>1. Upload della MRI</h2>
+
+<p>
+L’utente carica una risonanza magnetica strutturale cerebrale tramite
+l’interfaccia web. I formati supportati sono:
+</p>
+
+<ul>
+<li>.nii</li>
+<li>.nii.gz</li>
+</ul>
+
+<p>
+Il file viene salvato nel volume condiviso del sistema e registrato come task
+asincrono.
+</p>
+
+
+<h2>2. Preprocessing volumetrico</h2>
+
+<p>
+La pipeline esegue operazioni preliminari necessarie alla segmentazione:
+</p>
+
+<ul>
+<li>normalizzazione dell’intensità</li>
+<li>ricampionamento volumetrico</li>
+<li>allineamento spaziale</li>
+<li>verifica integrità del volume MRI</li>
+</ul>
+
+
+<h2>3. Segmentazione anatomica</h2>
+
+<p>
+La segmentazione cerebrale viene effettuata utilizzando:
+</p>
+
+<ul>
+<li>FreeSurfer (modalità CPU)</li>
+<li>FastSurfer (modalità GPU opzionale)</li>
+</ul>
+
+<p>
+Il risultato consiste nella parcellizzazione della corteccia cerebrale in
+regioni anatomiche standardizzate (ROI).
+</p>
+
+
+<h2>4. Estrazione delle ROI cerebrali</h2>
+
+<p>
+Le regioni segmentate vengono mappate utilizzando la tabella:
+</p>
+
+<div class="codeblock">
+ROI_labels.tsv
+</div>
+
+<p>
+Questa fase consente l’associazione tra etichette anatomiche e volumi segmentati.
+</p>
+
+
+<h2>5. Estrazione feature radiomiche</h2>
+
+<p>
+Le feature radiomiche vengono estratte tramite PyRadiomics utilizzando il file
+di configurazione:
+</p>
+
+<div class="codeblock">
+pyradiomics.yaml
+</div>
+
+<p>
+Le principali categorie di feature includono:
+</p>
+
+<ul>
+<li>first-order statistics</li>
+<li>GLCM texture features</li>
+<li>GLRLM features</li>
+<li>GLSZM features</li>
+<li>shape descriptors</li>
+</ul>
+
+
+<h2>6. Inferenza statistica</h2>
+
+<p>
+Le feature radiomiche estratte vengono inviate al servizio
+<b>inference_engine</b>, che esegue:
+</p>
+
+<ul>
+<li>classificazione tramite algoritmo KNN</li>
+<li>calcolo similarità con pazienti del dataset di riferimento</li>
+<li>stima della classe diagnostica</li>
+</ul>
+
+
+<h2>7. Proiezione nello spazio latente UMAP</h2>
+
+<p>
+Le feature vengono proiettate in uno spazio tridimensionale utilizzando UMAP
+per consentire:
+</p>
+
+<ul>
+<li>visualizzazione della distribuzione dei pazienti</li>
+<li>analisi dei cluster diagnostici</li>
+<li>identificazione dei nearest neighbors clinici</li>
+</ul>
+
+
+<h2>8. Visualizzazione dei risultati</h2>
+
+<p>
+I risultati finali sono disponibili nella dashboard React e includono:
+</p>
+
+<ul>
+<li>segmentazione multiplanare delle ROI (NiiVue)</li>
+<li>posizione del paziente nello spazio UMAP</li>
+<li>classe diagnostica stimata</li>
+<li>confidence score</li>
+<li>nearest neighbors clinici</li>
+</ul>
+
+
+<h2>9. Interpretazione tramite assistente AI</h2>
+
+<p>
+L’assistente AI context-aware supporta l’interpretazione dei risultati
+radiomici e della posizione del paziente nello spazio latente, fornendo
+spiegazioni clinicamente rilevanti.
+</p>
+
+
+<div class="nav-buttons">
+
+<a class="button">⬅ Previous</a>
+<a class="button">Next ➡</a>
 
 </div>
 
-<h2>Input: immagini MRI strutturali</h2>
 
-<p>
-La pipeline riceve in ingresso immagini volumetriche cerebrali T1-pesate nei formati standard:
-</p>
+<div class="footer">
 
-<ul>
-<li><span class="code">.nii</span></li>
-<li><span class="code">.nii.gz</span></li>
-</ul>
+© 2025 Clinical Twin Documentation  
+Built with custom HTML/CSS (ReadTheDocs-style layout)
 
-<p>
-Queste immagini costituiscono la base per l’estrazione di biomarcatori morfometrici regionali utilizzati nella classificazione diagnostica automatizzata.
-</p>
+</div>
 
-<p class="section-note">
-Prima dell’elaborazione, i dati vengono validati e organizzati per garantire compatibilità con la pipeline di segmentazione FreeSurfer e con lo standard BIDS quando disponibile.
-</p>
+</div>
 
-<h2>Segmentazione anatomica con FreeSurfer</h2>
-
-<p>
-La prima fase della pipeline consiste nella segmentazione anatomica cerebrale tramite
-<span class="highlight">FreeSurfer</span>, uno strumento ampiamente validato nella neuroimaging analysis strutturale.
-</p>
-
-<p>
-Il processo produce una rappresentazione dettagliata del cervello suddivisa in regioni neuroanatomiche standardizzate secondo atlanti di riferimento corticali e sottocorticali.
-</p>
-
-<h2>Estrazione delle regioni di interesse (ROI)</h2>
-
-<p>
-Successivamente vengono identificate automaticamente le
-<span class="highlight">Regions of Interest (ROI)</span>
-rilevanti per l’analisi delle alterazioni neurodegenerative frontotemporali.
-</p>
-
-<p>
-Le ROI sono derivate dalle mappe di segmentazione prodotte da FreeSurfer e organizzate secondo strutture neuroanatomiche standardizzate.
-</p>
-
-<p class="section-note">
-Questa fase consente di isolare le aree cerebrali su cui verranno calcolate le feature radiomiche regionali.
-</p>
-
-<h2>Estrazione delle feature radiomiche</h2>
-
-<p>
-Una volta definite le ROI, viene eseguita l’estrazione automatizzata delle
-<span class="highlight">feature radiomiche</span>
-mediante strumenti dedicati (PyRadiomics).
-</p>
-
-<p>
-Le feature includono descrittori quantitativi di:
-</p>
-
-<ul>
-<li>intensità voxel-wise</li>
-<li>texture regionale</li>
-<li>distribuzione statistica dei segnali</li>
-<li>proprietà morfometriche locali</li>
-</ul>
-
-<p class="section-note">
-Questa fase trasforma l’immagine MRI in una rappresentazione numerica ad alta dimensionalità utilizzabile per l’analisi computazionale supervisionata.
-</p>
-
-<h2>Generazione del dataset strutturato (CSV)</h2>
-
-<p>
-Le feature radiomiche estratte vengono aggregate in una rappresentazione tabellare strutturata in formato
-<span class="code">CSV</span>, in cui:
-</p>
-
-<ul>
-<li>ogni riga rappresenta un soggetto</li>
-<li>ogni colonna rappresenta una feature radiomica regionale</li>
-</ul>
-
-<p>
-Questo dataset costituisce l’input del modello di classificazione supervisionata utilizzato dal sistema ClinicalTwin.
-</p>
-
-<p class="section-note">
-La standardizzazione del formato consente l’integrazione con moduli di inferenza indipendenti dalla pipeline di preprocessing.
-</p>
-
-<h2>Classificazione tramite modello di Machine Learning</h2>
-
-<p>
-Il vettore di feature radiomiche viene elaborato da un modello supervisionato addestrato per distinguere tra:
-</p>
-
-<ul>
-<li><strong>Healthy Control (HC)</strong></li>
-<li><strong>behavioral variant Frontotemporal Dementia (bvFTD)</strong></li>
-</ul>
-
-<p>
-Il modello restituisce:
-</p>
-
-<ul>
-<li>classe predetta</li>
-<li>probabilità diagnostica associata</li>
-<li>posizionamento del soggetto nello spazio delle feature</li>
-</ul>
-
-<p class="section-note">
-Questa fase rappresenta il nucleo decisionale del sistema di supporto diagnostico assistito.
-</p>
-
-<h2>Proiezione nello spazio latente UMAP</h2>
-
-<p>
-Come fase finale della pipeline, i dati radiomici vengono proiettati in uno spazio latente tridimensionale tramite
-<span class="highlight">UMAP (Uniform Manifold Approximation and Projection)</span>.
-</p>
-
-<p>
-Questa trasformazione consente di:
-</p>
-
-<ul>
-<li>visualizzare la distribuzione dei soggetti nello spazio delle feature</li>
-<li>confrontare il profilo del paziente con la popolazione di riferimento</li>
-<li>supportare l’interpretazione delle predizioni del modello</li>
-<li>abilitare l’esplorazione interattiva tramite dashboard clinica</li>
-</ul>
-
-<p class="section-note">
-La rappresentazione UMAP costituisce uno strumento di interpretabilità visiva fondamentale per il supporto decisionale assistito nel contesto neurodegenerativo.
-</p>
+</body>
+</html>

@@ -1,197 +1,257 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Clinical Twin – Introduction</title>
+
 <style>
 
-:root {
-  --primary: #3f51b5;
-  --secondary: #009688;
-  --background-primary: #eef2ff;
-  --background-secondary: #eefaf8;
-  --text-main: #1f2937;
-  --text-soft: #4b5563;
-}
+/* ===== GLOBAL ===== */
 
 body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  line-height: 1.65;
-  color: var(--text-main);
-  max-width: 1100px;
-  margin: auto;
-  padding: 30px;
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    display: flex;
+    background: #f5f6f7;
 }
 
+/* ===== SIDEBAR ===== */
+
+.sidebar {
+    width: 300px;
+    height: 100vh;
+    background: linear-gradient(#2f6f95, #244f6a);
+    color: white;
+    position: fixed;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+}
+
+.sidebar input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    margin: 15px 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.sidebar li {
+    padding: 6px 0;
+    opacity: 0.9;
+}
+
+.sidebar li.active {
+    font-weight: bold;
+}
+
+/* ===== MAIN CONTENT ===== */
+
+.content {
+    margin-left: 320px;
+    padding: 40px;
+    max-width: 900px;
+}
+
+/* ===== BREADCRUMB ===== */
+
+.breadcrumb {
+    color: #6c6c6c;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* ===== HEADINGS ===== */
+
 h1 {
-  font-size: 2.2rem;
-  margin-bottom: 20px;
+    font-size: 36px;
+    margin-bottom: 25px;
 }
 
 h2 {
-  margin-top: 10px;
-  margin-bottom: 12px;
+    margin-top: 40px;
+    font-size: 26px;
 }
 
-.hero {
-  border-left: 6px solid var(--primary);
-  background: var(--background-primary);
-  padding: 22px;
-  border-radius: 8px;
-  margin: 28px 0;
+/* ===== CODE BLOCK ===== */
+
+.codeblock {
+    background: #eeeeee;
+    padding: 14px;
+    border-radius: 6px;
+    font-family: monospace;
+    margin: 15px 0;
 }
 
-.section {
-  border-left: 6px solid var(--secondary);
-  background: var(--background-secondary);
-  padding: 22px;
-  border-radius: 8px;
-  margin: 32px 0;
-}
-
-.section-title {
-  font-weight: 600;
-  margin-bottom: 10px;
-}
+/* ===== LIST ===== */
 
 ul {
-  margin-top: 8px;
-  margin-bottom: 8px;
+    margin-top: 10px;
 }
 
-li {
-  margin-bottom: 6px;
+/* ===== NAVIGATION BUTTONS ===== */
+
+.nav-buttons {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
 }
 
-.highlight {
-  font-weight: 600;
-  color: var(--secondary);
+.button {
+    background: #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: black;
 }
 
-.note {
-  margin-top: 12px;
-  color: var(--text-soft);
+/* ===== FOOTER ===== */
+
+.footer {
+    margin-top: 50px;
+    font-size: 14px;
+    color: gray;
 }
 
 </style>
+</head>
 
-<h1>
-ClinicalTwin – Sistema per l’analisi automatizzata di immagini MRI nella diagnosi differenziale della bvFTD
-</h1>
+<body>
 
-<div class="hero">
+<!-- ===== SIDEBAR ===== -->
 
-<p>
-<strong>ClinicalTwin</strong> è una piattaforma software modulare progettata per supportare l’analisi automatizzata di immagini di risonanza magnetica cerebrale strutturale (<span class="highlight">MRI T1-pesata</span>) nel contesto della diagnosi differenziale delle patologie neurodegenerative frontotemporali.
-</p>
+<div class="sidebar">
 
-<p>
-Il sistema implementa una pipeline completa di elaborazione neuroimaging che integra:
-</p>
+<h2>🏠 Clinical Twin</h2>
+
+<input placeholder="Search docs">
 
 <ul>
-<li>segmentazione anatomica cerebrale automatizzata</li>
-<li>estrazione di feature radiomiche regionali</li>
-<li>costruzione di vettori quantitativi ad alta dimensionalità</li>
-<li>classificazione supervisionata tramite modelli di machine learning</li>
-</ul>
-
-<p>
-L’architettura è basata su microservizi containerizzati orchestrati tramite <strong>Docker</strong> e workflow computazionali gestiti mediante <strong>Nextflow</strong>, garantendo elevati livelli di riproducibilità, scalabilità e portabilità dell’intero processo di analisi.
-</p>
-
-<p>
-ClinicalTwin consente l’automazione completa del flusso di elaborazione, dalla ricezione dell’immagine MRI fino alla generazione della predizione diagnostica.
-</p>
-
-</div>
-
-<div class="section">
-
-<h2 class="section-title">Cos’è ClinicalTwin</h2>
-
-<p>
-ClinicalTwin è una piattaforma software modulare per l’analisi automatizzata di immagini MRI cerebrali strutturali finalizzata alla diagnosi differenziale della
-<strong>behavioral variant Frontotemporal Dementia (bvFTD)</strong>.
-</p>
-
-<p>Il sistema integra:</p>
-
-<ul>
-<li>segmentazione anatomica cerebrale automatizzata</li>
-<li>estrazione di biomarcatori radiomici regionali</li>
-<li>costruzione di vettori di feature quantitative ad alta dimensionalità</li>
-<li>classificazione supervisionata tramite modelli di machine learning</li>
-<li>strumenti di visualizzazione interattiva per l’interpretazione clinica dei risultati</li>
+<li class="active">Introduction</li>
+<li>Installation</li>
+<li>Quickstart</li>
+<li>User Guide</li>
 </ul>
 
 </div>
 
-<div class="section">
 
-<h2 class="section-title">Obiettivo clinico</h2>
+<!-- ===== MAIN CONTENT ===== -->
+
+<div class="content">
+
+<div class="breadcrumb">
+Docs » Introduction
+</div>
+
+<h1>Introduction</h1>
+
+
+<h2>Description</h2>
 
 <p>
-L’obiettivo principale della piattaforma è supportare il processo di diagnosi differenziale tra:
+Clinical Twin is a clinical decision-support platform designed for the
+differential diagnosis of Frontotemporal Dementia (FTD) variants using
+radiomic analysis of structural brain MRI scans.
 </p>
+
+<p>
+The system integrates an automated neuroimaging pipeline based on
+FreeSurfer / FastSurfer and PyRadiomics, a statistical inference engine
+implemented in R, a context-aware AI assistant powered by Spatial RAG,
+and an interactive React dashboard for multiplanar visualization and
+exploration of the latent diagnostic space generated through UMAP.
+</p>
+
+
+<h2>Features</h2>
 
 <ul>
-<li><strong>Healthy Controls (HC)</strong></li>
-<li><strong>behavioral variant Frontotemporal Dementia (bvFTD)</strong></li>
+<li>Automated MRI segmentation using FreeSurfer or FastSurfer</li>
+<li>Radiomic feature extraction with PyRadiomics</li>
+<li>KNN-based statistical inference engine implemented in R</li>
+<li>3D latent space projection using UMAP</li>
+<li>Spatial RAG clinical assistant for explainability support</li>
+<li>Interactive multiplanar MRI viewer (NiiVue integration)</li>
+<li>Microservice architecture orchestrated with Docker Compose</li>
+<li>Model versioning and tracking via MLflow and DagsHub</li>
 </ul>
 
+
+<h2>Source Code</h2>
+
+<p>The source code is currently hosted on GitHub at:</p>
+
+<div class="codeblock">
+https://github.com/carlosto033/Tesi-FTD
+</div>
+
+
+<h2>Add the FreeSurfer license</h2>
+
+
 <p>
-mediante l’analisi quantitativa di immagini MRI strutturali ad alta risoluzione.
+FreeSurfer requires a valid license file to execute the segmentation pipeline.
+Download the license from:
 </p>
 
-<p class="note">
-Questo approccio consente di integrare biomarcatori morfometrici oggettivi nel processo diagnostico, contribuendo alla valutazione precoce delle patologie neurodegenerative frontotemporali.
+<div class="codeblock">
+https://surfer.nmr.mgh.harvard.edu/registration.html
+</div>
+
+<p>
+After downloading the file, copy it into the Nextflow worker directory:
 </p>
+
+<div class="codeblock">
+cp /path/to/license.txt nextflow_worker/license.txt
+</div>
+
+<p>
+Without this file, the segmentation stage of the neuroimaging pipeline cannot start.
+</p>
+<h2>Contributions</h2>
+
+<p>
+Clinical Twin is currently maintained as part of an academic research
+project. Suggestions, improvements, and collaborations related to
+radiomics workflows, neuroimaging pipelines, or explainable AI in
+clinical environments are welcome.
+</p>
+
+<p>
+For issues or feature requests, refer to the repository:
+</p>
+
+<div class="codeblock">
+https://github.com/carlosto033/Tesi-FTD/issues
+</div>
+
+
+<div class="nav-buttons">
+
+<a class="button">⬅ Previous</a>
+<a class="button">Next ➡</a>
 
 </div>
 
-<div class="section">
 
-<h2 class="section-title">Formato dei dati di input MRI</h2>
+<div class="footer">
 
-<p>
-ClinicalTwin utilizza immagini MRI strutturali T1-pesate nei seguenti formati standard:
-</p>
-
-<ul>
-<li>.nii</li>
-<li>.nii.gz</li>
-</ul>
-
-<p>Le immagini devono essere:</p>
-
-<ul>
-<li>volumetriche tridimensionali (3D)</li>
-<li>acquisite con sequenze T1-weighted ad alta risoluzione</li>
-<li>compatibili con la pipeline di segmentazione FreeSurfer</li>
-<li>preferibilmente organizzate secondo lo standard BIDS</li>
-</ul>
-
-<p class="note">
-Durante il preprocessing, le immagini vengono trasformate automaticamente in vettori strutturati di biomarcatori quantitativi utilizzabili per l’inferenza computazionale.
-</p>
+© 2025 Clinical Twin Documentation  
+Built with custom HTML/CSS (ReadTheDocs-style layout)
 
 </div>
 
-<div class="section">
-
-<h2 class="section-title">Output della pipeline diagnostica</h2>
-
-<p>
-Al termine della pipeline di elaborazione, ClinicalTwin restituisce:
-</p>
-
-<ul>
-<li>classe predetta (<strong>Healthy Control</strong> oppure <strong>bvFTD</strong>)</li>
-<li>probabilità diagnostica associata alla classificazione</li>
-</ul>
-
-<p>
-La classificazione è basata su feature radiomiche estratte automaticamente da regioni cerebrali segmentate e analizzate tramite modelli supervisionati addestrati su dataset di riferimento.
-</p>
-
-<p class="note">
-Oltre alla predizione finale, il sistema produce ulteriori indicatori quantitativi utili all’interpretazione clinica assistita.
-</p>
-
 </div>
+
+</body>
+</html>

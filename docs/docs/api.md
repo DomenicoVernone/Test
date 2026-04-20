@@ -1,664 +1,359 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Clinical Twin – API Reference</title>
+
 <style>
 
-.api-box {
+/* ===== GLOBAL ===== */
 
-&#x20; border-left: 6px solid #607d8b;
-
-&#x20; background: #eef3f6;
-
-&#x20; padding: 18px;
-
-&#x20; border-radius: 6px;
-
-&#x20; margin: 20px 0;
-
+body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    display: flex;
+    background: #f5f6f7;
 }
 
+/* ===== SIDEBAR ===== */
 
-
-.endpoint {
-
-&#x20; font-family: monospace;
-
-&#x20; background: #f4f4f4;
-
-&#x20; padding: 6px 10px;
-
-&#x20; border-radius: 4px;
-
-&#x20; display: inline-block;
-
+.sidebar {
+    width: 300px;
+    height: 100vh;
+    background: linear-gradient(#2f6f95, #244f6a);
+    color: white;
+    position: fixed;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
+.sidebar h2 { margin-top: 0; }
 
+.sidebar input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    margin: 15px 0;
+}
 
-.code {
+.sidebar ul {
+    list-style: none;
+    padding-left: 0;
+}
 
-&#x20; font-family: monospace;
+.sidebar li {
+    padding: 6px 0;
+    opacity: 0.9;
+}
 
-&#x20; background: #eeeeee;
+.sidebar li.active {
+    font-weight: bold;
+}
 
-&#x20; padding: 10px;
+/* ===== CONTENT ===== */
 
-&#x20; border-radius: 6px;
+.content {
+    margin-left: 320px;
+    padding: 40px;
+    max-width: 900px;
+}
 
-&#x20; white-space: pre;
+/* ===== BREADCRUMB ===== */
 
+.breadcrumb {
+    color: #6c6c6c;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* ===== HEADINGS ===== */
+
+h1 {
+    font-size: 36px;
+    margin-bottom: 25px;
+}
+
+h2 {
+    margin-top: 40px;
+    font-size: 26px;
+}
+
+/* ===== SERVICE BLOCK ===== */
+
+.endpoint-box {
+    background: white;
+    padding: 18px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+}
+
+/* ===== CODE BLOCK ===== */
+
+.codeblock {
+    background: #eeeeee;
+    padding: 14px;
+    border-radius: 6px;
+    font-family: monospace;
+    margin: 15px 0;
+}
+
+/* ===== NAV BUTTONS ===== */
+
+.nav-buttons {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.button {
+    background: #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: black;
+}
+
+/* ===== FOOTER ===== */
+
+.footer {
+    margin-top: 50px;
+    font-size: 14px;
+    color: gray;
 }
 
 </style>
+</head>
 
+<body>
 
+<div class="sidebar">
 
+<h2>🏠 Clinical Twin</h2>
 
-
-<h1>API Documentation</h1>
-
-
-
-
-
-<div class="api-box">
-
-
-
-ClinicalTwin espone un insieme di REST API distribuite su più microservizi containerizzati. Le API consentono la gestione dell’autenticazione, l’avvio della pipeline neuroimaging, l’esecuzione dell’inferenza diagnostica e l’interazione con l’assistente clinico basato su modelli linguistici.
-
-
-
-Le API sono documentate automaticamente tramite Swagger UI.
-
-
-
-</div>
-
-
-
-
-
-<h2>Servizi disponibili</h2>
-
-
+<input placeholder="Search docs">
 
 <ul>
-
-<li><strong>api\_gateway</strong> — porta 8000 — autenticazione utenti</li>
-
-<li><strong>orchestrator</strong> — porta 8001 — gestione task pipeline</li>
-
-<li><strong>llm\_service</strong> — porta 8002 — assistente AI</li>
-
-<li><strong>model\_service</strong> — porta 8003 — gestione modelli ML</li>
-
-<li><strong>inference\_engine</strong> — porta 8004 — inferenza statistica</li>
-
-<li><strong>nextflow\_worker</strong> — porta 8005 — pipeline neuroimaging</li>
-
+<li>Introduction</li>
+<li>Installation</li>
+<li>Quickstart</li>
+<li>System Architecture</li>
+<li>Pipeline Workflow</li>
+<li>Microservices Overview</li>
+<li>Configuration</li>
+<li>Testing</li>
+<li class="active">API Reference</li>
 </ul>
 
+</div>
 
 
+<div class="content">
+
+<div class="breadcrumb">
+Docs » API Reference
+</div>
+
+<h1>API Reference</h1>
+
+<p>
+Clinical Twin espone una serie di endpoint REST tramite microservizi FastAPI
+e Plumber (R). Questa sezione descrive le principali API disponibili per
+autenticazione, gestione task, inferenza diagnostica e assistente AI.
+</p>
 
 
-<h2>API Gateway</h2>
+<h2>api_gateway</h2>
 
+<div class="endpoint-box">
 
+<h3>POST /signup</h3>
 
-Swagger UI:
+<p>Crea un nuovo utente.</p>
 
-
-
-<code>http://localhost:8000/docs</code>
-
-
-
-Gestisce autenticazione e generazione token JWT.
-
-
-
-
-
-<h3>Registrazione utente</h3>
-
-
-
-<div class="endpoint">POST /signup</div>
-
-
-
-Request:
-
-
-
-<div class="code">
-
+<div class="codeblock">
 {
-
-&#x20; "username": "user",
-
-&#x20; "password": "password"
-
+  "username": "user",
+  "password": "password"
 }
+</div>
 
 </div>
 
 
+<div class="endpoint-box">
 
-Response:
+<h3>POST /login</h3>
 
+<p>Autenticazione utente e generazione token JWT.</p>
 
-
-<div class="code">
-
+<div class="codeblock">
 {
-
-&#x20; "message": "User created successfully"
-
+  "username": "user",
+  "password": "password"
 }
+</div>
 
 </div>
 
 
+<div class="endpoint-box">
+
+<h3>GET /me</h3>
+
+<p>Restituisce informazioni sull’utente autenticato.</p>
+
+</div>
 
 
+<h2>orchestrator</h2>
 
-<h3>Login utente</h3>
+<div class="endpoint-box">
 
+<h3>POST /analyze</h3>
 
+<p>
+Avvia una nuova pipeline di analisi radiomica su MRI caricata.
+</p>
 
-<div class="endpoint">POST /login</div>
-
-
-
-Request:
-
-
-
-<div class="code">
-
+<div class="codeblock">
 {
-
-&#x20; "username": "user",
-
-&#x20; "password": "password"
-
+  "filename": "subject01.nii.gz"
 }
+</div>
 
 </div>
 
 
+<div class="endpoint-box">
 
-Response:
+<h3>GET /task/{task_id}</h3>
+
+<p>
+Restituisce lo stato corrente del task di analisi.
+</p>
+
+</div>
 
 
+<div class="endpoint-box">
 
-<div class="code">
+<h3>GET /tasks</h3>
 
+<p>
+Elenco delle analisi eseguite dall’utente.
+</p>
+
+</div>
+
+
+<h2>model_service</h2>
+
+<div class="endpoint-box">
+
+<h3>POST /load-model</h3>
+
+<p>
+Scarica il champion model dal registry MLflow.
+</p>
+
+</div>
+
+
+<div class="endpoint-box">
+
+<h3>POST /predict</h3>
+
+<p>
+Invia feature radiomiche al motore di inferenza.
+</p>
+
+</div>
+
+
+<h2>inference_engine</h2>
+
+<div class="endpoint-box">
+
+<h3>POST /knn</h3>
+
+<p>
+Restituisce la classificazione diagnostica basata su KNN.
+</p>
+
+Esempio risposta:
+
+<div class="codeblock">
 {
-
-&#x20; "access\_token": "JWT\_TOKEN",
-
-&#x20; "token\_type": "bearer"
-
+  "prediction": "bvFTD",
+  "confidence": 0.81
 }
+</div>
 
 </div>
 
 
+<div class="endpoint-box">
 
-Header richiesto per richieste successive:
+<h3>POST /umap</h3>
 
-
-
-<div class="code">
-
-Authorization: Bearer \&lt;JWT\_TOKEN\&gt;
-
-</div>
-
-
-
-
-
-<h2>Orchestrator API</h2>
-
-
-
-Swagger UI:
-
-
-
-<code>http://localhost:8001/docs</code>
-
-
-
-Gestisce l’esecuzione asincrona delle pipeline MRI.
-
-
-
-
-
-<h3>Upload immagine MRI</h3>
-
-
-
-<div class="endpoint">POST /analyze/</div>
-
-
-
-Descrizione:
-
-
-
-Carica un file MRI in formato NIfTI e avvia la pipeline.
-
-
-
-Request:
-
-
-
-<div class="code">
-
-multipart/form-data
-
-file: .nii / .nii.gz
+<p>
+Calcola la proiezione del paziente nello spazio latente UMAP.
+</p>
 
 </div>
 
 
+<h2>llm_service</h2>
 
-Response:
+<div class="endpoint-box">
 
+<h3>POST /chat</h3>
 
+<p>
+Invia una richiesta all’assistente AI context-aware.
+</p>
 
-<div class="code">
-
+<div class="codeblock">
 {
-
-&#x20; "task\_id": 1,
-
-&#x20; "status": "PENDING"
-
+  "message": "Explain this patient's cluster position"
 }
+</div>
 
 </div>
 
 
+<h2>Swagger UI</h2>
+
+<p>
+La documentazione completa e interattiva delle API è disponibile tramite Swagger:
+</p>
+
+<div class="codeblock">
+http://localhost:8000/docs
+http://localhost:8001/docs
+http://localhost:8002/docs
+http://localhost:8003/docs
+</div>
 
 
+<div class="nav-buttons">
 
-<h3>Stato task pipeline</h3>
-
-
-
-<div class="endpoint">GET /analyze/status/{task\_id}</div>
-
-
-
-Response:
-
-
-
-<div class="code">
-
-{
-
-&#x20; "task\_id": 1,
-
-&#x20; "status": "RUNNING",
-
-&#x20; "progress": 45
-
-}
+<a class="button">⬅ Previous</a>
+<a class="button">Next ➡</a>
 
 </div>
 
 
+<div class="footer">
 
-Possibili stati:
-
-
-
-<ul>
-
-<li>PENDING</li>
-
-<li>RUNNING</li>
-
-<li>COMPLETED</li>
-
-<li>FAILED</li>
-
-</ul>
-
-
-
-
-
-<h3>Lista task utente</h3>
-
-
-
-<div class="endpoint">GET /analyze/</div>
-
-
-
-Response:
-
-
-
-<div class="code">
-
-\[
-
-&#x20; {
-
-&#x20;   "task\_id": 1,
-
-&#x20;   "filename": "subject01.nii",
-
-&#x20;   "status": "COMPLETED"
-
-&#x20; }
-
-]
+© 2025 Clinical Twin Documentation  
+Built with custom HTML/CSS (ReadTheDocs-style layout)
 
 </div>
 
-
-
-
-
-<h2>Nextflow Worker API</h2>
-
-
-
-Swagger UI:
-
-
-
-<code>http://localhost:8005/docs</code>
-
-
-
-
-
-<h3>Avvio preprocessing</h3>
-
-
-
-<div class="endpoint">POST /start\_preprocessing</div>
-
-
-
-Response:
-
-
-
-<div class="code">
-
-{
-
-&#x20; "task\_id": 1,
-
-&#x20; "status": "STARTED"
-
-}
-
 </div>
 
-
-
-
-
-<h3>Stato preprocessing</h3>
-
-
-
-<div class="endpoint">GET /status/{task\_id}</div>
-
-
-
-Response:
-
-
-
-<div class="code">
-
-{
-
-&#x20; "task\_id": 1,
-
-&#x20; "status": "RUNNING"
-
-}
-
-</div>
-
-
-
-
-
-<h2>Model Service API</h2>
-
-
-
-Swagger UI:
-
-
-
-<code>http://localhost:8003/docs</code>
-
-
-
-
-
-<h3>Informazioni modello attivo</h3>
-
-
-
-<div class="endpoint">GET /model\_info</div>
-
-
-
-Response:
-
-
-
-<div class="code">
-
-{
-
-&#x20; "model\_name": "HC\_vs\_bvFTD",
-
-&#x20; "version": "latest"
-
-}
-
-</div>
-
-
-
-
-
-<h3>Avvio inferenza diagnostica</h3>
-
-
-
-<div class="endpoint">POST /predict</div>
-
-
-
-Descrizione:
-
-
-
-Invia dataset radiomico al motore di inferenza.
-
-
-
-Response:
-
-
-
-<div class="code">
-
-{
-
-&#x20; "prediction": "bvFTD",
-
-&#x20; "confidence": 0.82
-
-}
-
-</div>
-
-
-
-
-
-<h2>Inference Engine API</h2>
-
-
-
-Servizio basato su R + Plumber.
-
-
-
-Endpoint principale:
-
-
-
-<div class="endpoint">POST /infer</div>
-
-
-
-Input:
-
-
-
-dataset radiomico CSV
-
-
-
-Output:
-
-
-
-<div class="code">
-
-{
-
-&#x20; "prediction": "HC",
-
-&#x20; "umap\_coordinates": \[1.25, -0.33, 2.11]
-
-}
-
-</div>
-
-
-
-
-
-<h2>LLM Service API</h2>
-
-
-
-Swagger UI:
-
-
-
-<code>http://localhost:8002/docs</code>
-
-
-
-
-
-<h3>Chat clinica</h3>
-
-
-
-<div class="endpoint">POST /chat</div>
-
-
-
-Request:
-
-
-
-<div class="code">
-
-{
-
-&#x20; "message": "Interpret the diagnostic result"
-
-}
-
-</div>
-
-
-
-Response:
-
-
-
-<div class="code">
-
-{
-
-&#x20; "response": "The radiomic profile suggests compatibility with bvFTD."
-
-}
-
-</div>
-
-
-
-Il servizio utilizza Spatial RAG per integrare informazioni radiomiche e embedding UMAP nella risposta.
-
-
-
-
-
-<h2>Autenticazione API</h2>
-
-
-
-Tutti gli endpoint protetti richiedono header:
-
-
-
-<div class="code">
-
-Authorization: Bearer \&lt;JWT\_TOKEN\&gt;
-
-</div>
-
-
-
-Il token viene ottenuto tramite login su api\_gateway.
-
-
-
-
-
-<h2>Flusso API completo</h2>
-
-
-
-Workflow tipico:
-
-
-
-<div class="code">
-
-Login → Upload MRI → Start preprocessing → Feature extraction → Classification → UMAP visualization → LLM interpretation
-
-</div>
-
-
-
-Questo flusso rappresenta la sequenza operativa standard della pipeline ClinicalTwin.
-
+</body>
+</html>

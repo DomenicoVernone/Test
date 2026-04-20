@@ -1,4 +1,4 @@
-site_name: ClinicalTwin FTD Pipeline Documentation
+site_name: Clinical Twin – FTD Radiomics Pipeline Documentation
 
 theme:
   name: material
@@ -6,24 +6,29 @@ theme:
 nav:
   - Introduction: index.md
 
+  - Getting Started:
+      - Installation: installation.md
+      - Quickstart: quickstart.md
+
   - System Overview:
-      - Architecture: architecture.md
+      - System Architecture: architecture.md
+      - Microservices Overview: microservices.md
       - Project Structure: project_structure.md
 
   - Neuroimaging Pipeline:
-      - Pipeline Overview: pipeline.md
-      - Nextflow Workflow: nextflow.md
-      - Dataset: dataset.md
+      - Pipeline Workflow: pipeline_workflow.md
 
-  - Machine Learning:
-      - Models: models.md
-      - LLM Assistant: llm.md
+  - Configuration:
+      - Environment Setup: configuration.md
+
+  - Testing:
+      - System Testing: testing.md
 
   - API Documentation:
-      - REST API: api.md
+      - REST API Reference: api_reference.md
 
   - Deployment:
-      - Installation: installation.md
-      - Usage: usage.md
-      - Testing: testing.md
-      - Troubleshooting: troubleshooting.md
+      - Deployment Guide: deployment.md
+
+  - Future Work:
+      - Roadmap: future_work.md
