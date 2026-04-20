@@ -1,302 +1,134 @@
-Installazione
+<style>
+
+.install-box {
+
+&#x20; border-left: 6px solid #3f51b5;
+
+&#x20; background: #eef2ff;
+
+&#x20; padding: 18px;
+
+&#x20; border-radius: 6px;
+
+}
+
+.code {
+
+&#x20; background: #f4f4f4;
+
+&#x20; padding: 10px;
+
+&#x20; border-radius: 6px;
+
+&#x20; font-family: monospace;
+
+}
+
+</style>
 
 
 
-Questa sezione descrive la procedura completa per installare ed eseguire ClinicalTwin in ambiente locale utilizzando Docker Compose. Al termine della procedura sarà disponibile un’istanza funzionante della piattaforma con pipeline neuroimaging automatizzata e dashboard clinica interattiva.
+<h1>Installazione</h1>
 
 
 
-Requisiti
+<div class="install-box">
+
+Questa sezione descrive l’installazione locale della piattaforma ClinicalTwin tramite Docker Compose.
+
+</div>
 
 
 
-Prima dell’installazione assicurarsi che siano disponibili i seguenti componenti:
+<h2>Prerequisiti</h2>
 
 
 
-Requisiti software
+<ul>
 
-Docker
+<li>Docker</li>
 
-Docker Compose
+<li>Docker Compose</li>
 
-Git
+<li>Git</li>
 
-
-
-Verifica installazione:
+</ul>
 
 
 
-docker --version
-
-docker compose version
-
-git --version
-
-Requisiti opzionali
-
-GPU NVIDIA (necessaria solo per FastSurfer)
-
-WSL2 con supporto CUDA (solo Windows + GPU)
+<h2>Clonazione repository</h2>
 
 
 
-In assenza di GPU il sistema utilizza automaticamente FreeSurfer CPU.
-
-
-
-Licenza FreeSurfer
-
-
-
-Scaricare gratuitamente la licenza da:
-
-
-
-https://surfer.nmr.mgh.harvard.edu/registration.html
-
-
-
-e copiarla in:
-
-
-
-nextflow\_worker/license.txt
-
-Clonazione del repository
-
-
-
-Scaricare il progetto:
-
-
+<div class="code">
 
 git clone https://github.com/DomenicoVernone/Test.git
 
 cd Test
 
-Configurazione variabili d’ambiente
+</div>
 
 
 
-Ogni microservizio utilizza un file .env.
+<h2>Configurazione variabili ambiente</h2>
 
 
 
-Creare i file di configurazione:
-
-
+<div class="code">
 
 cp .env.example .env
 
-cp api\_gateway/.env.example api\_gateway/.env
+</div>
 
-cp orchestrator/.env.example orchestrator/.env
 
-cp model\_service/.env.example model\_service/.env
 
-cp llm\_service/.env.example llm\_service/.env
+Configurare:
 
-cp frontend/.env.example frontend/.env
 
 
+<ul>
 
-Configurare le variabili principali:
+<li>SECRET\_KEY</li>
 
+<li>GROQ\_API\_KEY</li>
 
+<li>MLFLOW\_TRACKING\_URI</li>
 
-Variabile	Servizio	Descrizione
+</ul>
 
-SECRET\_KEY	api\_gateway, orchestrator, llm\_service	Chiave JWT condivisa
 
-GROQ\_API\_KEY	llm\_service	API key Groq
 
-MLFLOW\_TRACKING\_URI	model\_service	URL MLflow su DagsHub
+<h2>Build immagini pipeline</h2>
 
-MLFLOW\_TRACKING\_USERNAME	model\_service	Username DagsHub
 
-DAGSHUB\_TOKEN	model\_service	Token DagsHub
 
-REPO\_OWNER	model\_service	Proprietario repository
+<div class="code">
 
-REPO\_NAME	model\_service	Nome repository
+docker build -t clinical-freesurfer ...
 
-Configurazione dataset pipeline
+docker build -t clinical-fsl ...
 
+docker build -t clinical-pyradiomics ...
 
+</div>
 
-La pipeline Nextflow richiede file statici non inclusi nel repository.
 
 
+<h2>Avvio sistema</h2>
 
-Creare la struttura:
 
 
-
-nextflow\_worker/data/
-
-└── external/
-
-&#x20;   ├── ROI\_labels.tsv
-
-&#x20;   └── pyradiomics.yaml
-
-
-
-Questi file contengono:
-
-
-
-etichette delle 78 ROI cerebrali
-
-parametri di estrazione radiomica PyRadiomics
-
-
-
-Senza questi file la pipeline non può essere eseguita.
-
-
-
-Build immagini Docker pipeline
-
-
-
-La pipeline utilizza Docker-out-of-Docker (DooD). Le immagini devono essere costruite sull’host prima dell’avvio dello stack.
-
-
-
-Eseguire:
-
-
-
-docker build -t clinical-freesurfer -f nextflow\_worker/freesurfer.dockerfile nextflow\_worker/
-
-docker build -t clinical-fsl -f nextflow\_worker/fsl.dockerfile nextflow\_worker/
-
-docker build -t clinical-pyradiomics -f nextflow\_worker/pyradiomics.dockerfile nextflow\_worker/
-
-
-
-Questo passaggio è necessario solo al primo avvio o dopo modifiche ai Dockerfile.
-
-
-
-Avvio dello stack applicativo
-
-
-
-Avviare tutti i microservizi:
-
-
+<div class="code">
 
 docker compose up -d --build
 
+</div>
 
 
-Servizi avviati automaticamente:
 
+Frontend disponibile su:
 
 
-api\_gateway
 
-orchestrator
-
-nextflow\_worker
-
-model\_service
-
-inference\_engine
-
-llm\_service
-
-frontend
-
-Accesso alla dashboard
-
-
-
-Aprire il browser:
-
-
-
-http://localhost:5173
-
-
-
-Interfacce disponibili:
-
-
-
-Servizio	URL
-
-Frontend	http://localhost:5173
-
-
-
-Swagger API Gateway	http://localhost:8000/docs
-
-
-
-Swagger Orchestrator	http://localhost:8001/docs
-
-Creazione primo utente
-
-
-
-La registrazione non è disponibile tramite interfaccia grafica.
-
-
-
-Creare un utente tramite Swagger:
-
-
-
-http://localhost:8000/docs
-
-
-
-Eseguire endpoint:
-
-
-
-POST /signup
-
-
-
-Inserendo:
-
-
-
-username
-
-password
-
-
-
-Dopo la registrazione sarà possibile accedere alla dashboard.
-
-
-
-Verifica installazione
-
-
-
-Per verificare il corretto funzionamento del sistema:
-
-
-
-accedere alla dashboard
-
-caricare una MRI in formato NIfTI
-
-avviare la pipeline
-
-controllare lo stato elaborazione
-
-visualizzare embedding UMAP
-
-
-
-Se tutti i servizi risultano attivi, l’installazione è completata correttamente. ✅
+<strong>http://localhost:5173</strong>
 

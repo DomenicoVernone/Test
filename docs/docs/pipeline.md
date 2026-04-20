@@ -1,190 +1,210 @@
-Pipeline neuroimaging
+<style>
 
-Panoramica del workflow
+.box {
 
+&#x20; border-left: 6px solid #3f51b5;
 
+&#x20; background: #eef2ff;
 
-La pipeline neuroimaging implementata in ClinicalTwin consente la trasformazione automatizzata di immagini MRI strutturali T1-pesate in rappresentazioni quantitative utilizzabili per la classificazione diagnostica tra behavioral variant Frontotemporal Dementia (bvFTD) e Healthy Controls (HC).
+&#x20; padding: 14px;
 
+&#x20; border-radius: 6px;
 
+&#x20; margin: 18px 0;
 
-Il workflow segue una sequenza strutturata di operazioni computazionali:
+}
 
 
 
-MRI → FreeSurfer → ROI → Radiomics → CSV → modello ML → UMAP
+.flow {
 
+&#x20; background: #f5f6fa;
 
+&#x20; font-family: monospace;
 
-Ogni fase contribuisce alla costruzione progressiva di un vettore di biomarcatori radiomici interpretabili e riproducibili 
+&#x20; text-align: center;
 
+&#x20; padding: 12px;
 
+&#x20; border-radius: 6px;
 
-Input: immagini MRI strutturali
+}
 
 
 
-La pipeline riceve in ingresso immagini volumetriche cerebrali T1-pesate in formato NIfTI:
+.code {
 
+&#x20; background: #eeeeee;
 
+&#x20; padding: 4px 8px;
 
-.nii
+&#x20; border-radius: 4px;
 
-.nii.gz
+&#x20; font-family: monospace;
 
+}
 
+</style>
 
-Queste immagini rappresentano la base per l’estrazione di caratteristiche morfometriche regionali utilizzate nella classificazione diagnostica.
 
 
+<h1>Pipeline Neuroimaging</h1>
 
-Prima dell’elaborazione, i dati vengono validati e organizzati per garantire compatibilità con la pipeline di segmentazione automatica.
 
 
+<div class="box">
 
-Segmentazione anatomica con FreeSurfer
+La pipeline neuroimaging ClinicalTwin consente la trasformazione automatizzata di immagini MRI T1-pesate in biomarcatori quantitativi per la classificazione diagnostica tra <strong>bvFTD</strong> e <strong>Healthy Controls</strong>.
 
+</div>
 
 
-La prima fase della pipeline consiste nella segmentazione anatomica cerebrale tramite FreeSurfer, uno strumento ampiamente validato nel contesto della neuroimaging analysis.
 
+<h2>Workflow computazionale</h2>
 
 
-Durante questa fase vengono eseguite:
 
+<div class="flow">
 
+MRI → FreeSurfer → ROI → Radiomics → CSV → Machine Learning → UMAP
 
-normalizzazione spaziale dell’immagine;
+</div>
 
-rimozione del tessuto extracranico (skull stripping);
 
-segmentazione delle strutture sottocorticali;
 
-ricostruzione delle superfici corticali;
+<h2>Input MRI strutturali</h2>
 
-parcellizzazione della corteccia cerebrale.
 
 
+Formati supportati:
 
-Il risultato è una rappresentazione anatomica dettagliata del cervello suddivisa in regioni neuroanatomiche standardizzate.
 
 
+<ul>
 
-Estrazione delle regioni di interesse (ROI)
+<li>.nii</li>
 
+<li>.nii.gz</li>
 
+</ul>
 
-Successivamente, la pipeline identifica un insieme predefinito di regioni di interesse (Regions of Interest, ROI) corrispondenti a strutture cerebrali rilevanti per l’analisi neurodegenerativa.
 
 
+Le immagini vengono validate prima dell’elaborazione per garantire compatibilità con la pipeline.
 
-Le ROI vengono derivate dalle mappe di segmentazione prodotte da FreeSurfer e organizzate secondo atlanti neuroanatomici standard.
 
 
+<h2>Segmentazione anatomica</h2>
 
-Questa fase consente di isolare le aree cerebrali su cui verranno calcolate le feature radiomiche.
 
 
+Segmentazione eseguita tramite:
 
-Estrazione delle feature radiomiche
 
 
+<ul>
 
-Una volta definite le ROI, viene eseguita l’estrazione delle feature radiomiche mediante strumenti dedicati.
+<li>normalizzazione spaziale</li>
 
+<li>skull stripping</li>
 
+<li>segmentazione sottocorticale</li>
 
-Le feature radiomiche includono:
+<li>ricostruzione superfici corticali</li>
 
+<li>parcellizzazione anatomica</li>
 
+</ul>
 
-caratteristiche di intensità voxel-wise;
 
-descrittori statistici di primo ordine;
 
-metriche di texture;
+<h2>Estrazione ROI</h2>
 
-caratteristiche morfologiche regionali.
 
 
+Le ROI sono derivate da atlanti neuroanatomici standard e rappresentano regioni rilevanti per l’analisi neurodegenerativa.
 
-Queste informazioni permettono di trasformare l’immagine MRI in una rappresentazione numerica ad alta dimensionalità utile per l’analisi computazionale 
 
 
+<h2>Radiomics extraction</h2>
 
-Generazione del dataset strutturato (CSV)
 
 
+Feature estratte:
 
-Le feature estratte dalle ROI vengono aggregate in una rappresentazione tabellare strutturata in formato CSV, in cui:
 
 
+<ul>
 
-ogni riga rappresenta un soggetto;
+<li>statistiche voxel-wise</li>
 
-ogni colonna rappresenta una feature radiomica.
+<li>first-order features</li>
 
+<li>texture descriptors</li>
 
+<li>shape features</li>
 
-Questo dataset costituisce l’input del modello di classificazione supervisionata.
+</ul>
 
 
 
-La standardizzazione del formato consente l’integrazione con moduli di inferenza indipendenti dalla pipeline di preprocessing.
+<h2>Dataset CSV</h2>
 
 
 
-Classificazione tramite modello di Machine Learning
+Struttura:
 
 
 
-Il vettore di feature radiomiche viene successivamente utilizzato da un modello di machine learning supervisionato addestrato per distinguere tra:
+<ul>
 
+<li>righe → soggetti</li>
 
+<li>colonne → feature radiomiche</li>
 
-Healthy Control (HC)
+</ul>
 
-behavioral variant Frontotemporal Dementia (bvFTD)
 
 
+Utilizzato come input del classificatore diagnostico.
 
-Il modello restituisce:
 
 
+<h2>Classificazione ML</h2>
 
-la classe predetta;
 
-informazioni diagnostiche associate;
 
-rappresentazioni latenti del soggetto nello spazio delle feature.
+Output modello:
 
 
 
-Questa fase rappresenta il nucleo decisionale del sistema di supporto diagnostico 
+<ul>
 
+<li>classe predetta</li>
 
+<li>probabilità diagnostica</li>
 
-Proiezione nello spazio latente UMAP
+<li>embedding latente</li>
 
+</ul>
 
 
-Come fase finale della pipeline, i dati radiomici vengono proiettati in uno spazio latente tridimensionale tramite UMAP (Uniform Manifold Approximation and Projection).
 
+<h2>Proiezione UMAP</h2>
 
 
-Questa trasformazione consente di:
 
+Consente:
 
 
-visualizzare la distribuzione dei soggetti nello spazio delle feature;
 
-confrontare il profilo del paziente con quello della popolazione di riferimento;
+<ul>
 
-facilitare l’interpretazione delle predizioni del modello;
+<li>visualizzazione distribuzione soggetti</li>
 
-supportare l’esplorazione interattiva dei risultati tramite l’interfaccia clinica.
+<li>confronto con dataset di riferimento</li>
 
+<li>supporto interpretativo clinico</li>
 
-
-La rappresentazione UMAP costituisce uno strumento di interpretabilità visiva particolarmente utile nel contesto del supporto decisionale assistito 
+</ul>
 

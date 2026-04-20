@@ -1,210 +1,80 @@
-Assistente LLM clinico
+<style>
 
-Panoramica generale
+.llm-box {
 
+&#x20; border-left: 6px solid #9c27b0;
 
+&#x20; background: #f5ecfa;
 
-Il sistema ClinicalTwin integra un assistente basato su Large Language Models (LLM) progettato per supportare l’interpretazione clinica dei risultati prodotti dalla pipeline radiomica e dal classificatore diagnostico.
+&#x20; padding: 18px;
 
+&#x20; border-radius: 6px;
 
+}
 
-L’assistente è implementato come microservizio indipendente:
+</style>
 
 
 
-llm\_service
+<h1>Assistente LLM Clinico</h1>
 
 
 
-e fornisce funzionalità di:
+<div class="llm-box">
 
+ClinicalTwin integra un assistente AI basato su Spatial Retrieval-Augmented Generation (Spatial RAG).
 
+</div>
 
-interpretazione dei risultati diagnostici
 
-supporto decisionale clinico contestuale
 
-spiegazione dello spazio latente UMAP
+<h2>Funzioni principali</h2>
 
-interazione conversazionale multi-turno
 
-integrazione con feature radiomiche tramite Spatial RAG 🧠
 
+<ul>
 
+<li>interpretazione predizione diagnostica</li>
 
-Questo componente rappresenta un livello semantico superiore rispetto alla pipeline di inferenza statistica.
+<li>spiegazione embedding UMAP</li>
 
+<li>analisi feature radiomiche</li>
 
+<li>supporto conversazionale multi-turno</li>
 
-Architettura del servizio LLM
+</ul>
 
 
 
-Il servizio è sviluppato con:
+<h2>Architettura</h2>
 
 
 
-FastAPI
+Servizio:
 
 
 
-ed espone endpoint REST accessibili dal frontend React.
+<code>llm\_service</code>
 
 
 
-Struttura principale:
+Tecnologia:
 
 
 
-llm\_service/
+<ul>
 
-├── main.py
+<li>FastAPI</li>
 
-├── core/
+<li>Groq API</li>
 
-├── routers/
+<li>JWT authentication</li>
 
-└── services/
+</ul>
 
 
 
-Componenti principali:
-
-
-
-Modulo	Funzione
-
-main.py	avvio applicazione FastAPI
-
-core/config.py	configurazione ambiente
-
-core/security.py	gestione autenticazione JWT
-
-routers/chat.py	endpoint conversazionale
-
-services/llm\_service.py	logica inferenziale LLM
-
-Modello linguistico utilizzato
-
-
-
-Il servizio utilizza modelli LLM accessibili tramite:
-
-
-
-Groq API
-
-
-
-configurati attraverso la variabile:
-
-
-
-GROQ\_API\_KEY
-
-
-
-Questa architettura consente:
-
-
-
-latenza ridotta
-
-inferenza scalabile
-
-integrazione cloud-ready
-
-aggiornamento dinamico del modello
-
-
-
-senza modificare il backend applicativo.
-
-
-
-Spatial RAG
-
-
-
-L’assistente implementa una strategia:
-
-
-
-Spatial Retrieval-Augmented Generation (Spatial RAG)
-
-
-
-che estende il paradigma RAG tradizionale integrando informazioni strutturali provenienti dallo spazio latente radiomico.
-
-
-
-Le informazioni utilizzate includono:
-
-
-
-coordinate UMAP del paziente
-
-cluster diagnostici vicini
-
-distanza dai centroidi HC / bvFTD
-
-feature radiomiche selezionate
-
-
-
-Questo approccio consente risposte contestualizzate rispetto alla posizione geometrica del paziente nello spazio delle feature 📊
-
-
-
-Memoria conversazionale multi-turno
-
-
-
-Il sistema supporta interazioni multi-turno con mantenimento del contesto clinico.
-
-
-
-La memoria conversazionale consente di:
-
-
-
-riferirsi a risultati precedenti
-
-mantenere continuità interpretativa
-
-approfondire singole ROI
-
-spiegare variazioni radiomiche
-
-
-
-Esempio:
-
-
-
-Utente: Qual è il risultato diagnostico?
-
-Assistente: Il profilo radiomico è compatibile con bvFTD.
-
-
-
-Utente: Quali regioni contribuiscono maggiormente?
-
-Assistente: Le regioni frontali mediali mostrano maggiore deviazione rispetto ai controlli sani.
-
-Endpoint principali
-
-
-
-Swagger UI disponibile su:
-
-
-
-http://localhost:8002/docs
-
-
-
-Endpoint principale:
+<h2>Endpoint principale</h2>
 
 
 
@@ -212,171 +82,33 @@ POST /chat
 
 
 
-Request:
+Input:
 
 
 
-{
-
-&#x20; "message": "Interpret the diagnostic result"
-
-}
-
-
-
-Response:
-
-
+<pre>
 
 {
 
-&#x20; "response": "The radiomic profile suggests compatibility with bvFTD."
+&#x20;"message": "Interpret the diagnostic result"
 
 }
 
-
-
-Le risposte sono generate utilizzando:
-
-
-
-contesto radiomico
-
-embedding UMAP
-
-stato pipeline
-
-storico conversazionale
-
-Integrazione con pipeline diagnostica
+</pre>
 
 
 
-Il servizio LLM riceve input da:
+Output:
 
 
 
-model\_service
-
-
-
-contenenti:
-
-
-
-classe predetta
-
-probabilità diagnostica
-
-coordinate UMAP
-
-
-
-Esempio:
-
-
+<pre>
 
 {
 
-&#x20; "prediction": "bvFTD",
-
-&#x20; "confidence": 0.82,
-
-&#x20; "umap\_coordinates": \[1.24, -0.31, 2.08]
+&#x20;"response": "The radiomic profile suggests compatibility with bvFTD."
 
 }
 
-
-
-Queste informazioni vengono trasformate in spiegazioni clinicamente interpretabili.
-
-
-
-Integrazione con dashboard clinica
-
-
-
-Il frontend React utilizza il componente:
-
-
-
-ChatLLM.jsx
-
-
-
-per interagire con l’assistente.
-
-
-
-L’assistente supporta:
-
-
-
-interpretazione predizione diagnostica
-
-spiegazione posizione nello spazio UMAP
-
-descrizione pattern radiomici
-
-supporto alla refertazione esplorativa
-
-
-
-Questo consente un’interazione diretta tra medico e sistema AI 🤝
-
-
-
-Sicurezza e autenticazione
-
-
-
-L’accesso agli endpoint LLM è protetto tramite:
-
-
-
-JWT authentication
-
-
-
-Configurazione condivisa con:
-
-
-
-api\_gateway
-
-orchestrator
-
-
-
-Variabili richieste:
-
-
-
-SECRET\_KEY
-
-
-
-Questo garantisce coerenza del sistema di autenticazione tra microservizi.
-
-
-
-Ruolo clinico dell’assistente
-
-
-
-L’assistente non sostituisce la decisione clinica, ma fornisce:
-
-
-
-interpretazioni contestuali
-
-spiegazioni trasparenti
-
-supporto alla lettura dei risultati
-
-integrazione multimodale tra radiomica e visualizzazione latente
-
-
-
-Costituisce quindi un livello di Clinical Decision Support System (CDSS) integrato nella pipeline ClinicalTwin.
+</pre>
 

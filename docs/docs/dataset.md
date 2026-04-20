@@ -1,216 +1,128 @@
-Dataset
+<style>
 
-Formato dei dati MRI: NIfTI
+.dataset-box {
 
+&#x20; border-left: 6px solid #4caf50;
 
+&#x20; background: #edf7ed;
 
-La piattaforma ClinicalTwin utilizza immagini di risonanza magnetica strutturale cerebrale in formato NIfTI (Neuroimaging Informatics Technology Initiative), che rappresenta lo standard de facto per la memorizzazione e la condivisione di dati neuroimaging tridimensionali.
+&#x20; padding: 18px;
 
+&#x20; border-radius: 6px;
 
+}
 
-I formati supportati includono:
+</style>
 
 
 
-.nii
+<h1>Dataset MRI</h1>
 
-.nii.gz
 
 
+<div class="dataset-box">
 
-Il formato NIfTI consente la rappresentazione compatta di volumi MRI tridimensionali contenenti:
+ClinicalTwin utilizza immagini MRI strutturali in formato NIfTI come input della pipeline radiomica.
 
+</div>
 
 
-intensità voxel-wise;
 
-informazioni spaziali (voxel spacing);
+<h2>Formato supportato</h2>
 
-orientamento anatomico;
 
-metadati associati all’acquisizione.
 
+<ul>
 
+<li>.nii</li>
 
-Per l’utilizzo all’interno della pipeline ClinicalTwin, le immagini devono essere acquisite tramite sequenze T1-weighted ad alta risoluzione, generalmente impiegate nello studio delle alterazioni morfostrutturali associate alle patologie neurodegenerative 🧠
+<li>.nii.gz</li>
 
+</ul>
 
 
-Preprocessing richiesto
 
+Contengono:
 
 
-Le immagini MRI fornite in input vengono sottoposte automaticamente a una pipeline di preprocessing neuroanatomico basata su strumenti standardizzati di neuroimaging.
 
+<ul>
 
+<li>intensità voxel-wise</li>
 
-Le principali operazioni includono:
+<li>orientamento anatomico</li>
 
+<li>voxel spacing</li>
 
+<li>metadati acquisizione</li>
 
-normalizzazione dell’orientamento spaziale;
+</ul>
 
-rimozione del tessuto extracranico (skull stripping);
 
-segmentazione dei tessuti cerebrali;
 
-ricostruzione delle superfici corticali;
+<h2>Preprocessing automatico</h2>
 
-parcellizzazione anatomica regionale.
 
 
+Operazioni eseguite:
 
-Queste operazioni sono eseguite tramite FreeSurfer, che consente di ottenere una rappresentazione strutturata e riproducibile dell’anatomia cerebrale del soggetto.
 
 
+<ul>
 
-Non è richiesto preprocessing manuale preliminare da parte dell’utente, purché:
+<li>normalizzazione orientamento</li>
 
+<li>skull stripping</li>
 
+<li>segmentazione tessuti</li>
 
-l’immagine sia completa;
+<li>ricostruzione superfici corticali</li>
 
-non presenti artefatti severi;
+<li>parcellizzazione anatomica</li>
 
-sia acquisita con sequenza T1 strutturale standard.
+</ul>
 
 
 
-Questo approccio garantisce uniformità nella generazione delle feature tra soggetti diversi 🔬
+<h2>ROI extraction</h2>
 
 
 
-Estrazione delle regioni di interesse (ROI)
+Numero ROI:
 
 
 
-Dopo la segmentazione anatomica, la pipeline identifica automaticamente un insieme di regioni di interesse (Regions of Interest, ROI) corrispondenti a strutture cerebrali corticali e sottocorticali rilevanti per la classificazione diagnostica.
+<strong>78 regioni cerebrali</strong>
 
 
 
-Le ROI vengono derivate da atlanti neuroanatomici standard integrati nella pipeline FreeSurfer e comprendono:
+derivate da atlanti FreeSurfer.
 
 
 
-regioni frontali;
+<h2>Radiomics extraction</h2>
 
-regioni temporali;
 
-strutture limbiche;
 
-strutture sottocorticali profonde.
+Feature estratte:
 
 
 
-Queste regioni rappresentano aree particolarmente informative nello studio della behavioral variant Frontotemporal Dementia (bvFTD), caratterizzata da alterazioni morfologiche selettive nei lobi frontali e temporali.
+<ul>
 
+<li>first-order statistics</li>
 
+<li>texture descriptors</li>
 
-L’estrazione delle ROI consente di isolare sottovolumi anatomici specifici sui quali vengono successivamente calcolate le feature radiomiche 📊
+<li>shape features</li>
 
+</ul>
 
 
-Estrazione delle feature radiomiche
 
+Output finale:
 
 
-A partire dalle ROI segmentate, la pipeline esegue l’estrazione automatica di feature radiomiche quantitative tramite strumenti dedicati (PyRadiomics).
 
-
-
-Le feature estratte includono diverse categorie descrittive:
-
-
-
-Feature di primo ordine
-
-
-
-Descrivono la distribuzione statistica delle intensità voxel all’interno della ROI:
-
-
-
-media
-
-varianza
-
-skewness
-
-kurtosis
-
-entropia
-
-Feature di texture
-
-
-
-Caratterizzano la struttura spaziale delle intensità voxel:
-
-
-
-Gray Level Co-occurrence Matrix (GLCM)
-
-Gray Level Run Length Matrix (GLRLM)
-
-Gray Level Size Zone Matrix (GLSZM)
-
-Neighboring Gray Tone Difference Matrix (NGTDM)
-
-
-
-Queste metriche consentono di catturare pattern microstrutturali non osservabili visivamente.
-
-
-
-Feature morfologiche
-
-
-
-Descrivono proprietà geometriche delle regioni segmentate:
-
-
-
-volume regionale
-
-superficie
-
-compattezza
-
-sfericità
-
-rapporti dimensionali principali
-
-
-
-Queste caratteristiche risultano particolarmente rilevanti nello studio dell’atrofia regionale associata alla degenerazione frontotemporale.
-
-
-
-Dataset radiomico finale
-
-
-
-Le feature estratte vengono aggregate in un dataset strutturato in formato CSV, in cui:
-
-
-
-ogni riga rappresenta un soggetto;
-
-ogni colonna rappresenta una feature radiomica;
-
-ogni ROI contribuisce con un insieme specifico di descrittori quantitativi.
-
-
-
-Questo dataset costituisce l’input del modello di classificazione supervisionata utilizzato per la distinzione tra:
-
-
-
-Healthy Control (HC)
-
-behavioral variant Frontotemporal Dementia (bvFTD)
-
-
-
-La trasformazione delle immagini MRI in rappresentazioni numeriche ad alta dimensionalità consente l’applicazione di metodi avanzati di machine learning per il supporto decisionale clinico assistito 🧬
+<code>radiomics\_features.csv</code>
 

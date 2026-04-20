@@ -1,84 +1,54 @@
-Architettura
+<style>
+.arch-box {
+  border-left: 6px solid #009688;
+  background: #eefaf8;
+  padding: 18px;
+  border-radius: 6px;
+  margin: 20px 0;
+}
+.diagram {
+  font-family: monospace;
+  background: #f4f6fa;
+  padding: 20px;
+  border-radius: 6px;
+}
+</style>
 
+<h1>Architettura del sistema</h1>
 
+<div class="arch-box">
+ClinicalTwin adotta un’architettura a microservizi containerizzati orchestrati tramite Docker Compose, garantendo modularità, scalabilità e riproducibilità computazionale.
+</div>
 
-ClinicalTwin è progettato secondo un’architettura a microservizi containerizzati orchestrati tramite Docker Compose, con l’obiettivo di garantire modularità, riproducibilità computazionale e separazione delle responsabilità tra i diversi componenti della pipeline di analisi neuroimaging.
+<h2>Componenti principali</h2>
 
+<ul>
+<li>Frontend React</li>
+<li>API Gateway (FastAPI + JWT)</li>
+<li>Orchestrator</li>
+<li>Nextflow Worker</li>
+<li>Model Service</li>
+<li>Inference Engine (R)</li>
+<li>LLM Service</li>
+</ul>
 
+<h2>Diagramma architetturale</h2>
 
-Il sistema integra servizi dedicati alla gestione dell’autenticazione, orchestrazione delle elaborazioni, preprocessing MRI automatizzato, inferenza statistica, gestione dei modelli di classificazione e visualizzazione interattiva dei risultati clinici. Questa organizzazione consente l’esecuzione asincrona delle pipeline radiomiche e facilita l’estensione futura della piattaforma con nuovi moduli diagnostici.
+<div class="diagram">
 
+Frontend  
+↓  
+API Gateway  
+↓  
+Orchestrator  
+↓  
+Nextflow Worker  
+↓  
+Model Service  
+↓  
+Inference Engine  
 
+Parallelamente:
 
-Ogni servizio opera in modo indipendente all’interno di un container Docker, comunicando tramite API REST interne alla rete applicativa.
-
-                        +----------------------+
-
-&#x20;                       |      Frontend        |
-
-&#x20;                       |   React + NiiVue     |
-
-&#x20;                       +----------+-----------+
-
-&#x20;                                  |
-
-&#x20;                                  |
-
-&#x20;                       +----------v-----------+
-
-&#x20;                       |      API Gateway     |
-
-&#x20;                       | FastAPI + JWT Auth   |
-
-&#x20;                       +----------+-----------+
-
-&#x20;                                  |
-
-&#x20;               +------------------+------------------+
-
-&#x20;               |                                     |
-
-&#x20;   +-----------v-----------+             +-----------v-----------+
-
-&#x20;   |      Orchestrator     |             |      LLM Service      |
-
-&#x20;   |   Task coordination   |             | Spatial RAG Assistant |
-
-&#x20;   +-----------+-----------+             +-----------------------+
-
-&#x20;               |
-
-&#x20;               |
-
-&#x20;   +-----------v-----------+
-
-&#x20;   |   Nextflow Worker     |
-
-&#x20;   | FreeSurfer / Radiomics|
-
-&#x20;   +-----------+-----------+
-
-&#x20;               |
-
-&#x20;               |
-
-&#x20;   +-----------v-----------+
-
-&#x20;   |     Model Service     |
-
-&#x20;   |  MLflow + DagsHub     |
-
-&#x20;   +-----------+-----------+
-
-&#x20;               |
-
-&#x20;               |
-
-&#x20;   +-----------v-----------+
-
-&#x20;   |   Inference Engine    |
-
-&#x20;   |     R + UMAP + KNN    |
-
-&#x20;   +-----------------------+
-
+LLM Service
+</div>
