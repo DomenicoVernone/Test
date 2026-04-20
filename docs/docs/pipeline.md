@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
+
 <meta charset="UTF-8">
 <title>Clinical Twin – Pipeline Workflow</title>
 
@@ -11,46 +13,7 @@
 body {
     margin: 0;
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    display: flex;
     background: #f5f6f7;
-}
-
-/* ===== SIDEBAR ===== */
-
-.sidebar {
-    width: 300px;
-    height: 100vh;
-    background: linear-gradient(#2f6f95, #244f6a);
-    color: white;
-    position: fixed;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.sidebar h2 {
-    margin-top: 0;
-}
-
-.sidebar input {
-    width: 100%;
-    padding: 8px;
-    border-radius: 6px;
-    border: none;
-    margin: 15px 0;
-}
-
-.sidebar ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-.sidebar li {
-    padding: 6px 0;
-    opacity: 0.9;
-}
-
-.sidebar li.active {
-    font-weight: bold;
 }
 
 /* ===== CONTENT ===== */
@@ -81,6 +44,16 @@ h2 {
     font-size: 26px;
 }
 
+/* ===== SERVICE BLOCK ===== */
+
+.service-box {
+    background: white;
+    padding: 18px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+}
+
 /* ===== CODE BLOCK ===== */
 
 .codeblock {
@@ -89,6 +62,7 @@ h2 {
     border-radius: 6px;
     font-family: monospace;
     margin: 15px 0;
+    white-space: pre-line;
 }
 
 /* ===== NAV BUTTONS ===== */
@@ -116,11 +90,10 @@ h2 {
 }
 
 </style>
+
 </head>
 
 <body>
-
-<!-- ===== MAIN CONTENT ===== -->
 
 <div class="content">
 
@@ -131,13 +104,13 @@ Docs » Pipeline Workflow
 <h1>Pipeline Workflow</h1>
 
 <p>
-La pipeline di Clinical Twin implementa un workflow automatizzato di analisi
+La pipeline Clinical Twin implementa un workflow automatizzato di analisi
 radiomica su risonanze magnetiche cerebrali T1-weighted finalizzato alla
 diagnosi differenziale delle varianti di Frontotemporal Dementia (FTD).
 </p>
 
 <p>
-L’intero processo è orchestrato dal microservizio <b>orchestrator</b> e
+L’intero processo è orchestrato dal microservizio <b>orchestrator</b> ed
 eseguito tramite <b>Nextflow</b> all’interno del servizio
 <b>nextflow_worker</b>.
 </p>
@@ -145,17 +118,20 @@ eseguito tramite <b>Nextflow</b> all’interno del servizio
 
 <h2>Panoramica della pipeline</h2>
 
+<div class="service-box">
+
 <div class="codeblock">
 MRI → Preprocessing → Segmentazione → Estrazione ROI → Radiomics → Inferenza KNN → Embedding UMAP → Dashboard
+</div>
+
 </div>
 
 
 <h2>1. Upload della MRI</h2>
 
-<p>
-L’utente carica una risonanza magnetica strutturale cerebrale tramite
-l’interfaccia web. I formati supportati sono:
-</p>
+<div class="service-box">
+
+<p>Formati supportati:</p>
 
 <ul>
 <li>.nii</li>
@@ -163,16 +139,15 @@ l’interfaccia web. I formati supportati sono:
 </ul>
 
 <p>
-Il file viene salvato nel volume condiviso del sistema e registrato come task
-asincrono.
+Il file viene salvato nel volume condiviso del sistema e registrato come task asincrono.
 </p>
+
+</div>
 
 
 <h2>2. Preprocessing volumetrico</h2>
 
-<p>
-La pipeline esegue operazioni preliminari necessarie alla segmentazione:
-</p>
+<div class="service-box">
 
 <ul>
 <li>normalizzazione dell’intensità</li>
@@ -181,12 +156,14 @@ La pipeline esegue operazioni preliminari necessarie alla segmentazione:
 <li>verifica integrità del volume MRI</li>
 </ul>
 
+</div>
+
 
 <h2>3. Segmentazione anatomica</h2>
 
-<p>
-La segmentazione cerebrale viene effettuata utilizzando:
-</p>
+<div class="service-box">
+
+<p>Strumenti utilizzati:</p>
 
 <ul>
 <li>FreeSurfer (modalità CPU)</li>
@@ -194,40 +171,40 @@ La segmentazione cerebrale viene effettuata utilizzando:
 </ul>
 
 <p>
-Il risultato consiste nella parcellizzazione della corteccia cerebrale in
-regioni anatomiche standardizzate (ROI).
+Output: parcellizzazione anatomica standardizzata delle ROI cerebrali.
 </p>
+
+</div>
 
 
 <h2>4. Estrazione delle ROI cerebrali</h2>
 
-<p>
-Le regioni segmentate vengono mappate utilizzando la tabella:
-</p>
+<div class="service-box">
+
+<p>Tabella di mapping utilizzata:</p>
 
 <div class="codeblock">
 ROI_labels.tsv
 </div>
 
 <p>
-Questa fase consente l’associazione tra etichette anatomiche e volumi segmentati.
+Consente l’associazione tra etichette anatomiche e volumi segmentati.
 </p>
+
+</div>
 
 
 <h2>5. Estrazione feature radiomiche</h2>
 
-<p>
-Le feature radiomiche vengono estratte tramite PyRadiomics utilizzando il file
-di configurazione:
-</p>
+<div class="service-box">
+
+<p>Configurazione PyRadiomics:</p>
 
 <div class="codeblock">
 pyradiomics.yaml
 </div>
 
-<p>
-Le principali categorie di feature includono:
-</p>
+<p>Feature estratte:</p>
 
 <ul>
 <li>first-order statistics</li>
@@ -237,73 +214,63 @@ Le principali categorie di feature includono:
 <li>shape descriptors</li>
 </ul>
 
+</div>
+
 
 <h2>6. Inferenza statistica</h2>
 
-<p>
-Le feature radiomiche estratte vengono inviate al servizio
-<b>inference_engine</b>, che esegue:
-</p>
+<div class="service-box">
+
+<p>Servizio coinvolto: <b>inference_engine</b></p>
 
 <ul>
-<li>classificazione tramite algoritmo KNN</li>
-<li>calcolo similarità con pazienti del dataset di riferimento</li>
-<li>stima della classe diagnostica</li>
+<li>classificazione KNN</li>
+<li>similarità con dataset clinico di riferimento</li>
+<li>stima classe diagnostica</li>
 </ul>
+
+</div>
 
 
 <h2>7. Proiezione nello spazio latente UMAP</h2>
 
-<p>
-Le feature vengono proiettate in uno spazio tridimensionale utilizzando UMAP
-per consentire:
-</p>
+<div class="service-box">
 
 <ul>
-<li>visualizzazione della distribuzione dei pazienti</li>
-<li>analisi dei cluster diagnostici</li>
-<li>identificazione dei nearest neighbors clinici</li>
+<li>visualizzazione distribuzione pazienti</li>
+<li>analisi cluster diagnostici</li>
+<li>identificazione nearest neighbors clinici</li>
 </ul>
+
+</div>
 
 
 <h2>8. Visualizzazione dei risultati</h2>
 
-<p>
-I risultati finali sono disponibili nella dashboard React e includono:
-</p>
+<div class="service-box">
 
 <ul>
-<li>segmentazione multiplanare delle ROI (NiiVue)</li>
-<li>posizione del paziente nello spazio UMAP</li>
+<li>segmentazione multiplanare ROI (NiiVue)</li>
+<li>posizione nello spazio UMAP</li>
 <li>classe diagnostica stimata</li>
 <li>confidence score</li>
 <li>nearest neighbors clinici</li>
 </ul>
 
+</div>
+
 
 <h2>9. Interpretazione tramite assistente AI</h2>
 
+<div class="service-box">
+
 <p>
-L’assistente AI context-aware supporta l’interpretazione dei risultati
-radiomici e della posizione del paziente nello spazio latente, fornendo
-spiegazioni clinicamente rilevanti.
+L’assistente AI context-aware supporta l’interpretazione clinica dei risultati
+radiomici e della posizione nello spazio latente.
 </p>
 
-
-<div class="nav-buttons">
-
-<a class="button">⬅ Previous</a>
-<a class="button">Next ➡</a>
-
 </div>
 
-
-<div class="footer">
-
-© 2025 Clinical Twin Documentation  
-Built with custom HTML/CSS (ReadTheDocs-style layout)
-
-</div>
 
 </div>
 
