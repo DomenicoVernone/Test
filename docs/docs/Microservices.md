@@ -20,13 +20,13 @@
 
 body {
 
-&#x20;   margin: 0;
+   margin: 0;
 
-&#x20;   font-family: "Segoe UI", Roboto, Arial, sans-serif;
+   font-family: "Segoe UI", Roboto, Arial, sans-serif;
 
-&#x20;   display: flex;
+   display: flex;
 
-&#x20;   background: #f5f6f7;
+   background: #f5f6f7;
 
 }
 
@@ -38,19 +38,19 @@ body {
 
 .sidebar {
 
-&#x20;   width: 300px;
+   width: 300px;
 
-&#x20;   height: 100vh;
+   height: 100vh;
 
-&#x20;   background: linear-gradient(#2f6f95, #244f6a);
+   background: linear-gradient(#2f6f95, #244f6a);
 
-&#x20;   color: white;
+   color: white;
 
-&#x20;   position: fixed;
+   position: fixed;
 
-&#x20;   padding: 20px;
+   padding: 20px;
 
-&#x20;   box-sizing: border-box;
+   box-sizing: border-box;
 
 }
 
@@ -58,7 +58,7 @@ body {
 
 .sidebar h2 {
 
-&#x20;   margin-top: 0;
+   margin-top: 0;
 
 }
 
@@ -66,15 +66,15 @@ body {
 
 .sidebar input {
 
-&#x20;   width: 100%;
+   width: 100%;
 
-&#x20;   padding: 8px;
+   padding: 8px;
 
-&#x20;   border-radius: 6px;
+   border-radius: 6px;
 
-&#x20;   border: none;
+   border: none;
 
-&#x20;   margin: 15px 0;
+   margin: 15px 0;
 
 }
 
@@ -82,9 +82,9 @@ body {
 
 .sidebar ul {
 
-&#x20;   list-style: none;
+   list-style: none;
 
-&#x20;   padding-left: 0;
+   padding-left: 0;
 
 }
 
@@ -92,9 +92,9 @@ body {
 
 .sidebar li {
 
-&#x20;   padding: 6px 0;
+   padding: 6px 0;
 
-&#x20;   opacity: 0.9;
+   opacity: 0.9;
 
 }
 
@@ -102,7 +102,7 @@ body {
 
 .sidebar li.active {
 
-&#x20;   font-weight: bold;
+   font-weight: bold;
 
 }
 
@@ -114,11 +114,11 @@ body {
 
 .content {
 
-&#x20;   margin-left: 320px;
+   margin-left: 0px;
 
-&#x20;   padding: 40px;
+   padding: 40px;
 
-&#x20;   max-width: 900px;
+   max-width: 900px;
 
 }
 
@@ -130,11 +130,11 @@ body {
 
 .breadcrumb {
 
-&#x20;   color: #6c6c6c;
+   color: #6c6c6c;
 
-&#x20;   font-size: 14px;
+   font-size: 14px;
 
-&#x20;   margin-bottom: 10px;
+   margin-bottom: 10px;
 
 }
 
@@ -146,9 +146,9 @@ body {
 
 h1 {
 
-&#x20;   font-size: 36px;
+   font-size: 36px;
 
-&#x20;   margin-bottom: 25px;
+   margin-bottom: 25px;
 
 }
 
@@ -156,9 +156,9 @@ h1 {
 
 h2 {
 
-&#x20;   margin-top: 40px;
+   margin-top: 40px;
 
-&#x20;   font-size: 26px;
+   font-size: 26px;
 
 }
 
@@ -170,15 +170,15 @@ h2 {
 
 .service-box {
 
-&#x20;   background: white;
+   background: white;
 
-&#x20;   padding: 18px;
+   padding: 18px;
 
-&#x20;   border-radius: 8px;
+   border-radius: 8px;
 
-&#x20;   margin-top: 20px;
+   margin-top: 20px;
 
-&#x20;   box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+   box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
 
 }
 
@@ -190,15 +190,15 @@ h2 {
 
 .codeblock {
 
-&#x20;   background: #eeeeee;
+   background: #eeeeee;
 
-&#x20;   padding: 14px;
+   padding: 14px;
 
-&#x20;   border-radius: 6px;
+   border-radius: 6px;
 
-&#x20;   font-family: monospace;
+   font-family: monospace;
 
-&#x20;   margin: 15px 0;
+   margin: 15px 0;
 
 }
 
@@ -210,11 +210,11 @@ h2 {
 
 .nav-buttons {
 
-&#x20;   margin-top: 40px;
+   margin-top: 40px;
 
-&#x20;   display: flex;
+   display: flex;
 
-&#x20;   justify-content: space-between;
+   justify-content: space-between;
 
 }
 
@@ -222,15 +222,15 @@ h2 {
 
 .button {
 
-&#x20;   background: #e0e0e0;
+   background: #e0e0e0;
 
-&#x20;   border-radius: 6px;
+   border-radius: 6px;
 
-&#x20;   padding: 10px 15px;
+   padding: 10px 15px;
 
-&#x20;   text-decoration: none;
+   text-decoration: none;
 
-&#x20;   color: black;
+   color: black;
 
 }
 
@@ -242,11 +242,11 @@ h2 {
 
 .footer {
 
-&#x20;   margin-top: 50px;
+   margin-top: 50px;
 
-&#x20;   font-size: 14px;
+   font-size: 14px;
 
-&#x20;   color: gray;
+   color: gray;
 
 }
 
@@ -263,40 +263,6 @@ h2 {
 
 
 <!-- ===== SIDEBAR ===== -->
-
-
-
-<div class="sidebar">
-
-
-
-<h2>🏠 Clinical Twin</h2>
-
-
-
-<input placeholder="Search docs">
-
-
-
-<ul>
-
-<li>Introduction</li>
-
-<li>Installation</li>
-
-<li>Quickstart</li>
-
-<li>System Architecture</li>
-
-<li>Pipeline Workflow</li>
-
-<li class="active">Microservices Overview</li>
-
-</ul>
-
-
-
-</div>
 
 
 
@@ -346,9 +312,9 @@ e comunica tramite API REST.
 
 api\_gateway → orchestrator → nextflow\_worker → model\_service → inference\_engine → frontend
 
-&#x20;                                    ↓
+                                    ↓
 
-&#x20;                              llm\_service
+                              llm\_service
 
 </div>
 

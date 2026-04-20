@@ -4,28 +4,30 @@ theme:
   name: material
 
 nav:
-  - Introduction: index.md
+  - Introduzione: index.md
 
-  - Getting Started:
-      - Installation: installation.md
-      - Quickstart: quickstart.md
-
-  - System Overview:
-      - System Architecture: architecture.md
-      - Microservices Overview: Microservices.md
+  - Architettura:
+      - Architettura Clinical Twin: architecture.md
+      - Microservices Overview: microservices.md
       - Project Structure: project_structure.md
 
-  - Neuroimaging Pipeline:
+  - Setup Ambiente:
+      - Prerequisiti: prerequisites.md
+      - Installazione: installation.md
+      - Configuration: configuration.md
+
+  - Pipeline Neuroimaging:
       - Pipeline Workflow: pipeline.md
 
-  - Configuration:
-      - Environment Setup: configuration.md
+  - Utilizzo:
+      - Quickstart: quickstart.md
 
-  - Testing:
-      - System Testing: testing.md
-
-  - API Documentation:
+  - API:
       - REST API Reference: api.md
 
   - Deployment:
-      - Deployment Guide: Deployment.md
+      - Deployment Guide: deployment.md
+      - Aggiornamento Deployment: update.md
+
+  - Testing:
+      - System Testing: testing.md

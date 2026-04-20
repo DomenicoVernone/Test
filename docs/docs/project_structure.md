@@ -54,7 +54,7 @@ body {
 /* ===== CONTENT ===== */
 
 .content {
-    margin-left: 320px;
+    margin-left: 0px;
     padding: 40px;
     max-width: 900px;
 }
@@ -127,29 +127,6 @@ h2 {
 </head>
 
 <body>
-
-<div class="sidebar">
-
-<h2>🏠 Clinical Twin</h2>
-
-<input placeholder="Search docs">
-
-<ul>
-<li>Introduction</li>
-<li>Installation</li>
-<li>Quickstart</li>
-<li>System Architecture</li>
-<li>Pipeline Workflow</li>
-<li>Microservices Overview</li>
-<li>Configuration</li>
-<li>Testing</li>
-<li>API Reference</li>
-<li>Deployment</li>
-<li class="active">Project Structure</li>
-</ul>
-
-</div>
-
 
 <div class="content">
 
