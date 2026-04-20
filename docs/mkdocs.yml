@@ -8,26 +8,22 @@ nav:
 
   - Architettura:
       - Architettura Clinical Twin: architecture.md
-      - Microservices Overview: microservices.md
-      - Project Structure: project_structure.md
+      - Panoramica Microservizi: microservices.md
+      - Struttura del Progetto: project_structure.md
 
   - Setup Ambiente:
       - Prerequisiti: prerequisites.md
       - Installazione: installation.md
-      - Configuration: configuration.md
+      - Configurazione: configuration.md
 
-  - Pipeline Neuroimaging:
-      - Pipeline Workflow: pipeline.md
+  - Pipeline Neuroimaging: pipeline.md
 
-  - Utilizzo:
-      - Quickstart: quickstart.md
+  - Guida Rapida: quickstart.md
 
-  - API:
-      - REST API Reference: api.md
+  - Riferimento API: api.md
 
   - Deployment:
-      - Deployment Guide: deployment.md
-      - Aggiornamento Deployment: update.md
+      - Guida al Deployment: deployment.md
+      - Aggiornamento del Deployment: update.md
 
-  - Testing:
-      - System Testing: testing.md
+  - Testing: testing.md

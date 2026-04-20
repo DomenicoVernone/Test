@@ -255,9 +255,6 @@ h2 {
 <body>
 
 
-
-
-
 <div class="content">
 
 
