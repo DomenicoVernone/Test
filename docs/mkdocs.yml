@@ -12,7 +12,6 @@ nav:
       - Struttura del Progetto: project_structure.md
 
   - Setup Ambiente:
-      - Prerequisiti: prerequisites.md
       - Installazione: installation.md
       - Configurazione: configuration.md
 

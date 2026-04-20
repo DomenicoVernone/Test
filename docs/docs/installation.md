@@ -11,47 +11,7 @@
 body {
     margin: 0;
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    display: flex;
     background: #f5f6f7;
-}
-
-/* ===== SIDEBAR ===== */
-
-.sidebar {
-    width: 300px;
-    height: 100vh;
-    background: linear-gradient(#2f6f95, #244f6a);
-    color: white;
-    position: fixed;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.sidebar h2 {
-    margin-top: 0;
-}
-
-.sidebar input {
-    width: 100%;
-    padding: 8px;
-    border-radius: 6px;
-    border: none;
-    margin: 15px 0;
-}
-
-.sidebar ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-.sidebar li {
-    padding: 6px 0;
-    opacity: 0.9;
-}
-
-.sidebar li.active {
-    font-weight: bold;
-    color: white;
 }
 
 /* ===== MAIN CONTENT ===== */
@@ -113,40 +73,10 @@ th {
     background: #f0f0f0;
 }
 
-/* ===== NAVIGATION BUTTONS ===== */
-
-.nav-buttons {
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.button {
-    background: #e0e0e0;
-    border-radius: 6px;
-    padding: 10px 15px;
-    text-decoration: none;
-    color: black;
-}
-
-/* ===== FOOTER ===== */
-
-.footer {
-    margin-top: 50px;
-    font-size: 14px;
-    color: gray;
-}
-
 </style>
 </head>
 
 <body>
-
-<!-- ===== SIDEBAR ===== -->
-
-
-
-<!-- ===== MAIN CONTENT ===== -->
 
 <div class="content">
 
@@ -281,22 +211,6 @@ http://localhost:8000/docs
 
 <div class="codeblock">
 POST /signup
-</div>
-
-
-<div class="nav-buttons">
-
-<a class="button">⬅ Previous</a>
-<a class="button">Next ➡</a>
-
-</div>
-
-
-<div class="footer">
-
-© 2025 Clinical Twin Documentation  
-Built with custom HTML/CSS (ReadTheDocs style)
-
 </div>
 
 </div>
