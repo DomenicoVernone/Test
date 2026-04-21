@@ -65,22 +65,6 @@ h2 {
     white-space: pre-line;
 }
 
-/* ===== NAV BUTTONS ===== */
-
-.nav-buttons {
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.button {
-    background: #e0e0e0;
-    border-radius: 6px;
-    padding: 10px 15px;
-    text-decoration: none;
-    color: black;
-}
-
 /* ===== FOOTER ===== */
 
 .footer {
@@ -104,22 +88,40 @@ Docs » Quickstart
 
 <h1>Quickstart</h1>
 
+<div class="service-box">
+
 <p>
-Questa guida rapida mostra come eseguire la prima analisi di una risonanza
-magnetica cerebrale utilizzando Clinical Twin dopo l’installazione dello stack.
+Questa guida rapida descrive i passaggi necessari per eseguire la prima analisi
+radiomica su una risonanza magnetica cerebrale T1-weighted utilizzando la
+piattaforma Clinical Twin dopo l’installazione dello stack applicativo.
 </p>
+
+<p>
+Il workflow comprende l’avvio dei microservizi, la registrazione dell’utente,
+il caricamento della MRI e l’esecuzione automatizzata della pipeline di
+segmentazione, estrazione radiomica e inferenza diagnostica.
+</p>
+
+</div>
 
 
 <h2>1. Avvia lo stack Docker</h2>
 
 <div class="service-box">
 
+<p>
+Avviare l’intera architettura a microservizi tramite Docker Compose.
+Questo comando inizializza API Gateway, orchestrator, pipeline Nextflow,
+motore di inferenza, servizio LLM e dashboard clinica.
+</p>
+
 <div class="codeblock">
 docker compose up -d --build
 </div>
 
 <p>
-Attendere il completamento dell’avvio dei microservizi prima di procedere.
+Attendere il completamento dell’avvio dei container prima di procedere
+alle fasi successive.
 </p>
 
 </div>
@@ -129,7 +131,12 @@ Attendere il completamento dell’avvio dei microservizi prima di procedere.
 
 <div class="service-box">
 
-<p>Aprire il browser all’indirizzo:</p>
+<p>
+Una volta avviati i servizi, l’interfaccia clinica React sarà disponibile
+tramite browser web. La dashboard consente l’upload delle immagini MRI,
+la visualizzazione dello spazio diagnostico e l’interazione con
+l’assistente AI.
+</p>
 
 <div class="codeblock">
 http://localhost:5173
@@ -143,7 +150,9 @@ http://localhost:5173
 <div class="service-box">
 
 <p>
-Se è il primo avvio del sistema, creare un utente tramite Swagger UI:
+Al primo avvio della piattaforma è necessario registrare un utente tramite
+Swagger UI esposto dall’API Gateway. Questa operazione consente di ottenere
+le credenziali di accesso alla dashboard.
 </p>
 
 <div class="codeblock">
@@ -156,6 +165,10 @@ http://localhost:8000/docs
 POST /signup
 </div>
 
+<p>
+Dopo la registrazione sarà possibile autenticarsi ed eseguire nuove analisi MRI.
+</p>
+
 </div>
 
 
@@ -163,13 +176,21 @@ POST /signup
 
 <div class="service-box">
 
-<p>Dopo il login nella dashboard:</p>
+<p>
+Dopo il login nella dashboard clinica è possibile caricare una risonanza
+magnetica strutturale cerebrale per avviare la pipeline radiomica.
+</p>
 
 <ul>
 <li>aprire la sezione upload</li>
-<li>selezionare un file MRI formato .nii oppure .nii.gz</li>
-<li>avviare l’analisi</li>
+<li>selezionare un file MRI in formato .nii oppure .nii.gz</li>
+<li>avviare l’elaborazione</li>
 </ul>
+
+<p>
+Il dataset viene salvato nel volume condiviso Docker e registrato come
+task asincrono gestito dall’orchestrator.
+</p>
 
 </div>
 
@@ -178,14 +199,20 @@ POST /signup
 
 <div class="service-box">
 
-<p>Il sistema eseguirà automaticamente:</p>
+<p>
+Dopo l’upload, la pipeline neuroimaging viene eseguita automaticamente
+tramite Nextflow all’interno del servizio nextflow_worker.
+</p>
+
+<p>Le principali fasi computazionali includono:</p>
 
 <ul>
-<li>preprocessing MRI</li>
-<li>segmentazione cerebrale (FreeSurfer o FastSurfer)</li>
-<li>estrazione feature radiomiche</li>
-<li>inferenza statistica KNN</li>
-<li>proiezione nello spazio latente UMAP</li>
+<li>preprocessing volumetrico MRI</li>
+<li>segmentazione anatomica (FreeSurfer o FastSurfer)</li>
+<li>estrazione delle regioni cerebrali (ROI)</li>
+<li>estrazione feature radiomiche con PyRadiomics</li>
+<li>inferenza statistica tramite classificatore KNN</li>
+<li>proiezione nello spazio latente diagnostico UMAP</li>
 </ul>
 
 </div>
@@ -195,14 +222,17 @@ POST /signup
 
 <div class="service-box">
 
-<p>Al termine dell’elaborazione saranno disponibili:</p>
+<p>
+Al termine dell’elaborazione, i risultati vengono resi disponibili nella
+dashboard clinica per l’analisi interattiva del caso paziente.
+</p>
 
 <ul>
-<li>segmentazione delle ROI cerebrali</li>
-<li>coordinate nello spazio latente UMAP</li>
+<li>segmentazione multiplanare delle ROI cerebrali (viewer NiiVue)</li>
+<li>coordinate del paziente nello spazio latente UMAP</li>
 <li>classe diagnostica stimata</li>
-<li>nearest neighbors clinici</li>
-<li>spiegazione tramite assistente AI</li>
+<li>confidence score del classificatore</li>
+<li>nearest neighbors clinicamente simili</li>
 </ul>
 
 </div>
@@ -212,13 +242,22 @@ POST /signup
 
 <div class="service-box">
 
-<p>Utilizzare il pannello laterale dell’assistente per:</p>
+<p>
+L’assistente AI context-aware consente di interpretare i risultati radiomici
+e la posizione del paziente nello spazio diagnostico tramite analisi
+Spatial-RAG.
+</p>
 
 <ul>
-<li>interpretare i risultati radiomici</li>
-<li>analizzare la posizione nello spazio UMAP</li>
-<li>ottenere supporto diagnostico contestuale</li>
+<li>interpretazione delle feature radiomiche</li>
+<li>analisi della posizione nel cluster diagnostico UMAP</li>
+<li>supporto decisionale clinico contestualizzato</li>
 </ul>
+
+<p>
+Questo modulo migliora l’interpretabilità del modello e supporta il processo
+decisionale medico.
+</p>
 
 </div>
 

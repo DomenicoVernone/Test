@@ -82,22 +82,6 @@ th {
     background: #f0f0f0;
 }
 
-/* ===== NAV BUTTONS ===== */
-
-.nav-buttons {
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.button {
-    background: #e0e0e0;
-    border-radius: 6px;
-    padding: 10px 15px;
-    text-decoration: none;
-    color: black;
-}
-
 /* ===== FOOTER ===== */
 
 .footer {
@@ -126,13 +110,18 @@ Docs » Installation
 
 <div class="service-box">
 
-<p>Repository ufficiale:</p>
+<p>
+Il codice sorgente di Clinical Twin è disponibile su GitHub. Il repository
+include tutti i microservizi della piattaforma, la pipeline di neuroimaging
+basata su Nextflow, i modelli di inferenza statistica e la dashboard clinica
+per l’esplorazione dello spazio diagnostico latente.
+</p>
 
 <div class="codeblock">
 https://github.com/carlosto033/Tesi-FTD.git
 </div>
 
-<p>Clone del progetto:</p>
+<p>Clonare il repository localmente:</p>
 
 <div class="codeblock">
 git clone https://github.com/carlosto033/Tesi-FTD.git
@@ -146,18 +135,29 @@ cd Tesi-FTD
 
 <div class="service-box">
 
+<p>
+Prima dell’avvio della piattaforma è necessario configurare l’ambiente
+di esecuzione installando i componenti richiesti per la gestione dei
+container Docker e l’esecuzione della pipeline di segmentazione MRI.
+</p>
+
 <ul>
-<li>Docker</li>
-<li>Docker Compose</li>
-<li>Git</li>
-<li>NVIDIA GPU (opzionale – solo per FastSurfer)</li>
-<li>WSL2 + CUDA drivers (Windows GPU setup)</li>
-<li>FreeSurfer license file</li>
+<li>Docker – esecuzione dei microservizi containerizzati</li>
+<li>Docker Compose – orchestrazione dello stack applicativo</li>
+<li>Git – clonazione del repository sorgente</li>
+<li>NVIDIA GPU (opzionale) – accelerazione FastSurfer</li>
+<li>WSL2 + CUDA drivers (Windows) – supporto GPU in ambiente Docker</li>
+<li>FreeSurfer license file – necessario per la segmentazione anatomica</li>
 </ul>
 
 <div class="codeblock">
 https://surfer.nmr.mgh.harvard.edu/registration.html
 </div>
+
+<p>
+Il file di licenza FreeSurfer è obbligatorio per eseguire correttamente
+la fase di segmentazione cerebrale della pipeline neuroimaging.
+</p>
 
 </div>
 
@@ -166,7 +166,15 @@ https://surfer.nmr.mgh.harvard.edu/registration.html
 
 <div class="service-box">
 
-<p>Copiare i file environment template:</p>
+<p>
+Clinical Twin utilizza file <code>.env</code> dedicati per ogni microservizio
+al fine di configurare parametri di autenticazione, accesso ai modelli,
+endpoint di inferenza e integrazione con servizi esterni.
+</p>
+
+<p>
+Copiare i template forniti e personalizzarli prima dell’avvio dello stack:
+</p>
 
 <div class="codeblock">
 cp .env.example .env
@@ -184,6 +192,12 @@ cp frontend/.env.example frontend/.env
 
 <div class="service-box">
 
+<p>
+Le variabili seguenti rappresentano i parametri principali utilizzati
+per autenticazione tra microservizi, accesso al registry dei modelli
+e integrazione con il servizio di inferenza AI.
+</p>
+
 <table>
 
 <tr>
@@ -195,25 +209,25 @@ cp frontend/.env.example frontend/.env
 <tr>
 <td>SECRET_KEY</td>
 <td>api_gateway, orchestrator, llm_service</td>
-<td>Shared JWT secret</td>
+<td>Chiave condivisa per la generazione e validazione dei token JWT tra i microservizi</td>
 </tr>
 
 <tr>
 <td>GROQ_API_KEY</td>
 <td>llm_service</td>
-<td>Groq API key</td>
+<td>Chiave di accesso al servizio LLM utilizzato dall’assistente AI context-aware</td>
 </tr>
 
 <tr>
 <td>MLFLOW_TRACKING_URI</td>
 <td>model_service</td>
-<td>DagsHub MLflow tracking server</td>
+<td>Endpoint del server MLflow per il recupero dei modelli registrati</td>
 </tr>
 
 <tr>
 <td>DAGSHUB_TOKEN</td>
 <td>model_service</td>
-<td>DagsHub authentication token</td>
+<td>Token di autenticazione per l’accesso al Model Registry ospitato su DagsHub</td>
 </tr>
 
 </table>
@@ -224,6 +238,12 @@ cp frontend/.env.example frontend/.env
 <h2>FreeSurfer license</h2>
 
 <div class="service-box">
+
+<p>
+La pipeline di segmentazione cerebrale richiede la presenza del file
+di licenza FreeSurfer nella directory del worker Nextflow. Senza questo
+file la fase di preprocessing MRI non può essere eseguita.
+</p>
 
 <div class="codeblock">
 cp /path/to/license.txt nextflow_worker/license.txt
@@ -236,12 +256,19 @@ cp /path/to/license.txt nextflow_worker/license.txt
 
 <div class="service-box">
 
+<p>
+Questi comandi costruiscono le immagini Docker necessarie per eseguire
+i moduli della pipeline radiomica, inclusi segmentazione anatomica,
+preprocessing volumetrico e estrazione delle feature PyRadiomics.
+</p>
+
 <div class="codeblock">
-docker build -t clinical-freesurfer -f nextflow_worker/freesurfer.dockerfile nextflow_worker/
 
-docker build -t clinical-fsl -f nextflow_worker/fsl.dockerfile nextflow_worker/
+docker build -t clinical-freesurfer -f nextflow_worker/dockerfiles/freesurfer.dockerfile nextflow_worker/
 
-docker build -t clinical-pyradiomics -f nextflow_worker/pyradiomics.dockerfile nextflow_worker/
+docker build -t clinical-fsl -f nextflow_worker/dockerfiles/fsl.dockerfile nextflow_worker/
+
+docker build -t clinical-pyradiomics -f nextflow_worker/dockerfiles/pyradiomics.dockerfile nextflow_worker/
 </div>
 
 </div>
@@ -251,11 +278,20 @@ docker build -t clinical-pyradiomics -f nextflow_worker/pyradiomics.dockerfile n
 
 <div class="service-box">
 
+<p>
+L’avvio dello stack Docker inizializza tutti i microservizi della piattaforma,
+inclusi API Gateway, orchestrator, pipeline Nextflow, inference engine,
+servizio LLM e interfaccia frontend.
+</p>
+
 <div class="codeblock">
 docker compose up -d --build
 </div>
 
-<p>Frontend disponibile su:</p>
+<p>
+Una volta completato l’avvio dei container, la dashboard clinica sarà
+disponibile all’indirizzo:
+</p>
 
 <div class="codeblock">
 http://localhost:5173
@@ -268,17 +304,26 @@ http://localhost:5173
 
 <div class="service-box">
 
-<p>Aprire Swagger UI:</p>
+<p>
+Al primo avvio della piattaforma è necessario registrare un utente tramite
+Swagger UI esposto dall’API Gateway. Questo consente l’accesso alla dashboard
+clinica e l’avvio delle analisi radiomiche.
+</p>
 
 <div class="codeblock">
 http://localhost:8000/docs
 </div>
 
-<p>Eseguire:</p>
+<p>Eseguire la richiesta:</p>
 
 <div class="codeblock">
 POST /signup
 </div>
+
+<p>
+Dopo la registrazione sarà possibile autenticarsi e utilizzare la piattaforma
+per l’analisi automatizzata delle immagini MRI.
+</p>
 
 </div>
 

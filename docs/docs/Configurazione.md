@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
+
 <meta charset="UTF-8">
 <title>Clinical Twin – Configuration</title>
 
@@ -60,6 +62,7 @@ h2 {
     border-radius: 6px;
     font-family: monospace;
     margin: 15px 0;
+    white-space: pre-line;
 }
 
 /* ===== TABLE ===== */
@@ -79,8 +82,18 @@ th {
     background: #f0f0f0;
 }
 
+/* ===== FOOTER ===== */
+
+.footer {
+    margin-top: 50px;
+    font-size: 14px;
+    color: gray;
+}
+
 </style>
+
 </head>
+
 
 <body>
 
@@ -92,14 +105,33 @@ Docs » Configuration
 
 <h1>Configuration</h1>
 
+<div class="service-box">
+
 <p>
-Clinical Twin utilizza file di configurazione distribuiti tra i vari
-microservizi per gestire autenticazione, pipeline neuroimaging,
-inferenza diagnostica e integrazione con servizi esterni.
+Clinical Twin utilizza file di configurazione distribuiti tra i diversi
+microservizi della piattaforma per gestire autenticazione, orchestrazione
+della pipeline neuroimaging, accesso ai modelli registrati e integrazione
+con servizi di inferenza basati su modelli linguistici.
 </p>
+
+<p>
+La corretta configurazione delle variabili di ambiente è necessaria per
+garantire la comunicazione tra i servizi e il funzionamento completo
+della pipeline radiomica.
+</p>
+
+</div>
 
 
 <h2>File .env principali</h2>
+
+<div class="service-box">
+
+<p>
+Ogni microservizio utilizza un file <code>.env</code> dedicato contenente
+le variabili di configurazione specifiche per autenticazione, accesso
+alle risorse e parametri operativi.
+</p>
 
 <div class="codeblock">
 .env
@@ -111,15 +143,24 @@ frontend/.env
 </div>
 
 <p>
-Ogni servizio possiede un file di configurazione dedicato.
+Questi file devono essere configurati prima dell’avvio dello stack Docker.
 </p>
+
+</div>
 
 
 <h2>Variabili condivise (JWT)</h2>
 
 <div class="service-box">
 
+<p>
+Le variabili JWT permettono l’autenticazione sicura tra i microservizi
+tramite token firmati digitalmente e garantiscono la protezione delle
+richieste interne alla piattaforma.
+</p>
+
 <table>
+
 <tr>
 <th>Variabile</th>
 <th>Servizi</th>
@@ -129,7 +170,7 @@ Ogni servizio possiede un file di configurazione dedicato.
 <tr>
 <td>SECRET_KEY</td>
 <td>api_gateway, orchestrator, llm_service</td>
-<td>Chiave condivisa per autenticazione JWT</td>
+<td>Chiave crittografica condivisa per la generazione e validazione dei token JWT tra i servizi</td>
 </tr>
 
 </table>
@@ -141,7 +182,14 @@ Ogni servizio possiede un file di configurazione dedicato.
 
 <div class="service-box">
 
+<p>
+Queste variabili consentono l’accesso al Model Registry MLflow ospitato
+su DagsHub e permettono il recupero automatico del modello champion
+utilizzato per l’inferenza diagnostica.
+</p>
+
 <table>
+
 <tr>
 <th>Variabile</th>
 <th>Descrizione</th>
@@ -149,27 +197,27 @@ Ogni servizio possiede un file di configurazione dedicato.
 
 <tr>
 <td>MLFLOW_TRACKING_URI</td>
-<td>URL tracking server MLflow</td>
+<td>Endpoint del server MLflow utilizzato per tracciare esperimenti e modelli</td>
 </tr>
 
 <tr>
 <td>MLFLOW_TRACKING_USERNAME</td>
-<td>Username DagsHub</td>
+<td>Username dell’account DagsHub per autenticazione al registry</td>
 </tr>
 
 <tr>
 <td>DAGSHUB_TOKEN</td>
-<td>Token accesso Model Registry</td>
+<td>Token di accesso al Model Registry remoto su DagsHub</td>
 </tr>
 
 <tr>
 <td>REPO_OWNER</td>
-<td>Owner repository DagsHub</td>
+<td>Nome utente o organizzazione proprietaria del repository MLflow</td>
 </tr>
 
 <tr>
 <td>REPO_NAME</td>
-<td>Nome repository MLflow</td>
+<td>Nome del repository contenente i modelli registrati</td>
 </tr>
 
 </table>
@@ -181,7 +229,14 @@ Ogni servizio possiede un file di configurazione dedicato.
 
 <div class="service-box">
 
+<p>
+L’assistente clinico context-aware utilizza modelli linguistici esterni
+tramite API. La seguente variabile consente l’autenticazione al servizio
+LLM utilizzato per supportare l’interpretazione dei risultati radiomici.
+</p>
+
 <table>
+
 <tr>
 <th>Variabile</th>
 <th>Descrizione</th>
@@ -189,7 +244,7 @@ Ogni servizio possiede un file di configurazione dedicato.
 
 <tr>
 <td>GROQ_API_KEY</td>
-<td>Chiave API per accesso al modello LLM</td>
+<td>Chiave API per l’accesso al modello linguistico utilizzato dal servizio AI</td>
 </tr>
 
 </table>
@@ -199,8 +254,11 @@ Ogni servizio possiede un file di configurazione dedicato.
 
 <h2>Configurazione GPU (opzionale)</h2>
 
+<div class="service-box">
+
 <p>
-Se disponibile una GPU NVIDIA, FastSurfer può utilizzare accelerazione CUDA.
+Se disponibile una GPU NVIDIA, FastSurfer può utilizzare accelerazione
+CUDA per ridurre significativamente i tempi di segmentazione delle immagini MRI.
 </p>
 
 <div class="codeblock">
@@ -208,37 +266,51 @@ MIG_DEVICE=
 </div>
 
 <p>
-Su GPU partizionate impostare l’UUID della MIG instance.
-Lasciare vuoto su sistemi CPU-only o GPU standard.
+Su sistemi con GPU partizionate (Multi-Instance GPU) è possibile specificare
+l’identificativo della MIG instance assegnata al container. Lasciare vuoto
+su sistemi CPU-only o GPU standard.
 </p>
+
+</div>
 
 
 <h2>Configurazione volumi condivisi</h2>
+
+<div class="service-box">
+
+<p>
+La variabile seguente definisce la directory host utilizzata per condividere
+dataset MRI e output intermedi tra i container della pipeline Nextflow.
+</p>
 
 <div class="codeblock">
 HOST_SHARED_VOLUME_DIR=
 </div>
 
 <p>
-Parametro richiesto solo su sistemi Linux bare-metal.
-Su Docker Desktop (Windows/macOS) può rimanere vuoto.
+Questo parametro è richiesto principalmente su sistemi Linux bare-metal.
+Su Docker Desktop (Windows/macOS) può rimanere non impostato.
 </p>
+
+</div>
 
 
 <h2>Configurazione pipeline Nextflow</h2>
 
+<div class="service-box">
+
 <p>
-I parametri principali della pipeline sono definiti in:
+I parametri principali della pipeline radiomica sono definiti nel file
+di configurazione Nextflow. Queste impostazioni controllano parallelizzazione,
+modalità di segmentazione e numero di job radiomici eseguiti simultaneamente.
 </p>
 
 <div class="codeblock">
 nextflow_worker/nextflow/configs/nextflow.config
 </div>
 
-
-<div class="service-box">
-
 <table>
+
 <tr>
 <th>Parametro</th>
 <th>Descrizione</th>
@@ -246,32 +318,33 @@ nextflow_worker/nextflow/configs/nextflow.config
 
 <tr>
 <td>params.maxforks</td>
-<td>Numero massimo processi paralleli</td>
+<td>Numero massimo di processi paralleli eseguibili simultaneamente</td>
 </tr>
 
 <tr>
 <td>params.fastsurfer_threads</td>
-<td>Thread CPU FastSurfer</td>
+<td>Numero di thread CPU utilizzati durante la segmentazione FastSurfer</td>
 </tr>
 
 <tr>
 <td>params.fastsurfer_device</td>
-<td>cpu oppure cuda</td>
+<td>Dispositivo di esecuzione: cpu oppure cuda</td>
 </tr>
 
 <tr>
 <td>params.pyradiomics_jobs</td>
-<td>Numero job radiomica paralleli</td>
+<td>Numero massimo di estrazioni radiomiche eseguite in parallelo</td>
 </tr>
 
 <tr>
 <td>params.brain_segmenter</td>
-<td>freesurfer oppure fastsurfer</td>
+<td>Selezione del segmentatore: freesurfer oppure fastsurfer</td>
 </tr>
 
 </table>
 
 </div>
+
 
 </div>
 

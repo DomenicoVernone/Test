@@ -65,22 +65,6 @@ h2 {
     white-space: pre-line;
 }
 
-/* ===== NAV BUTTONS ===== */
-
-.nav-buttons {
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.button {
-    background: #e0e0e0;
-    border-radius: 6px;
-    padding: 10px 15px;
-    text-decoration: none;
-    color: black;
-}
-
 /* ===== FOOTER ===== */
 
 .footer {
@@ -103,22 +87,33 @@ Docs » Pipeline Workflow
 
 <h1>Pipeline Workflow</h1>
 
+<div class="service-box">
+
 <p>
 La pipeline Clinical Twin implementa un workflow automatizzato di analisi
-radiomica su risonanze magnetiche cerebrali T1-weighted finalizzato alla
-diagnosi differenziale delle varianti di Frontotemporal Dementia (FTD).
+radiomica su risonanze magnetiche strutturali T1-weighted finalizzato alla
+diagnosi differenziale delle varianti della Frontotemporal Dementia (FTD).
 </p>
 
 <p>
-L’intero processo è orchestrato dal microservizio <b>orchestrator</b> ed
-eseguito tramite <b>Nextflow</b> all’interno del servizio
-<b>nextflow_worker</b>.
+L’esecuzione è orchestrata dal microservizio <b>orchestrator</b>, mentre
+l’elaborazione computazionale viene gestita tramite <b>Nextflow</b> all’interno
+del servizio <b>nextflow_worker</b>, garantendo parallelizzazione,
+riproducibilità e scalabilità dell’intero processo neuroimaging.
 </p>
+
+</div>
 
 
 <h2>Panoramica della pipeline</h2>
 
 <div class="service-box">
+
+<p>
+Il flusso operativo della pipeline segue una sequenza strutturata di
+trasformazioni volumetriche, estrazione di biomarcatori radiomici e
+inferenza statistica nello spazio latente diagnostico.
+</p>
 
 <div class="codeblock">
 MRI → Preprocessing → Segmentazione → Estrazione ROI → Radiomics → Inferenza KNN → Embedding UMAP → Dashboard
@@ -131,6 +126,12 @@ MRI → Preprocessing → Segmentazione → Estrazione ROI → Radiomics → Inf
 
 <div class="service-box">
 
+<p>
+L’utente carica una risonanza magnetica cerebrale strutturale tramite la
+dashboard clinica. I dati vengono salvati nel volume condiviso Docker e
+registrati come task asincrono gestito dall’orchestrator.
+</p>
+
 <p>Formati supportati:</p>
 
 <ul>
@@ -139,7 +140,7 @@ MRI → Preprocessing → Segmentazione → Estrazione ROI → Radiomics → Inf
 </ul>
 
 <p>
-Il file viene salvato nel volume condiviso del sistema e registrato come task asincrono.
+Questa fase rappresenta il punto di ingresso della pipeline neuroimaging.
 </p>
 
 </div>
@@ -149,12 +150,22 @@ Il file viene salvato nel volume condiviso del sistema e registrato come task as
 
 <div class="service-box">
 
+<p>
+Il preprocessing prepara il volume MRI per la segmentazione anatomica
+standardizzata e l’estrazione delle feature radiomiche.
+</p>
+
 <ul>
-<li>normalizzazione dell’intensità</li>
-<li>ricampionamento volumetrico</li>
-<li>allineamento spaziale</li>
-<li>verifica integrità del volume MRI</li>
+<li>normalizzazione dell’intensità voxel</li>
+<li>ricampionamento isotropico del volume</li>
+<li>allineamento spaziale stereotassico</li>
+<li>verifica integrità del dataset MRI</li>
 </ul>
+
+<p>
+Queste operazioni riducono la variabilità inter-scanner e migliorano la
+robustezza delle feature estratte.
+</p>
 
 </div>
 
@@ -162,6 +173,12 @@ Il file viene salvato nel volume condiviso del sistema e registrato come task as
 <h2>3. Segmentazione anatomica</h2>
 
 <div class="service-box">
+
+<p>
+La segmentazione cerebrale consente la parcellizzazione della corteccia
+in regioni anatomiche standardizzate utilizzabili per analisi radiomiche
+regionalizzate.
+</p>
 
 <p>Strumenti utilizzati:</p>
 
@@ -171,7 +188,8 @@ Il file viene salvato nel volume condiviso del sistema e registrato come task as
 </ul>
 
 <p>
-Output: parcellizzazione anatomica standardizzata delle ROI cerebrali.
+L’output consiste in mappe di etichettatura volumetrica delle ROI corticali
+e sottocorticali.
 </p>
 
 </div>
@@ -181,14 +199,18 @@ Output: parcellizzazione anatomica standardizzata delle ROI cerebrali.
 
 <div class="service-box">
 
-<p>Tabella di mapping utilizzata:</p>
+<p>
+Le regioni anatomiche segmentate vengono associate a etichette standard
+tramite la tabella di mapping utilizzata dalla pipeline.
+</p>
 
 <div class="codeblock">
 ROI_labels.tsv
 </div>
 
 <p>
-Consente l’associazione tra etichette anatomiche e volumi segmentati.
+Questa fase consente la costruzione di un dataset strutturato per
+l’estrazione delle feature radiomiche regionali.
 </p>
 
 </div>
@@ -198,21 +220,29 @@ Consente l’associazione tra etichette anatomiche e volumi segmentati.
 
 <div class="service-box">
 
-<p>Configurazione PyRadiomics:</p>
+<p>
+Le feature radiomiche vengono estratte tramite <b>PyRadiomics</b> utilizzando
+una configurazione parametrica definita nel file YAML della pipeline.
+</p>
 
 <div class="codeblock">
 pyradiomics.yaml
 </div>
 
-<p>Feature estratte:</p>
+<p>Feature principali estratte:</p>
 
 <ul>
-<li>first-order statistics</li>
+<li>first-order intensity statistics</li>
 <li>GLCM texture features</li>
-<li>GLRLM features</li>
-<li>GLSZM features</li>
-<li>shape descriptors</li>
+<li>GLRLM texture features</li>
+<li>GLSZM texture features</li>
+<li>shape descriptors tridimensionali</li>
 </ul>
+
+<p>
+Queste feature rappresentano biomarcatori quantitativi utilizzati per
+la classificazione diagnostica.
+</p>
 
 </div>
 
@@ -221,13 +251,20 @@ pyradiomics.yaml
 
 <div class="service-box">
 
-<p>Servizio coinvolto: <b>inference_engine</b></p>
+<p>
+Le feature radiomiche vengono inviate al microservizio <b>inference_engine</b>,
+che esegue la classificazione diagnostica nello spazio delle feature.
+</p>
 
 <ul>
-<li>classificazione KNN</li>
-<li>similarità con dataset clinico di riferimento</li>
-<li>stima classe diagnostica</li>
+<li>classificazione tramite algoritmo K-Nearest Neighbors (KNN)</li>
+<li>calcolo similarità con pazienti del dataset di riferimento</li>
+<li>stima probabilistica della classe diagnostica FTD</li>
 </ul>
+
+<p>
+Questa fase rappresenta il core decisionale del sistema Clinical Twin.
+</p>
 
 </div>
 
@@ -236,11 +273,20 @@ pyradiomics.yaml
 
 <div class="service-box">
 
+<p>
+Le feature vengono proiettate in uno spazio latente tridimensionale tramite
+UMAP per consentire l’esplorazione visiva della distribuzione dei pazienti.
+</p>
+
 <ul>
-<li>visualizzazione distribuzione pazienti</li>
-<li>analisi cluster diagnostici</li>
-<li>identificazione nearest neighbors clinici</li>
+<li>visualizzazione distribuzione campioni clinici</li>
+<li>identificazione cluster diagnostici</li>
+<li>ricerca nearest neighbors clinicamente simili</li>
 </ul>
+
+<p>
+Lo spazio UMAP costituisce la base del modello di explainability visiva.
+</p>
 
 </div>
 
@@ -249,12 +295,17 @@ pyradiomics.yaml
 
 <div class="service-box">
 
+<p>
+I risultati vengono resi disponibili nella dashboard React interattiva
+per supportare l’analisi clinica del caso paziente.
+</p>
+
 <ul>
-<li>segmentazione multiplanare ROI (NiiVue)</li>
-<li>posizione nello spazio UMAP</li>
+<li>segmentazione multiplanare delle ROI cerebrali (NiiVue)</li>
+<li>posizione del paziente nello spazio latente UMAP</li>
 <li>classe diagnostica stimata</li>
-<li>confidence score</li>
-<li>nearest neighbors clinici</li>
+<li>confidence score del classificatore</li>
+<li>nearest neighbors clinicamente simili</li>
 </ul>
 
 </div>
@@ -265,11 +316,18 @@ pyradiomics.yaml
 <div class="service-box">
 
 <p>
-L’assistente AI context-aware supporta l’interpretazione clinica dei risultati
-radiomici e della posizione nello spazio latente.
+L’assistente AI context-aware utilizza un approccio Spatial-RAG per
+interpretare i risultati radiomici e fornire spiegazioni clinicamente
+contestualizzate sulla posizione del paziente nello spazio diagnostico.
+</p>
+
+<p>
+Questo modulo migliora l’interpretabilità del modello e supporta il
+processo decisionale medico.
 </p>
 
 </div>
+
 
 
 </div>

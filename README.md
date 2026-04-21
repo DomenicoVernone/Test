@@ -100,9 +100,9 @@ Senza questi file il `nextflow_worker` si avvia ma non è in grado di eseguire l
 La pipeline Nextflow utilizza il pattern Docker-out-of-Docker (DooD): quando un task viene avviato, Nextflow chiede al daemon Docker dell'host di eseguire i container della pipeline. Le immagini devono quindi essere presenti nel registry locale dell'host — non dentro i container. Il prebuild va eseguito sulla macchina che ospita lo stack, prima di avviare i servizi.
 
 ```bash
-docker build -t clinical-freesurfer -f nextflow_worker/freesurfer.dockerfile nextflow_worker/
-docker build -t clinical-fsl -f nextflow_worker/fsl.dockerfile nextflow_worker/
-docker build -t clinical-pyradiomics -f nextflow_worker/pyradiomics.dockerfile nextflow_worker/
+docker build -t clinical-freesurfer -f nextflow_worker/dockerfiles/freesurfer.dockerfile nextflow_worker/
+docker build -t clinical-fsl -f nextflow_worker/dockerfiles/fsl.dockerfile nextflow_worker/
+docker build -t clinical-pyradiomics -f nextflow_worker/dockerfiles/pyradiomics.dockerfile nextflow_worker/
 ```
 
 Questo passaggio va ripetuto solo se i Dockerfile vengono modificati.

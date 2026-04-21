@@ -65,22 +65,6 @@ h2 {
     white-space: pre-line;
 }
 
-/* ===== NAV BUTTONS ===== */
-
-.nav-buttons {
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.button {
-    background: #e0e0e0;
-    border-radius: 6px;
-    padding: 10px 15px;
-    text-decoration: none;
-    color: black;
-}
-
 /* ===== FOOTER ===== */
 
 .footer {
@@ -103,10 +87,20 @@ Docs » Deployment
 
 <h1>Deployment</h1>
 
+<div class="service-box">
+
 <p>
-Clinical Twin è progettato per essere eseguito in diversi ambienti di deployment,
-dal computer locale fino a server GPU dedicati per pipeline neuroimaging accelerate.
+Clinical Twin può essere distribuito in diversi ambienti operativi,
+dal computer locale per attività di sviluppo fino a server GPU dedicati
+per l’esecuzione efficiente della pipeline neuroimaging su dataset clinici.
 </p>
+
+<p>
+L’architettura containerizzata basata su Docker Compose garantisce
+portabilità, riproducibilità sperimentale e scalabilità computazionale.
+</p>
+
+</div>
 
 
 <h2>Deployment locale (Docker Desktop)</h2>
@@ -114,23 +108,30 @@ dal computer locale fino a server GPU dedicati per pipeline neuroimaging acceler
 <div class="service-box">
 
 <p>
-Configurazione consigliata per sviluppo e test.
-Compatibile con:
+Configurazione consigliata per sviluppo, test funzionali e validazione
+della pipeline su singoli dataset MRI.
 </p>
 
+<p>Compatibile con:</p>
+
 <ul>
-<li>Windows (WSL2)</li>
+<li>Windows (tramite WSL2)</li>
 <li>macOS</li>
 <li>Linux</li>
 </ul>
 
-<p>Avvio stack:</p>
+<p>Avvio completo dello stack applicativo:</p>
 
 <div class="codeblock">
 docker compose up -d --build
 </div>
 
-<p>Accesso dashboard:</p>
+<p>
+Questo comando inizializza API Gateway, orchestrator, Nextflow worker,
+motore di inferenza, servizio LLM e dashboard React.
+</p>
+
+<p>Accesso alla dashboard clinica:</p>
 
 <div class="codeblock">
 http://localhost:5173
@@ -144,18 +145,23 @@ http://localhost:5173
 <div class="service-box">
 
 <p>
-Configurazione consigliata per ambienti di ricerca o laboratorio.
-Richiede:
+Configurazione consigliata per ambienti di laboratorio, infrastrutture
+di ricerca o server dipartimentali dedicati all’elaborazione radiomica.
 </p>
 
+<p>Prerequisiti hardware/software:</p>
+
 <ul>
-<li>Docker Engine</li>
+<li>Docker Engine installato</li>
 <li>Docker Compose</li>
 <li>CPU multicore</li>
-<li>≥16GB RAM consigliati</li>
+<li>≥16 GB RAM consigliati</li>
 </ul>
 
-<p>Configurare volume condiviso:</p>
+<p>
+Configurare la directory condivisa utilizzata dalla pipeline Nextflow
+per l’accesso ai volumi MRI:
+</p>
 
 <div class="codeblock">
 HOST_SHARED_VOLUME_DIR=/mnt/shared_volume
@@ -175,25 +181,28 @@ docker compose up -d
 <div class="service-box">
 
 <p>
-FastSurfer può utilizzare accelerazione CUDA per ridurre drasticamente
-i tempi di segmentazione MRI.
+L’utilizzo di GPU NVIDIA consente l’accelerazione della segmentazione
+cerebrale tramite FastSurfer, riducendo significativamente i tempi di
+elaborazione rispetto alla modalità CPU.
 </p>
 
 <p>Prerequisiti:</p>
 
 <ul>
-<li>NVIDIA Driver aggiornati</li>
-<li>CUDA Toolkit</li>
+<li>Driver NVIDIA aggiornati</li>
+<li>CUDA Toolkit compatibile</li>
 <li>NVIDIA Container Toolkit</li>
 </ul>
 
-<p>Verifica GPU:</p>
+<p>Verifica disponibilità GPU:</p>
 
 <div class="codeblock">
 nvidia-smi
 </div>
 
-<p>Configurazione device:</p>
+<p>
+Abilitazione accelerazione GPU nella pipeline:
+</p>
 
 <div class="codeblock">
 params.fastsurfer_device=cuda
@@ -207,17 +216,20 @@ params.fastsurfer_device=cuda
 <div class="service-box">
 
 <p>
-Su server con GPU partizionata è possibile assegnare una singola MIG instance
-alla pipeline Clinical Twin.
+Su sistemi HPC o server multi-utente dotati di GPU partizionabili,
+è possibile assegnare una specifica MIG instance alla pipeline
+Clinical Twin per isolare le risorse computazionali.
 </p>
 
-<p>Configurare variabile:</p>
+<p>Configurazione variabile ambiente:</p>
 
 <div class="codeblock">
 MIG_DEVICE=MIG-xxxxxxxxxxxxxxxx
 </div>
 
-<p>Lasciare vuoto su GPU standard.</p>
+<p>
+Lasciare il parametro vuoto su sistemi senza partizionamento GPU.
+</p>
 
 </div>
 
@@ -227,11 +239,14 @@ MIG_DEVICE=MIG-xxxxxxxxxxxxxxxx
 <div class="service-box">
 
 <p>
-Clinical Twin utilizza il modello Docker-out-of-Docker (DooD).
-Le immagini della pipeline devono essere disponibili nel registry locale.
+Clinical Twin utilizza un modello Docker-out-of-Docker (DooD) per
+l’esecuzione modulare dei componenti della pipeline neuroimaging.
 </p>
 
-<p>Build immagini:</p>
+<p>
+Prima dell’avvio della pipeline è necessario costruire le immagini
+container utilizzate dai worker Nextflow:
+</p>
 
 <div class="codeblock">
 docker build -t clinical-freesurfer -f nextflow_worker/freesurfer.dockerfile nextflow_worker/
@@ -241,32 +256,46 @@ docker build -t clinical-fsl -f nextflow_worker/fsl.dockerfile nextflow_worker/
 docker build -t clinical-pyradiomics -f nextflow_worker/pyradiomics.dockerfile nextflow_worker/
 </div>
 
+<p>
+Queste immagini includono gli strumenti di segmentazione anatomica,
+preprocessing MRI ed estrazione feature radiomiche.
+</p>
+
 </div>
 
 
-<h2>Deployment produzione (consigliato)</h2>
+<h2>Deployment in produzione (consigliato)</h2>
 
 <div class="service-box">
+
+<p>
+Per ambienti clinici o dataset di grandi dimensioni è consigliata una
+configurazione server dedicata con accelerazione GPU.
+</p>
 
 <p>Configurazione suggerita:</p>
 
 <ul>
-<li>Server Linux dedicato</li>
-<li>GPU NVIDIA</li>
+<li>server Linux dedicato</li>
+<li>GPU NVIDIA compatibile CUDA</li>
 <li>Docker Engine</li>
-<li>Volume condiviso persistente</li>
-<li>Backup dataset radiomico</li>
+<li>volume condiviso persistente per dataset MRI</li>
+<li>sistema di backup per dataset radiomici e modelli</li>
 </ul>
 
-<p>Architettura supportata:</p>
+<p>Architettura logica dei servizi:</p>
 
 <div class="codeblock">
 Frontend → API Gateway → Orchestrator → Nextflow Worker → Inference Engine → LLM Service
 </div>
 
+<p>
+Questa configurazione garantisce scalabilità della pipeline,
+separazione dei microservizi e supporto a workflow clinico-radiomici
+riproducibili.
+</p>
+
 </div>
-
-
 
 </div>
 
