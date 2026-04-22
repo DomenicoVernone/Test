@@ -7,7 +7,7 @@ const LLM_URL = import.meta.env.VITE_LLM_URL || 'http://localhost:8002';
 const createApiInstance = (baseURL) => {
     const instance = axios.create({
         baseURL,
-        headers: { 'Content-Type': 'application/json' },
+        /*headers: { 'Content-Type': 'application/json' },*/
     });
 
     instance.interceptors.request.use(
