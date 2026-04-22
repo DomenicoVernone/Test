@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="it">
 
 <head>
@@ -84,6 +85,11 @@ th {
     background: #f0f0f0;
 }
 
+.note {
+    margin-top: 8px;
+    color: #555;
+}
+
 </style>
 
 </head>
@@ -101,20 +107,37 @@ Docs » Test Plan
 <div class="service-box">
 
 <p>
-Questo piano di test definisce le procedure di validazione funzionale,
-strutturale e prestazionale della piattaforma Clinical Twin, includendo
-verifiche sui microservizi, pipeline neuroimaging, motore di inferenza,
-assistente AI e dashboard clinica.
+Questo piano di test definisce le procedure di validazione funzionale, strutturale e prestazionale della piattaforma <strong>ClinicalTwin</strong>.
+</p>
+
+<p>
+Le verifiche coprono l’intero stack applicativo, inclusi:
+</p>
+
+<ul>
+<li>microservizi backend containerizzati</li>
+<li>pipeline neuroimaging Nextflow</li>
+<li>motore statistico di inferenza (KNN + UMAP)</li>
+<li>model registry MLflow</li>
+<li>assistente LLM Spatial RAG</li>
+<li>dashboard clinica React</li>
+</ul>
+
+<p class="note">
+L’obiettivo del test plan è garantire correttezza computazionale, robustezza operativa e riproducibilità del workflow diagnostico.
 </p>
 
 </div>
-
 
 <h2>1. Test deployment dello stack Docker</h2>
 
 <div class="service-box">
 
-<h3>Build immagini pipeline</h3>
+<p>
+Questa fase verifica la corretta costruzione delle immagini container e l’avvio dell’intera architettura a microservizi.
+</p>
+
+<h3>Build immagini pipeline scientifica</h3>
 
 <div class="codeblock">
 docker build -t clinical-freesurfer ...
@@ -122,7 +145,15 @@ docker build -t clinical-fsl ...
 docker build -t clinical-pyradiomics ...
 </div>
 
-<p><b>Expected:</b> build completata senza errori e immagini presenti in docker images.</p>
+<p>
+Expected:
+</p>
+
+<ul>
+<li>assenza errori durante la build</li>
+<li>presenza immagini nel registry locale Docker</li>
+<li>compatibilità runtime con Nextflow</li>
+</ul>
 
 <h3>Avvio stack</h3>
 
@@ -130,130 +161,93 @@ docker build -t clinical-pyradiomics ...
 docker compose up -d --build
 </div>
 
-<p><b>Verifica servizi attivi:</b></p>
+<p>
+Verifica:
+</p>
 
 <ul>
-<li>api_gateway → 8000</li>
-<li>orchestrator → 8001</li>
-<li>llm_service → 8002</li>
-<li>model_service → 8003</li>
-<li>inference_engine → 8004</li>
-<li>nextflow_worker → 8005</li>
-<li>frontend → 5173</li>
+<li>tutti i container risultano in stato running</li>
+<li>assenza crash nei log iniziali</li>
+<li>mount dei volumi condivisi correttamente eseguito</li>
 </ul>
 
 </div>
-
 
 <h2>2. Test autenticazione (api_gateway)</h2>
 
 <div class="service-box">
 
-<h3>Signup</h3>
-
-Endpoint:
-
-<div class="codeblock">
-POST /signup
-</div>
+<p>
+Questa fase valida il sistema di autenticazione JWT condiviso tra i microservizi.
+</p>
 
 Expected:
 
-utente salvato correttamente nel database SQLite.
+<ul>
+<li>creazione utente persistente su SQLite</li>
+<li>generazione token valido</li>
+<li>protezione endpoint REST</li>
+<li>coerenza SECRET_KEY tra servizi</li>
+</ul>
 
-<h3>Login</h3>
-
-Endpoint:
-
-<div class="codeblock">
-POST /login
-</div>
-
-Expected:
-
-token JWT valido restituito.
-
-<h3>Endpoint protetti</h3>
-
-Expected:
-
-senza token → 401  
-con token → 200
+<p class="note">
+Il test garantisce isolamento delle sessioni e accesso sicuro alla pipeline diagnostica.
+</p>
 
 </div>
-
 
 <h2>3. Test orchestrator pipeline</h2>
 
 <div class="service-box">
 
-<h3>Creazione task</h3>
+<p>
+Il servizio orchestrator coordina l’esecuzione asincrona della pipeline radiomica.
+</p>
 
-Endpoint:
+Verifiche:
 
-<div class="codeblock">
-POST /analyze
-</div>
-
-Expected:
-
-task_id generato  
-stato iniziale = pending
-
-<h3>Polling stato task</h3>
-
-Endpoint:
-
-<div class="codeblock">
-GET /task/{id}
-</div>
+<ul>
+<li>creazione task MRI</li>
+<li>transizione stati corretta</li>
+<li>propagazione errori pipeline</li>
+<li>gestione job concorrenti</li>
+</ul>
 
 Flow atteso:
 
+<div class="codeblock">
 pending → running → completed
-
-<h3>Failure handling</h3>
-
-Input MRI non valido:
-
-Expected:
-
-status = failed
-
 </div>
 
+Failure case:
+
+MRI non valida → status = failed
+
+</div>
 
 <h2>4. Test pipeline nextflow_worker</h2>
 
 <div class="service-box">
 
+<p>
+Verifica l’esecuzione completa della pipeline neuroimaging automatizzata.
+</p>
+
 Pipeline:
 
-FreeSurfer / FastSurfer → PyRadiomics → feature table
-
-Expected output directory:
-
 <div class="codeblock">
-segmentation/
-stats/
-labels/
+FreeSurfer / FastSurfer → ROI extraction → PyRadiomics → CSV generation
 </div>
 
-Output radiomica:
-
-<div class="codeblock">
-radiomics_features.csv
-</div>
-
-Contenuti:
+Output attesi:
 
 <ul>
-<li>shape features</li>
-<li>texture features</li>
-<li>intensity features</li>
+<li>segmentazioni corticali corrette</li>
+<li>maschere ROI generate</li>
+<li>dataset radiomico completo</li>
 </ul>
 
-Config richiesti:
+File richiesti:
 
 <div class="codeblock">
 ROI_labels.tsv
@@ -262,120 +256,97 @@ pyradiomics.yaml
 
 </div>
 
-
 <h2>5. Test model_service</h2>
 
 <div class="service-box">
 
-Trigger:
-
-<div class="codeblock">
-POST /predict
-</div>
+<p>
+Valida l’integrazione con MLflow Model Registry su backend DagsHub.
+</p>
 
 Expected:
 
-download champion model  
-cache locale creata  
-registry MLflow raggiungibile
-
-Variabili richieste:
-
-MLFLOW_TRACKING_URI  
-DAGSHUB_TOKEN
+<ul>
+<li>connessione al tracking server</li>
+<li>download modello champion</li>
+<li>cache locale creata correttamente</li>
+<li>compatibilità feature vector</li>
+</ul>
 
 </div>
-
 
 <h2>6. Test inference_engine</h2>
 
 <div class="service-box">
 
-Motore:
+<p>
+Il servizio inference_engine implementa classificazione KNN e proiezione UMAP tridimensionale.
+</p>
 
-KNN + UMAP 3D
-
-Output KNN:
+Output attesi:
 
 <div class="codeblock">
 diagnosis_class
 probability
-</div>
-
-Output UMAP:
-
-<div class="codeblock">
-x
-y
-z
+umap_coordinates
 </div>
 
 Test robustezza:
 
-feature mancanti → errore controllato
+<ul>
+<li>feature mancanti → errore controllato</li>
+<li>dimension mismatch → pipeline abort</li>
+<li>dataset incompleto → fallback logging</li>
+</ul>
 
 </div>
-
 
 <h2>7. Test llm_service</h2>
 
 <div class="service-box">
 
-Query:
+<p>
+Valida la generazione di spiegazioni cliniche contestualizzate tramite Spatial RAG.
+</p>
 
-<div class="codeblock">
-Explain this cluster
-</div>
+Verifiche:
 
-Expected:
-
-risposta embedding-aware
-
-Test memoria multi-turno:
-
-Q1 → Q2 follow-up
-
-Expected:
-
-persistenza contesto conversazionale
+<ul>
+<li>risposte embedding-aware</li>
+<li>uso coordinate UMAP</li>
+<li>accesso feature radiomiche rilevanti</li>
+<li>persistenza memoria conversazionale</li>
+</ul>
 
 Accesso senza token:
 
 Expected:
 
+<div class="codeblock">
 401 Unauthorized
-
 </div>
 
+</div>
 
 <h2>8. Test frontend React dashboard</h2>
 
 <div class="service-box">
 
-Login UI:
+<p>
+Verifica la corretta integrazione tra UI clinica e backend microservizi.
+</p>
 
-Expected:
+Componenti verificati:
 
-redirect automatico alla dashboard
-
-Upload MRI:
-
-UploadZone.jsx → task backend creato
-
-Viewer MRI:
-
-NiiVue.jsx → rendering sagittale / coronale / assiale
-
-Spazio latente:
-
-UmapPlot.jsx → scatter 3D interattivo
-
-Storico analisi:
-
-TaskHistory.jsx → lista task precedenti
+<ul>
+<li>Login.jsx → autenticazione</li>
+<li>UploadZone.jsx → invio MRI</li>
+<li>NiiVue.jsx → rendering volumetrico</li>
+<li>UmapPlot.jsx → visualizzazione spazio latente</li>
+<li>TaskHistory.jsx → storico analisi</li>
+</ul>
 
 </div>
-
 
 <h2>9. Test integrazione end-to-end</h2>
 
@@ -397,41 +368,32 @@ Query LLM assistant
 Expected:
 
 pipeline completata senza errori
+output coerente tra servizi
+visualizzazione consistente UI
 
 </div>
-
 
 <h2>10. Test sicurezza</h2>
 
 <div class="service-box">
 
-JWT alterato:
+Verifiche:
 
-Expected:
+<ul>
+<li>validazione token JWT</li>
+<li>isolamento dati utente</li>
+<li>protezione API keys sensibili</li>
+<li>assenza esposizione credenziali frontend</li>
+</ul>
 
-access denied
-
-Access isolation:
-
-Utente A ≠ Utente B
-
-Expected:
-
-isolamento task
-
-Protezione API keys:
+Chiavi protette:
 
 <div class="codeblock">
 GROQ_API_KEY
 DAGSHUB_TOKEN
 </div>
 
-Expected:
-
-non esposte al frontend
-
 </div>
-
 
 <h2>11. Test performance</h2>
 
@@ -442,37 +404,42 @@ non esposte al frontend
 <tr>
 <th>Componente</th>
 <th>Metrica</th>
+<th>Obiettivo</th>
 </tr>
 
 <tr>
 <td>Segmentazione</td>
 <td>tempo esecuzione</td>
+<td>≤ baseline hardware</td>
 </tr>
 
 <tr>
 <td>Radiomics</td>
 <td>tempo estrazione</td>
+<td>parallelizzazione attiva</td>
 </tr>
 
 <tr>
 <td>Inferenza</td>
 <td>latency</td>
+<td>&lt; 1 secondo</td>
 </tr>
 
 <tr>
 <td>LLM</td>
 <td>response time</td>
+<td>&lt; 2 secondi</td>
 </tr>
 
 <tr>
 <td>Viewer MRI</td>
 <td>fps rendering</td>
+<td>fluido su browser moderno</td>
 </tr>
 
 </table>
 
 </div>
-
 
 <h2>12. Test compatibilità ambiente</h2>
 
@@ -484,10 +451,6 @@ CPU-only:
 params.brain_segmenter=freesurfer
 </div>
 
-Expected:
-
-pipeline funzionante
-
 GPU mode:
 
 <div class="codeblock">
@@ -496,10 +459,9 @@ params.brain_segmenter=fastsurfer
 
 Expected:
 
-accelerazione attiva
+pipeline funzionante in entrambi gli scenari.
 
 </div>
-
 
 <h2>13. Test resilienza errori</h2>
 
@@ -514,28 +476,27 @@ accelerazione attiva
 
 <tr>
 <td>MRI corrotta</td>
-<td>pipeline abort</td>
+<td>pipeline abort controllato</td>
 </tr>
 
 <tr>
 <td>MLflow offline</td>
-<td>errore controllato</td>
+<td>fallback errore gestito</td>
 </tr>
 
 <tr>
 <td>R service offline</td>
-<td>task failed</td>
+<td>task marked failed</td>
 </tr>
 
 <tr>
 <td>Docker image missing</td>
-<td>warning log</td>
+<td>warning + stop pipeline</td>
 </tr>
 
 </table>
 
 </div>
-
 
 <h2>14. Test configurazione variabili ambiente</h2>
 
@@ -550,12 +511,12 @@ accelerazione attiva
 
 <tr>
 <td>SECRET_KEY</td>
-<td>autenticazione valida</td>
+<td>autenticazione inter-servizio coerente</td>
 </tr>
 
 <tr>
 <td>GROQ_API_KEY</td>
-<td>LLM funzionante</td>
+<td>LLM attivo</td>
 </tr>
 
 <tr>
@@ -565,16 +526,14 @@ accelerazione attiva
 
 <tr>
 <td>HOST_SHARED_VOLUME_DIR</td>
-<td>mount corretto</td>
+<td>mount correttamente configurato</td>
 </tr>
 
 </table>
 
 </div>
 
-
 </div>
 
 </body>
-
 </html>
