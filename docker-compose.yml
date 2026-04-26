@@ -133,7 +133,7 @@ services:
   nextflow_worker:
     build:
       context: ./nextflow_worker
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     container_name: nextflow_worker
     networks:
       - clinical_network
