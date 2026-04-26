@@ -149,5 +149,5 @@ services:
       - SHARED_VOLUME_DIR=/shared_data
       - HOST_SHARED_VOLUME_DIR=${HOST_SHARED_VOLUME_DIR:-/shared_data}
       - NF_OUTDIR=${NF_OUTDIR:-/shared_data/nf_output}
-      - NF_LABELS=${NF_LABELS:-/app/data/external/ROI_labels.tsv}
+      - NF_LABELS=${NF_LABELS:-/tmp/ROI_labels.tsv}
       - MIG_DEVICE=${MIG_DEVICE:-all}
