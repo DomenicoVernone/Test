@@ -105,32 +105,36 @@ Docs » Configuration
 
 <h1>Configuration</h1>
 
+<p>
+This section describes the main configuration variables used by Clinical Twin microservices to manage authentication, model access, integration with AI services, and radiomics pipeline parameters.
+</p>
+
 <div class="service-box">
 
 <p>
-Clinical Twin utilizza file di configurazione distribuiti tra i diversi
-microservizi della piattaforma per gestire autenticazione, orchestrazione
-della pipeline neuroimaging, accesso ai modelli registrati e integrazione
-con servizi di inferenza basati su modelli linguistici.
+Clinical Twin uses configuration files distributed across the different
+platform microservices to manage authentication, orchestration of the
+neuroimaging pipeline, access to registered models, and integration
+with inference services based on language models.
 </p>
 
 <p>
-La corretta configurazione delle variabili di ambiente è necessaria per
-garantire la comunicazione tra i servizi e il funzionamento completo
-della pipeline radiomica.
+Proper configuration of environment variables is required to ensure
+communication between services and correct operation of the complete
+radiomics pipeline.
 </p>
 
 </div>
 
 
-<h2>File .env principali</h2>
+<h2>Main .env files</h2>
 
 <div class="service-box">
 
 <p>
-Ogni microservizio utilizza un file <code>.env</code> dedicato contenente
-le variabili di configurazione specifiche per autenticazione, accesso
-alle risorse e parametri operativi.
+Each microservice uses a dedicated <code>.env</code> file containing
+configuration variables specific to authentication, resource access,
+and operational parameters.
 </p>
 
 <div class="codeblock">
@@ -143,34 +147,34 @@ frontend/.env
 </div>
 
 <p>
-Questi file devono essere configurati prima dell’avvio dello stack Docker.
+These files must be configured before starting the Docker stack.
 </p>
 
 </div>
 
 
-<h2>Variabili condivise (JWT)</h2>
+<h2>Shared variables (JWT)</h2>
 
 <div class="service-box">
 
 <p>
-Le variabili JWT permettono l’autenticazione sicura tra i microservizi
-tramite token firmati digitalmente e garantiscono la protezione delle
-richieste interne alla piattaforma.
+JWT variables enable secure authentication between microservices
+through digitally signed tokens and ensure protection of internal
+platform requests.
 </p>
 
 <table>
 
 <tr>
-<th>Variabile</th>
-<th>Servizi</th>
-<th>Descrizione</th>
+<th>Variable</th>
+<th>Services</th>
+<th>Description</th>
 </tr>
 
 <tr>
 <td>SECRET_KEY</td>
 <td>api_gateway, orchestrator, llm_service</td>
-<td>Chiave crittografica condivisa per la generazione e validazione dei token JWT tra i servizi</td>
+<td>Shared cryptographic key for generating and validating JWT tokens between services</td>
 </tr>
 
 </table>
@@ -178,46 +182,46 @@ richieste interne alla piattaforma.
 </div>
 
 
-<h2>Configurazione MLflow / DagsHub</h2>
+<h2>MLflow / DagsHub configuration</h2>
 
 <div class="service-box">
 
 <p>
-Queste variabili consentono l’accesso al Model Registry MLflow ospitato
-su DagsHub e permettono il recupero automatico del modello champion
-utilizzato per l’inferenza diagnostica.
+These variables enable access to the MLflow Model Registry hosted
+on DagsHub and allow automatic retrieval of the champion model
+used for diagnostic inference.
 </p>
 
 <table>
 
 <tr>
-<th>Variabile</th>
-<th>Descrizione</th>
+<th>Variable</th>
+<th>Description</th>
 </tr>
 
 <tr>
 <td>MLFLOW_TRACKING_URI</td>
-<td>Endpoint del server MLflow utilizzato per tracciare esperimenti e modelli</td>
+<td>MLflow server endpoint used to track experiments and models</td>
 </tr>
 
 <tr>
 <td>MLFLOW_TRACKING_USERNAME</td>
-<td>Username dell’account DagsHub per autenticazione al registry</td>
+<td>DagsHub account username for registry authentication</td>
 </tr>
 
 <tr>
 <td>DAGSHUB_TOKEN</td>
-<td>Token di accesso al Model Registry remoto su DagsHub</td>
+<td>Access token for the remote Model Registry on DagsHub</td>
 </tr>
 
 <tr>
 <td>REPO_OWNER</td>
-<td>Nome utente o organizzazione proprietaria del repository MLflow</td>
+<td>Username or organization that owns the MLflow repository</td>
 </tr>
 
 <tr>
 <td>REPO_NAME</td>
-<td>Nome del repository contenente i modelli registrati</td>
+<td>Name of the repository containing registered models</td>
 </tr>
 
 </table>
@@ -225,26 +229,26 @@ utilizzato per l’inferenza diagnostica.
 </div>
 
 
-<h2>Configurazione assistente AI</h2>
+<h2>AI assistant configuration</h2>
 
 <div class="service-box">
 
 <p>
-L’assistente clinico context-aware utilizza modelli linguistici esterni
-tramite API. La seguente variabile consente l’autenticazione al servizio
-LLM utilizzato per supportare l’interpretazione dei risultati radiomici.
+The context-aware clinical assistant uses external language models
+via APIs. The following variable enables authentication with the
+LLM service used to support interpretation of radiomic results.
 </p>
 
 <table>
 
 <tr>
-<th>Variabile</th>
-<th>Descrizione</th>
+<th>Variable</th>
+<th>Description</th>
 </tr>
 
 <tr>
 <td>GROQ_API_KEY</td>
-<td>Chiave API per l’accesso al modello linguistico utilizzato dal servizio AI</td>
+<td>API key for accessing the language model used by the AI service</td>
 </tr>
 
 </table>
@@ -252,13 +256,13 @@ LLM utilizzato per supportare l’interpretazione dei risultati radiomici.
 </div>
 
 
-<h2>Configurazione GPU (opzionale)</h2>
+<h2>GPU configuration (optional)</h2>
 
 <div class="service-box">
 
 <p>
-Se disponibile una GPU NVIDIA, FastSurfer può utilizzare accelerazione
-CUDA per ridurre significativamente i tempi di segmentazione delle immagini MRI.
+If an NVIDIA GPU is available, FastSurfer can use CUDA acceleration
+to significantly reduce MRI segmentation processing time.
 </p>
 
 <div class="codeblock">
@@ -266,21 +270,22 @@ MIG_DEVICE=
 </div>
 
 <p>
-Su sistemi con GPU partizionate (Multi-Instance GPU) è possibile specificare
-l’identificativo della MIG instance assegnata al container. Lasciare vuoto
-su sistemi CPU-only o GPU standard.
+On systems with partitioned GPUs (Multi-Instance GPU), it is possible
+to specify the identifier of the MIG instance assigned to the container.
+Leave empty on CPU-only systems or standard GPU setups.
 </p>
 
 </div>
 
 
-<h2>Configurazione volumi condivisi</h2>
+<h2>Shared volumes configuration</h2>
 
 <div class="service-box">
 
 <p>
-La variabile seguente definisce la directory host utilizzata per condividere
-dataset MRI e output intermedi tra i container della pipeline Nextflow.
+The following variable defines the host directory used to share
+MRI datasets and intermediate outputs between containers in the
+Nextflow pipeline.
 </p>
 
 <div class="codeblock">
@@ -288,21 +293,21 @@ HOST_SHARED_VOLUME_DIR=
 </div>
 
 <p>
-Questo parametro è richiesto principalmente su sistemi Linux bare-metal.
-Su Docker Desktop (Windows/macOS) può rimanere non impostato.
+This parameter is mainly required on Linux bare-metal systems.
+On Docker Desktop (Windows/macOS) it may remain unset.
 </p>
 
 </div>
 
 
-<h2>Configurazione pipeline Nextflow</h2>
+<h2>Nextflow pipeline configuration</h2>
 
 <div class="service-box">
 
 <p>
-I parametri principali della pipeline radiomica sono definiti nel file
-di configurazione Nextflow. Queste impostazioni controllano parallelizzazione,
-modalità di segmentazione e numero di job radiomici eseguiti simultaneamente.
+The main radiomics pipeline parameters are defined in the Nextflow
+configuration file. These settings control parallelization,
+segmentation mode, and the number of radiomics jobs executed simultaneously.
 </p>
 
 <div class="codeblock">
@@ -312,33 +317,33 @@ nextflow_worker/nextflow/configs/nextflow.config
 <table>
 
 <tr>
-<th>Parametro</th>
-<th>Descrizione</th>
+<th>Parameter</th>
+<th>Description</th>
 </tr>
 
 <tr>
 <td>params.maxforks</td>
-<td>Numero massimo di processi paralleli eseguibili simultaneamente</td>
+<td>Maximum number of parallel processes that can run simultaneously</td>
 </tr>
 
 <tr>
 <td>params.fastsurfer_threads</td>
-<td>Numero di thread CPU utilizzati durante la segmentazione FastSurfer</td>
+<td>Number of CPU threads used during FastSurfer segmentation</td>
 </tr>
 
 <tr>
 <td>params.fastsurfer_device</td>
-<td>Dispositivo di esecuzione: cpu oppure cuda</td>
+<td>Execution device: cpu or cuda</td>
 </tr>
 
 <tr>
 <td>params.pyradiomics_jobs</td>
-<td>Numero massimo di estrazioni radiomiche eseguite in parallelo</td>
+<td>Maximum number of radiomics extractions executed in parallel</td>
 </tr>
 
 <tr>
 <td>params.brain_segmenter</td>
-<td>Selezione del segmentatore: freesurfer oppure fastsurfer</td>
+<td>Segmenter selection: freesurfer or fastsurfer</td>
 </tr>
 
 </table>

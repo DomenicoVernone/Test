@@ -143,100 +143,100 @@ Docs » System Architecture
 <div class="service-box">
 
 <p>
-Clinical Twin is designed as a modular platform based on containerized
-microservices orchestrated through Docker Compose.
-The architecture clearly separates neuroimaging preprocessing,
-statistical inference, model management, and the clinical interface.
+Clinical Twin è progettato come una piattaforma modulare basata su
+microservizi containerizzati orchestrati tramite Docker Compose.
+L’architettura separa chiaramente preprocessing neuroimaging, inferenza
+statistica, gestione modelli e interfaccia clinica.
 </p>
 
 </div>
 
 
-<h2>General overview</h2>
+<h2>Panoramica generale</h2>
 
 <div class="service-box">
 
 <p>
-The following diagram represents the logical structure of the microservices
-and the data flow within the Clinical Twin pipeline.
+Il diagramma seguente rappresenta la struttura logica dei microservizi e
+il flusso dei dati all’interno della pipeline Clinical Twin.
 </p>
 
 <div class="arch-image">
 <img src="../assets/architecture.png" alt="Clinical Twin architecture diagram">
 <div class="caption">
-Figure: Microservices architecture of the Clinical Twin platform
+Figura: Architettura a microservizi della piattaforma Clinical Twin
 </div>
 </div>
 
-<p>Main operational workflow:</p>
+<p>Flusso operativo principale:</p>
 
 <div class="codeblock">
-MRI → Segmentation → Radiomic extraction → KNN inference → UMAP embedding → Clinical dashboard
+MRI → Segmentazione → Estrazione radiomica → Inferenza KNN → Embedding UMAP → Dashboard clinica
 </div>
 
 </div>
 
 
-<h2>Microservices architecture</h2>
+<h2>Architettura a microservizi</h2>
 
 <div class="service-box">
 
 <table>
 
 <tr>
-<th>Service</th>
-<th>Technology</th>
-<th>Port</th>
-<th>Function</th>
+<th>Servizio</th>
+<th>Tecnologia</th>
+<th>Porta</th>
+<th>Funzione</th>
 </tr>
 
 <tr>
 <td>api_gateway</td>
 <td>FastAPI, JWT</td>
 <td>8000</td>
-<td>User authentication and request routing</td>
+<td>Autenticazione utenti e routing richieste</td>
 </tr>
 
 <tr>
 <td>orchestrator</td>
 <td>FastAPI</td>
 <td>8001</td>
-<td>Asynchronous pipeline task management</td>
+<td>Gestione task asincroni pipeline</td>
 </tr>
 
 <tr>
 <td>llm_service</td>
 <td>FastAPI, Spatial RAG</td>
 <td>8002</td>
-<td>Context-aware AI assistant</td>
+<td>Assistente AI context-aware</td>
 </tr>
 
 <tr>
 <td>model_service</td>
 <td>FastAPI, MLflow</td>
 <td>8003</td>
-<td>Champion model management</td>
+<td>Gestione modelli champion</td>
 </tr>
 
 <tr>
 <td>inference_engine</td>
 <td>R, Plumber</td>
 <td>8004</td>
-<td>KNN inference and UMAP projection</td>
+<td>Inferenza KNN e proiezione UMAP</td>
 </tr>
 
 <tr>
 <td>nextflow_worker</td>
 <td>Nextflow, FreeSurfer</td>
 <td>8005</td>
-<td>MRI segmentation and radiomics extraction</td>
+<td>Segmentazione MRI e radiomica</td>
 </tr>
 
 <tr>
 <td>frontend</td>
 <td>React, Plotly, NiiVue</td>
 <td>5173</td>
-<td>Interactive clinical dashboard</td>
+<td>Dashboard clinica interattiva</td>
 </tr>
 
 </table>
@@ -244,20 +244,19 @@ MRI → Segmentation → Radiomic extraction → KNN inference → UMAP embeddin
 </div>
 
 
-<h2>Neuroimaging pipeline</h2>
+<h2>Pipeline neuroimaging</h2>
 
 <div class="service-box">
 
 <p>
-Main stages of the preprocessing and radiomic analysis pipeline applied
-to structural MRI images.
+Le principali fasi della pipeline di preprocessing e analisi radiomica applicata alle immagini MRI strutturali.
 </p>
 
 <ul>
-<li>volumetric MRI preprocessing</li>
-<li>FreeSurfer / FastSurfer anatomical segmentation</li>
-<li>brain ROI extraction</li>
-<li>PyRadiomics feature extraction</li>
+<li>preprocessing MRI volumetrica</li>
+<li>segmentazione anatomica FreeSurfer / FastSurfer</li>
+<li>estrazione ROI cerebrali</li>
+<li>feature radiomiche PyRadiomics</li>
 </ul>
 
 </div>
@@ -268,33 +267,32 @@ to structural MRI images.
 <div class="service-box">
 
 <p>
-Implements KNN classification and 3D UMAP projection
-to represent the patient within the diagnostic latent space.
+Implementa classificazione KNN e proiezione
+UMAP 3D per rappresentare il paziente nello spazio latente diagnostico.
 </p>
 
 <ul>
-<li>clinical nearest neighbors</li>
-<li>diagnostic clusters</li>
-<li>interpretable decision support</li>
+<li>nearest neighbors clinici</li>
+<li>cluster diagnostici</li>
+<li>supporto decisionale interpretabile</li>
 </ul>
 
 </div>
 
 
-<h2>Context-aware AI assistant</h2>
+<h2>Assistente AI context-aware</h2>
 
 <div class="service-box">
 
 <p>
-Provides interpretative support for model predictions by integrating
-radiomic features, UMAP embeddings, and conversational clinical context.
+Fornisce supporto interpretativo alle predizioni del modello integrando informazioni radiomiche, embedding UMAP e contesto clinico conversazionale.
 </p>
 
 <ul>
-<li>radiomic feature interpretation</li>
-<li>position analysis in the UMAP space</li>
-<li>clinical explainability support</li>
-<li>multi-turn conversational memory</li>
+<li>interpretazione feature radiomiche</li>
+<li>analisi posizione nello spazio UMAP</li>
+<li>supporto explainability clinica</li>
+<li>memoria conversazionale multi-turno</li>
 </ul>
 
 </div>

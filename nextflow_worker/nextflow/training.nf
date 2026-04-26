@@ -1,106 +1,140 @@
-// Composed parameters
+// ==========================================
+// PARAMETRI COMPOSTI
+// ==========================================
+
 params.experiment_path = "${params.brain_segmenter}/${params.experiment_name}/${params.selection_method}"
 params.training_args = "${params.brain_segmenter} ${params.selection_method} ${params.experiment_name}"
 
+
+// ==========================================
+// WORKFLOW
+// ==========================================
+
 workflow {
-    merge_ch = channel
-        .fromPath(params.merge_script)
-    
-    rfe_ch = channel
-        .fromPath(params.rfe_script)
-    
-    lasso_ch = channel
-        .fromPath(params.lasso_script)
-    
-    labels_file_ch = channel
-        .fromPath(params.labels)
-    
-    demographic_ch = channel
-        .fromPath(params.demographic_data ?: "NULL")
 
-    csv_dir = channel
-        .fromPath(
-            params.feat_output,
-            type: 'dir'
-        )
-    env_ch = channel
-        .fromPath(params.env)
-    
-    hyperparams_ch = channel
-            .fromPath(params.config)
+    merge_ch = channel.fromPath(params.merge_script)
 
-    parallel_ch = channel
-        .fromPath(params.selection)
+    rfe_ch = channel.fromPath(params.rfe_script)
 
-    models_ch = channel
-        .fromPath([
-            params.svm,
-            params.rf,
-            params.knn,
-            params.xgb
-        ])
-    
-    metrics_ch = channel
-        .fromPath(params.metrics_script)
+    lasso_ch = channel.fromPath(params.lasso_script)
 
-    stability_ch = channel
-        .fromPath(params.stability_script)
+    labels_file_ch = channel.fromPath(params.labels)
+
+    demographic_ch = channel.fromPath(params.demographic_data ?: "NULL")
+
+    csv_dir = channel.fromPath(params.feat_output, type: 'dir')
+
+    env_ch = channel.fromPath(params.env)
+
+    hyperparams_ch = channel.fromPath(params.config)
+
+    parallel_ch = channel.fromPath(params.selection)
+
+    models_ch = channel.fromPath([
+        params.svm,
+        params.rf,
+        params.knn,
+        params.xgb
+    ])
+
+    metrics_ch = channel.fromPath(params.metrics_script)
+
+    stability_ch = channel.fromPath(params.stability_script)
 
 
-    // Training pipeline
+    /*
+    ==========================================
+    FEATURE MERGING
+    ==========================================
+    */
+
     feat_all = aggregate_features(
-        merge_ch, 
+        merge_ch,
         csv_dir,
         labels_file_ch,
         demographic_ch
-        )
+    )
+
+
+    /*
+    ==========================================
+    PARALLEL TRAINING
+    ==========================================
+    */
+
     if (params.parallel_training) {
+
         features = select_features(
             parallel_ch,
             feat_all,
             hyperparams_ch
-            )
+        )
+
         frequency_stability(
             stability_ch,
             features.feat,
             labels_file_ch
-            )
+        )
+
         training_input = features.rds
-            .combine(models_ch).combine(env_ch)
-        results = parallel_training(
-            training_input
-            )
+            .combine(models_ch)
+            .combine(env_ch)
+
+        results = parallel_training(training_input)
+
         aggregate_metrics(
             results.collect(),
             metrics_ch
-            )
+        )
+
+
+    /*
+    ==========================================
+    SEQUENTIAL TRAINING
+    ==========================================
+    */
+
     } else {
-        sequential_ch = params.selection_method == "rfe" ? rfe_ch :
-                        params.selection_method == "lasso" ? lasso_ch:
-                        error("Wrong method specified. Use 'rfe' or 'lasso'")
+
+        sequential_ch =
+            params.selection_method == "rfe" ? rfe_ch :
+            params.selection_method == "lasso" ? lasso_ch :
+            error("Wrong method specified. Use 'rfe' or 'lasso'")
+
         results = sequential_training(
-            feat_all, 
-            sequential_ch, 
+            feat_all,
+            sequential_ch,
             hyperparams_ch
-            )
+        )
+
         frequency_stability(
-            stability_ch, 
-            results.feat, 
+            stability_ch,
+            results.feat,
             labels_file_ch
-            )
+        )
+
         csv = results.svm
-                .mix(results.rf, 
-                     results.knn, 
-                     results.xgb
-                     )
+            .mix(results.rf,
+                 results.knn,
+                 results.xgb)
+
         aggregate_metrics(
-            csv.collect(), 
+            csv.collect(),
             metrics_ch
-            )
+        )
     }
 }
 
+
+
+/*
+==========================================
+PROCESS: MERGE FEATURES
+==========================================
+*/
+
 process aggregate_features {
+
     container 'ftd-training'
     debug true
 
@@ -111,17 +145,35 @@ process aggregate_features {
     path demograph
 
     output:
-    path csv_dir
+    path "*.csv"
 
     script:
     """
-    Rscript $script $csv_dir $labels "$params.sperimental" "$params.control" $demograph
+    Rscript $script \
+        $csv_dir \
+        $labels \
+        "$params.experimental" \
+        "$params.control" \
+        $demograph
     """
 }
 
+
+
+/*
+==========================================
+PROCESS: SEQUENTIAL TRAINING
+==========================================
+*/
+
 process sequential_training {
+
     container 'ftd-training'
-    publishDir "data/experiments-sequential/${params.experiment_path}", mode: 'copy'
+
+    publishDir "data/experiments-sequential/${params.experiment_path}",
+        mode: 'copy',
+        pattern: "*.csv"
+
     debug true
 
     input:
@@ -130,11 +182,11 @@ process sequential_training {
     path config
 
     output:
-    path ("*+SVM.csv"), emit: svm
-    path ("*+RF.csv"), emit: rf
-    path ("*+kNN.csv"), emit: knn
-    path ("*+XGB.csv"), emit: xgb
-    path ("*_feat.csv"), emit: feat
+    path("*+SVM.csv"), emit: svm
+    path("*+RF.csv"), emit: rf
+    path("*+kNN.csv"), emit: knn
+    path("*+XGB.csv"), emit: xgb
+    path("*_feat.csv"), emit: feat
 
     script:
     """
@@ -142,9 +194,22 @@ process sequential_training {
     """
 }
 
+
+
+/*
+==========================================
+PROCESS: FEATURE SELECTION
+==========================================
+*/
+
 process select_features {
+
     container 'ftd-training'
-    publishDir "data/experiments-selected-mwmote/${params.experiment_path}", mode: 'copy', pattern: 'feat.csv'
+
+    publishDir "data/experiments-selected-mwmote/${params.experiment_path}",
+        mode: 'copy',
+        pattern: "*.csv"
+
     debug true
 
     input:
@@ -153,7 +218,10 @@ process select_features {
     path config
 
     output:
-    tuple path("features", type: 'dir'), path("data", type: 'dir'), emit: rds
+    tuple path("features", type: 'dir'),
+          path("data", type: 'dir'),
+          emit: rds
+
     path("feat.csv"), emit: feat
 
     script:
@@ -162,33 +230,64 @@ process select_features {
     """
 }
 
+
+
+/*
+==========================================
+PROCESS: PARALLEL TRAINING
+==========================================
+*/
+
 process parallel_training {
+
     container 'ftd-training'
-    containerOptions "--env-file ${env}"
-    publishDir "data/experiments-selected-mwmote/${params.experiment_path}", mode: 'copy'
+
+    publishDir "data/experiments-selected-mwmote/${params.experiment_path}",
+        mode: 'copy',
+        pattern: "*.csv"
+
     debug true
 
     input:
-    tuple path(feat_dir), path(data_dir), path(script), val(env)
+    tuple path(feat_dir),
+          path(data_dir),
+          path(script),
+          path(env)
 
     output:
-    path ("*.csv")
+    path("*.csv")
 
     script:
     """
-    Rscript $script $data_dir $feat_dir ${params.training_args}
+    export $(cat ${env} | xargs)
+
+    Rscript $script \
+        $data_dir \
+        $feat_dir \
+        ${params.training_args}
     """
 }
 
+
+
+/*
+==========================================
+PROCESS: STABILITY ANALYSIS
+==========================================
+*/
+
 process frequency_stability {
+
     container 'ftd-training'
-    debug true
-    publishDir (
-        params.parallel_training ? 
+
+    publishDir(
+        params.parallel_training ?
         "data/experiments-selected-mwmote/${params.experiment_path}" :
         "data/experiments-sequential/${params.experiment_path}",
         mode: 'copy'
     )
+
+    debug true
 
     input:
     path script
@@ -205,19 +304,30 @@ process frequency_stability {
     """
 }
 
+
+
+/*
+==========================================
+PROCESS: METRICS AGGREGATION
+==========================================
+*/
+
 process aggregate_metrics {
+
     container 'ftd-training'
-    debug true
-    publishDir (
-        params.parallel_training ? 
+
+    publishDir(
+        params.parallel_training ?
         "data/experiments-selected-mwmote/${params.experiment_path}" :
         "data/experiments-sequential/${params.experiment_path}",
         mode: 'copy'
     )
 
+    debug true
+
     input:
-    path csv_files
-    path metrics_script
+    path(csv_files)
+    path(metrics_script)
 
     output:
     path("metrics.csv")

@@ -2,26 +2,40 @@ site_name: Clinical Twin – FTD Radiomics Pipeline Documentation
 
 theme:
   name: material
+  language: en  # Lingua predefinita per l'interfaccia (Inglese)
+  palette:
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.tabs
+    - content.code.copy
+
+plugins:
+  - search
+  - i18n:
+      default_language: en
+      languages:
+        en:
+          name: English
+          build: true
+        it:
+          name: Italiano
+          build: true
+      add_selector: true
+      fallback_to_default: true 
 
 nav:
-  - Introduzione: index.md
-
-  - Architettura:
-      - Architettura Clinical Twin: Architettura.md
-      - Panoramica Microservizi: Microservizi.md
-      - Struttura del Progetto: Struttura_del_Progetto.md
-
-  - Setup Ambiente:
-      - Installazione: Installazione.md
-      - Configurazione: Configurazione.md
-
-  - Pipeline Neuroimaging: pipeline.md
-
-  - Guida Rapida: Guida_Rapida.md
-
-  - Riferimento API: api.md
-
+  - Introduction: index.md
+  - Architecture:
+      - Clinical Twin Architecture: Architettura.md
+      - Microservices Overview: Microservizi.md
+      - Project Structure: Struttura_del_Progetto.md
+  - Environment Setup:
+      - Installation: Installazione.md
+      - Configuration: Configurazione.md
+  - Neuroimaging Pipeline: pipeline.md
+  - Quick Guide: Guida_Rapida.md
+  - API Reference: api.md
   - Deployment: Deployment.md
-
   - Testing: testing.md
-  - TestProvati: TestProvati.md
+  - Test Results: TestProvati.md

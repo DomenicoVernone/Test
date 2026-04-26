@@ -1,11 +1,13 @@
 // ==========================================
 // 0. PARAMETRI DI DEFAULT
 // ==========================================
+params.labels = "${projectDir}/data/external/ROI_labels.tsv"
+params.settings = "${projectDir}/data/external/pyradiomics.yaml"
 params.outdir = "/shared_data/nf_output"
 params.segmenter_folder_output = "${params.outdir}/segmentation"
 params.features_output = "${params.outdir}/features"
 params.feat_output = "${params.outdir}/feat"
-params.error_strategy = 'ignore'
+params.error_strategy = 'terminate'
 params.maxforks = 1
 params.pyradiomics_jobs = 4
 params.fastsurfer_device = 'cpu' // default sicuro - viene sovrasctitto dalla CLI
@@ -36,8 +38,9 @@ workflow {
             }
     }
 
-    labels_file_ch = channel.fromPath(params.labels)
-    params_file_ch = channel.fromPath(params.settings)
+
+labels_file_ch = channel.fromPath(params.labels)
+params_file_ch = channel.fromPath(params.settings)
 
     if (params.brain_segmenter == "freesurfer") {
         segmenter_out = freesurfer(subjects_ch)
@@ -49,11 +52,20 @@ workflow {
 
     nifti_out = nifti_converter(segmenter_out, params.segmenter_folder_output)
 
-    roi = roi_creator(nifti_out.combine(labels_file_ch), params.segmenter_folder_output)
+    roi_input = nifti_out.combine(labels_file_ch)
+                     .map { subject, group, nu, aparc, labels ->
+                         tuple(subject, group, nu, aparc, labels)
+                     }
 
-    csv_out = csv_collector(
-        nifti_out.join(roi).combine(labels_file_ch)
-    )
+roi = roi_creator(roi_input, params.segmenter_folder_output)
+
+   csv_input = nifti_out.join(roi)
+                     .combine(labels_file_ch)
+                     .map { subject, group, nu, aparc, roi_dir, labels ->
+                         tuple(subject, group, nu, aparc, roi_dir, labels)
+                     }
+
+csv_out = csv_collector(csv_input)
 
     feature_extraction(
         csv_out,
@@ -113,7 +125,8 @@ process fastsurfer {
 
 process nifti_converter {
     container 'clinical-freesurfer'
-    errorStrategy params.error_strategy
+    errorStrategy 'terminate'
+
     publishDir "${params.segmenter_folder_output}/${FTD_group}/${subject}/mri", mode: 'copy'
 
     input:
@@ -125,7 +138,14 @@ process nifti_converter {
 
     script:
     """
-    export FS_LICENSE=/app/license.txt
+    export FS_LICENSE=/usr/local/freesurfer/.license
+
+    echo "Listing subject_dir:"
+    ls -R ${subject_dir}
+
+    test -f ${subject_dir}/mri/nu.mgz
+    test -f ${subject_dir}/mri/aparc+aseg.mgz
+
     mri_convert ${subject_dir}/mri/nu.mgz nu.nii
     mri_convert ${subject_dir}/mri/aparc+aseg.mgz aparc+aseg.nii
     """
@@ -143,24 +163,31 @@ process roi_creator {
     output:
     tuple val(subject), path("ROI")
 
-    script:
-    """
-    mkdir -p ROI
-    cd ROI
-    while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
-        if [[ -z "\$label" || "\$label" == "#"* ]]; then
-            continue
-        fi
-        clean_name=\$(echo "\$name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
-        if [[ -z "\$clean_name" ]]; then
-            continue
-        fi
-        fslmaths ../${aparc_aseg_nii} -thr \$label -uthr \$label \${clean_name}.nii.gz
-        if [[ -f "\${clean_name}.nii.gz" ]]; then
-            fslmaths \${clean_name}.nii.gz -bin \${clean_name}.nii.gz
-        fi
-    done < ../${labels_file}
-    """
+  script:
+"""
+mkdir -p ROI
+cd ROI
+
+while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
+
+    if [[ -z "\$label" || "\$label" == "#"* ]]; then
+        continue
+    fi
+
+    clean_name=\$(echo "\$name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
+
+    if [[ -z "\$clean_name" ]]; then
+        continue
+    fi
+
+    fslmaths ${aparc_aseg_nii} -thr \$label -uthr \$label \${clean_name}.nii.gz
+
+    if [[ -f "\${clean_name}.nii.gz" ]]; then
+        fslmaths \${clean_name}.nii.gz -bin \${clean_name}.nii.gz
+    fi
+
+done < ${labels_file}
+"""
 }
 
 process csv_collector {
@@ -199,7 +226,7 @@ process feature_extraction {
     publishDir "${params.outdir}", mode: 'copy', pattern: 'radiomics_features.csv'
 
     input:
-    path csv_files
+    path csv_files, stageAs: "*.csv"
     path nu_files
     path roi_dirs
     path labels_file
@@ -251,7 +278,7 @@ else:
                         if new_key not in all_keys:
                             all_keys.append(new_key)
     with open('radiomics_features.csv', 'w', newline='') as out:
-        writer = csv.DictWriter(out, fieldnames=all_keys, extrasaction='ignore')
+        writer = csv.DictWriter(out, fieldnames=all_keys, extrasaction='terminate')
         writer.writeheader()
         writer.writerows(rows.values())
     print('radiomics_features.csv generato.')

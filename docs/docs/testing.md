@@ -102,47 +102,47 @@ th {
 Docs » Test Plan
 </div>
 
-<h1>Piano di test completo – Clinical Twin</h1>
+<h1>Complete Test Plan – Clinical Twin</h1>
 
 <div class="service-box">
 
 <p>
-Questo piano di test definisce le procedure di validazione funzionale, strutturale e prestazionale della piattaforma <strong>ClinicalTwin</strong>.
+This test plan defines the functional, structural, and performance validation procedures of the <strong>ClinicalTwin</strong> platform.
 </p>
 
 <p>
-Le verifiche coprono l’intero stack applicativo, inclusi:
+The verification activities cover the entire application stack, including:
 </p>
 
 <ul>
-<li>microservizi backend containerizzati</li>
-<li>pipeline neuroimaging Nextflow</li>
-<li>motore statistico di inferenza (KNN + UMAP)</li>
-<li>model registry MLflow</li>
-<li>assistente LLM Spatial RAG</li>
-<li>dashboard clinica React</li>
+<li>containerized backend microservices</li>
+<li>Nextflow neuroimaging pipeline</li>
+<li>statistical inference engine (KNN + UMAP)</li>
+<li>MLflow model registry</li>
+<li>Spatial RAG LLM assistant</li>
+<li>React clinical dashboard</li>
 </ul>
 
 <p class="note">
-L’obiettivo del test plan è garantire correttezza computazionale, robustezza operativa e riproducibilità del workflow diagnostico.
+The objective of the test plan is to ensure computational correctness, operational robustness, and reproducibility of the diagnostic workflow.
 </p>
 
 </div>
 
-<h2>1. Test deployment dello stack Docker</h2>
+<h2>1. Docker stack deployment test</h2>
 
 <div class="service-box">
 
 <p>
-Questa fase verifica la corretta costruzione delle immagini container e l’avvio dell’intera architettura a microservizi.
+This phase verifies the correct build of container images and the startup of the entire microservices architecture.
 </p>
 
-<h3>Build immagini pipeline scientifica</h3>
+<h3>Scientific pipeline image build</h3>
 
 <div class="codeblock">
-docker build -t clinical-freesurfer ...
-docker build -t clinical-fsl ...
-docker build -t clinical-pyradiomics ...
+docker build -t clinical-freesurfer -f nextflow_worker/dockerfiles/freesurfer.dockerfile nextflow_worker/
+docker build -t clinical-fsl -f nextflow_worker/dockerfiles/fsl.dockerfile nextflow_worker/
+docker build -t clinical-pyradiomics -f nextflow_worker/dockerfiles/pyradiomics.dockerfile nextflow_worker/
 </div>
 
 <p>
@@ -150,70 +150,70 @@ Expected:
 </p>
 
 <ul>
-<li>assenza errori durante la build</li>
-<li>presenza immagini nel registry locale Docker</li>
-<li>compatibilità runtime con Nextflow</li>
+<li>no errors during build</li>
+<li>images available in the local Docker registry</li>
+<li>runtime compatibility with Nextflow</li>
 </ul>
 
-<h3>Avvio stack</h3>
+<h3>Stack startup</h3>
 
 <div class="codeblock">
 docker compose up -d --build
 </div>
 
 <p>
-Verifica:
+Verification:
 </p>
 
 <ul>
-<li>tutti i container risultano in stato running</li>
-<li>assenza crash nei log iniziali</li>
-<li>mount dei volumi condivisi correttamente eseguito</li>
+<li>all containers are in running state</li>
+<li>no crashes in initial logs</li>
+<li>shared volume mounts correctly configured</li>
 </ul>
 
 </div>
 
-<h2>2. Test autenticazione (api_gateway)</h2>
+<h2>2. Authentication test (api_gateway)</h2>
 
 <div class="service-box">
 
 <p>
-Questa fase valida il sistema di autenticazione JWT condiviso tra i microservizi.
+This phase validates the JWT authentication system shared between microservices.
 </p>
 
 Expected:
 
 <ul>
-<li>creazione utente persistente su SQLite</li>
-<li>generazione token valido</li>
-<li>protezione endpoint REST</li>
-<li>coerenza SECRET_KEY tra servizi</li>
+<li>persistent user creation in SQLite</li>
+<li>valid token generation</li>
+<li>REST endpoint protection</li>
+<li>SECRET_KEY consistency across services</li>
 </ul>
 
 <p class="note">
-Il test garantisce isolamento delle sessioni e accesso sicuro alla pipeline diagnostica.
+This test ensures session isolation and secure access to the diagnostic pipeline.
 </p>
 
 </div>
 
-<h2>3. Test orchestrator pipeline</h2>
+<h2>3. Orchestrator pipeline test</h2>
 
 <div class="service-box">
 
 <p>
-Il servizio orchestrator coordina l’esecuzione asincrona della pipeline radiomica.
+The orchestrator service coordinates asynchronous execution of the radiomics pipeline.
 </p>
 
-Verifiche:
+Checks:
 
 <ul>
-<li>creazione task MRI</li>
-<li>transizione stati corretta</li>
-<li>propagazione errori pipeline</li>
-<li>gestione job concorrenti</li>
+<li>MRI task creation</li>
+<li>correct state transitions</li>
+<li>pipeline error propagation</li>
+<li>concurrent job handling</li>
 </ul>
 
-Flow atteso:
+Expected flow:
 
 <div class="codeblock">
 pending → running → completed
@@ -221,16 +221,16 @@ pending → running → completed
 
 Failure case:
 
-MRI non valida → status = failed
+invalid MRI → status = failed
 
 </div>
 
-<h2>4. Test pipeline nextflow_worker</h2>
+<h2>4. nextflow_worker pipeline test</h2>
 
 <div class="service-box">
 
 <p>
-Verifica l’esecuzione completa della pipeline neuroimaging automatizzata.
+Verifies full execution of the automated neuroimaging pipeline.
 </p>
 
 Pipeline:
@@ -239,15 +239,15 @@ Pipeline:
 FreeSurfer / FastSurfer → ROI extraction → PyRadiomics → CSV generation
 </div>
 
-Output attesi:
+Expected outputs:
 
 <ul>
-<li>segmentazioni corticali corrette</li>
-<li>maschere ROI generate</li>
-<li>dataset radiomico completo</li>
+<li>correct cortical segmentations</li>
+<li>ROI masks generated</li>
+<li>complete radiomics dataset</li>
 </ul>
 
-File richiesti:
+Required files:
 
 <div class="codeblock">
 ROI_labels.tsv
@@ -256,34 +256,34 @@ pyradiomics.yaml
 
 </div>
 
-<h2>5. Test model_service</h2>
+<h2>5. model_service test</h2>
 
 <div class="service-box">
 
 <p>
-Valida l’integrazione con MLflow Model Registry su backend DagsHub.
+Validates integration with the MLflow Model Registry on the DagsHub backend.
 </p>
 
 Expected:
 
 <ul>
-<li>connessione al tracking server</li>
-<li>download modello champion</li>
-<li>cache locale creata correttamente</li>
-<li>compatibilità feature vector</li>
+<li>connection to tracking server</li>
+<li>champion model download</li>
+<li>local cache correctly created</li>
+<li>feature vector compatibility</li>
 </ul>
 
 </div>
 
-<h2>6. Test inference_engine</h2>
+<h2>6. inference_engine test</h2>
 
 <div class="service-box">
 
 <p>
-Il servizio inference_engine implementa classificazione KNN e proiezione UMAP tridimensionale.
+The inference_engine service implements KNN classification and three-dimensional UMAP projection.
 </p>
 
-Output attesi:
+Expected outputs:
 
 <div class="codeblock">
 diagnosis_class
@@ -291,34 +291,34 @@ probability
 umap_coordinates
 </div>
 
-Test robustezza:
+Robustness tests:
 
 <ul>
-<li>feature mancanti → errore controllato</li>
+<li>missing features → controlled error</li>
 <li>dimension mismatch → pipeline abort</li>
-<li>dataset incompleto → fallback logging</li>
+<li>incomplete dataset → fallback logging</li>
 </ul>
 
 </div>
 
-<h2>7. Test llm_service</h2>
+<h2>7. llm_service test</h2>
 
 <div class="service-box">
 
 <p>
-Valida la generazione di spiegazioni cliniche contestualizzate tramite Spatial RAG.
+Validates generation of contextualized clinical explanations through Spatial RAG.
 </p>
 
-Verifiche:
+Checks:
 
 <ul>
-<li>risposte embedding-aware</li>
-<li>uso coordinate UMAP</li>
-<li>accesso feature radiomiche rilevanti</li>
-<li>persistenza memoria conversazionale</li>
+<li>embedding-aware responses</li>
+<li>use of UMAP coordinates</li>
+<li>access to relevant radiomic features</li>
+<li>conversational memory persistence</li>
 </ul>
 
-Accesso senza token:
+Access without token:
 
 Expected:
 
@@ -328,65 +328,65 @@ Expected:
 
 </div>
 
-<h2>8. Test frontend React dashboard</h2>
+<h2>8. React dashboard frontend test</h2>
 
 <div class="service-box">
 
 <p>
-Verifica la corretta integrazione tra UI clinica e backend microservizi.
+Verifies correct integration between the clinical UI and backend microservices.
 </p>
 
-Componenti verificati:
+Verified components:
 
 <ul>
-<li>Login.jsx → autenticazione</li>
-<li>UploadZone.jsx → invio MRI</li>
-<li>NiiVue.jsx → rendering volumetrico</li>
-<li>UmapPlot.jsx → visualizzazione spazio latente</li>
-<li>TaskHistory.jsx → storico analisi</li>
+<li>Login.jsx → authentication</li>
+<li>UploadZone.jsx → MRI submission</li>
+<li>NiiVue.jsx → volumetric rendering</li>
+<li>UmapPlot.jsx → latent space visualization</li>
+<li>TaskHistory.jsx → analysis history</li>
 </ul>
 
 </div>
 
-<h2>9. Test integrazione end-to-end</h2>
+<h2>9. End-to-end integration test</h2>
 
 <div class="service-box">
 
-Workflow completo:
+Complete workflow:
 
 <div class="codeblock">
 Login
 Upload MRI
-Segmentazione
+Segmentation
 Radiomics extraction
-Inferenza KNN
-Embedding UMAP
-Visualizzazione dashboard
-Query LLM assistant
+KNN inference
+UMAP embedding
+Dashboard visualization
+LLM assistant query
 </div>
 
 Expected:
 
-pipeline completata senza errori
-output coerente tra servizi
-visualizzazione consistente UI
+pipeline completed without errors
+consistent output across services
+consistent UI visualization
 
 </div>
 
-<h2>10. Test sicurezza</h2>
+<h2>10. Security test</h2>
 
 <div class="service-box">
 
-Verifiche:
+Checks:
 
 <ul>
-<li>validazione token JWT</li>
-<li>isolamento dati utente</li>
-<li>protezione API keys sensibili</li>
-<li>assenza esposizione credenziali frontend</li>
+<li>JWT token validation</li>
+<li>user data isolation</li>
+<li>sensitive API key protection</li>
+<li>no credential exposure in frontend</li>
 </ul>
 
-Chiavi protette:
+Protected keys:
 
 <div class="codeblock">
 GROQ_API_KEY
@@ -395,53 +395,53 @@ DAGSHUB_TOKEN
 
 </div>
 
-<h2>11. Test performance</h2>
+<h2>11. Performance test</h2>
 
 <div class="service-box">
 
 <table>
 
 <tr>
-<th>Componente</th>
-<th>Metrica</th>
-<th>Obiettivo</th>
+<th>Component</th>
+<th>Metric</th>
+<th>Target</th>
 </tr>
 
 <tr>
-<td>Segmentazione</td>
-<td>tempo esecuzione</td>
-<td>≤ baseline hardware</td>
+<td>Segmentation</td>
+<td>execution time</td>
+<td>≤ hardware baseline</td>
 </tr>
 
 <tr>
 <td>Radiomics</td>
-<td>tempo estrazione</td>
-<td>parallelizzazione attiva</td>
+<td>extraction time</td>
+<td>parallelization active</td>
 </tr>
 
 <tr>
-<td>Inferenza</td>
+<td>Inference</td>
 <td>latency</td>
-<td>&lt; 1 secondo</td>
+<td>&lt; 1 second</td>
 </tr>
 
 <tr>
 <td>LLM</td>
 <td>response time</td>
-<td>&lt; 2 secondi</td>
+<td>&lt; 2 seconds</td>
 </tr>
 
 <tr>
-<td>Viewer MRI</td>
-<td>fps rendering</td>
-<td>fluido su browser moderno</td>
+<td>MRI Viewer</td>
+<td>rendering fps</td>
+<td>smooth on modern browser</td>
 </tr>
 
 </table>
 
 </div>
 
-<h2>12. Test compatibilità ambiente</h2>
+<h2>12. Environment compatibility test</h2>
 
 <div class="service-box">
 
@@ -459,29 +459,29 @@ params.brain_segmenter=fastsurfer
 
 Expected:
 
-pipeline funzionante in entrambi gli scenari.
+pipeline functional in both scenarios.
 
 </div>
 
-<h2>13. Test resilienza errori</h2>
+<h2>13. Error resilience test</h2>
 
 <div class="service-box">
 
 <table>
 
 <tr>
-<th>Errore simulato</th>
+<th>Simulated error</th>
 <th>Expected</th>
 </tr>
 
 <tr>
-<td>MRI corrotta</td>
-<td>pipeline abort controllato</td>
+<td>corrupted MRI</td>
+<td>controlled pipeline abort</td>
 </tr>
 
 <tr>
 <td>MLflow offline</td>
-<td>fallback errore gestito</td>
+<td>managed fallback error</td>
 </tr>
 
 <tr>
@@ -491,42 +491,42 @@ pipeline funzionante in entrambi gli scenari.
 
 <tr>
 <td>Docker image missing</td>
-<td>warning + stop pipeline</td>
+<td>warning + pipeline stop</td>
 </tr>
 
 </table>
 
 </div>
 
-<h2>14. Test configurazione variabili ambiente</h2>
+<h2>14. Environment variable configuration test</h2>
 
 <div class="service-box">
 
 <table>
 
 <tr>
-<th>Variabile</th>
+<th>Variable</th>
 <th>Expected</th>
 </tr>
 
 <tr>
 <td>SECRET_KEY</td>
-<td>autenticazione inter-servizio coerente</td>
+<td>consistent inter-service authentication</td>
 </tr>
 
 <tr>
 <td>GROQ_API_KEY</td>
-<td>LLM attivo</td>
+<td>LLM active</td>
 </tr>
 
 <tr>
 <td>MLFLOW_TRACKING_URI</td>
-<td>registry raggiungibile</td>
+<td>registry reachable</td>
 </tr>
 
 <tr>
 <td>HOST_SHARED_VOLUME_DIR</td>
-<td>mount correttamente configurato</td>
+<td>mount correctly configured</td>
 </tr>
 
 </table>

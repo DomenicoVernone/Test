@@ -88,31 +88,29 @@ Docs » Quickstart
 
 <h1>Quickstart</h1>
 
+<p>
+This guide describes the essential steps required to run the first MRI analysis with Clinical Twin after completing the installation and environment configuration phases.
+</p>
+
 <div class="service-box">
 
 <p>
-Questa guida rapida descrive i passaggi necessari per eseguire la prima analisi
-radiomica su una risonanza magnetica cerebrale T1-weighted utilizzando la
-piattaforma Clinical Twin dopo l’installazione dello stack applicativo.
-</p>
-
-<p>
-Il workflow comprende l’avvio dei microservizi, la registrazione dell’utente,
-il caricamento della MRI e l’esecuzione automatizzata della pipeline di
-segmentazione, estrazione radiomica e inferenza diagnostica.
+The workflow includes starting the microservices, creating the first user,
+uploading the MRI, and automatically executing the segmentation pipeline,
+radiomic feature extraction, and diagnostic inference.
 </p>
 
 </div>
 
 
-<h2>1. Avvia lo stack Docker</h2>
+<h2>1. Start the Docker stack</h2>
 
 <div class="service-box">
 
 <p>
-Avviare l’intera architettura a microservizi tramite Docker Compose.
-Questo comando inizializza API Gateway, orchestrator, pipeline Nextflow,
-motore di inferenza, servizio LLM e dashboard clinica.
+Start the entire architecture using Docker Compose. The command initializes
+the API Gateway, orchestrator, Nextflow pipeline, inference engine, LLM service,
+and clinical dashboard.
 </p>
 
 <div class="codeblock">
@@ -120,22 +118,20 @@ docker compose up -d --build
 </div>
 
 <p>
-Attendere il completamento dell’avvio dei container prima di procedere
-alle fasi successive.
+Wait until all containers are active before proceeding.
 </p>
 
 </div>
 
 
-<h2>2. Accedi alla dashboard</h2>
+<h2>2. Access the dashboard</h2>
 
 <div class="service-box">
 
 <p>
-Una volta avviati i servizi, l’interfaccia clinica React sarà disponibile
-tramite browser web. La dashboard consente l’upload delle immagini MRI,
-la visualizzazione dello spazio diagnostico e l’interazione con
-l’assistente AI.
+Once the services are running, the React dashboard is available through the browser.
+The interface allows MRI upload, visualization of the UMAP diagnostic space,
+and interaction with the AI assistant.
 </p>
 
 <div class="codeblock">
@@ -145,122 +141,120 @@ http://localhost:5173
 </div>
 
 
-<h2>3. Crea il primo utente</h2>
+<h2>3. Create the first user</h2>
 
 <div class="service-box">
 
 <p>
-Al primo avvio della piattaforma è necessario registrare un utente tramite
-Swagger UI esposto dall’API Gateway. Questa operazione consente di ottenere
-le credenziali di accesso alla dashboard.
+At first startup it is necessary to register a user through Swagger UI exposed
+by the API Gateway. This step enables authenticated access to the dashboard.
 </p>
 
 <div class="codeblock">
 http://localhost:8000/docs
 </div>
 
-<p>Eseguire la richiesta:</p>
+<p>Execute the request:</p>
 
 <div class="codeblock">
 POST /signup
 </div>
 
 <p>
-Dopo la registrazione sarà possibile autenticarsi ed eseguire nuove analisi MRI.
+After registration it will be possible to log in and start MRI analyses.
 </p>
 
 </div>
 
 
-<h2>4. Carica una risonanza magnetica</h2>
+<h2>4. Upload an MRI scan</h2>
 
 <div class="service-box">
 
 <p>
-Dopo il login nella dashboard clinica è possibile caricare una risonanza
-magnetica strutturale cerebrale per avviare la pipeline radiomica.
+After login it is possible to upload a structural T1-weighted brain MRI
+to automatically start the analysis pipeline.
 </p>
 
 <ul>
-<li>aprire la sezione upload</li>
-<li>selezionare un file MRI in formato .nii oppure .nii.gz</li>
-<li>avviare l’elaborazione</li>
+<li>open the upload section</li>
+<li>select a .nii or .nii.gz file</li>
+<li>confirm processing</li>
 </ul>
 
 <p>
-Il dataset viene salvato nel volume condiviso Docker e registrato come
-task asincrono gestito dall’orchestrator.
+The dataset is stored in the shared Docker volume and registered as an
+asynchronous task managed by the orchestrator.
 </p>
 
 </div>
 
 
-<h2>5. Avvia la pipeline di segmentazione</h2>
+<h2>5. Pipeline execution</h2>
 
 <div class="service-box">
 
 <p>
-Dopo l’upload, la pipeline neuroimaging viene eseguita automaticamente
-tramite Nextflow all’interno del servizio nextflow_worker.
+After upload, the pipeline runs automatically through Nextflow
+in the nextflow_worker service.
 </p>
 
-<p>Le principali fasi computazionali includono:</p>
+<p>Main processing stages include:</p>
 
 <ul>
-<li>preprocessing volumetrico MRI</li>
-<li>segmentazione anatomica (FreeSurfer o FastSurfer)</li>
-<li>estrazione delle regioni cerebrali (ROI)</li>
-<li>estrazione feature radiomiche con PyRadiomics</li>
-<li>inferenza statistica tramite classificatore KNN</li>
-<li>proiezione nello spazio latente diagnostico UMAP</li>
-</ul>
-
-</div>
-
-
-<h2>6. Visualizza i risultati</h2>
-
-<div class="service-box">
-
-<p>
-Al termine dell’elaborazione, i risultati vengono resi disponibili nella
-dashboard clinica per l’analisi interattiva del caso paziente.
-</p>
-
-<ul>
-<li>segmentazione multiplanare delle ROI cerebrali (viewer NiiVue)</li>
-<li>coordinate del paziente nello spazio latente UMAP</li>
-<li>classe diagnostica stimata</li>
-<li>confidence score del classificatore</li>
-<li>nearest neighbors clinicamente simili</li>
+<li>volumetric MRI preprocessing</li>
+<li>anatomical segmentation (FreeSurfer or FastSurfer)</li>
+<li>brain ROI extraction</li>
+<li>radiomic feature extraction with PyRadiomics</li>
+<li>KNN classification</li>
+<li>projection into the UMAP latent space</li>
 </ul>
 
 </div>
 
 
-<h2>7. Interroga l’assistente AI</h2>
+<h2>6. View results</h2>
 
 <div class="service-box">
 
 <p>
-L’assistente AI context-aware consente di interpretare i risultati radiomici
-e la posizione del paziente nello spazio diagnostico tramite analisi
-Spatial-RAG.
+Once processing is complete, results are available in the clinical
+dashboard for interactive patient case analysis.
 </p>
 
 <ul>
-<li>interpretazione delle feature radiomiche</li>
-<li>analisi della posizione nel cluster diagnostico UMAP</li>
-<li>supporto decisionale clinico contestualizzato</li>
+<li>multiplanar ROI segmentation (NiiVue viewer)</li>
+<li>patient position in the UMAP latent space</li>
+<li>estimated diagnostic class</li>
+<li>classifier confidence score</li>
+<li>clinically similar nearest neighbors</li>
 </ul>
-
-<p>
-Questo modulo migliora l’interpretabilità del modello e supporta il processo
-decisionale medico.
-</p>
 
 </div>
 
+
+<h2>7. Query the AI assistant</h2>
+
+<div class="service-box">
+
+<p>
+The context-aware AI assistant supports interpretation of radiomic results
+by combining extracted features, position in the UMAP space,
+and clinical context through a Spatial-RAG approach.
+</p>
+
+<ul>
+<li>interpretation of relevant radiomic features</li>
+<li>analysis of position within diagnostic clusters</li>
+<li>support for clinical interpretation of predictive results</li>
+</ul>
+
+<p>
+This module improves model interpretability and facilitates
+evaluation of the patient case.
+</p>
+
+</div>
 
 
 </div>

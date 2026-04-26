@@ -137,18 +137,18 @@ Docs » Project Structure
 <h1>Project Structure</h1>
 
 <p>
-This section describes the organization of the Clinical Twin repository and the role of the main directories that compose the platform’s microservices architecture.
+Questa sezione descrive l’organizzazione del repository Clinical Twin e il ruolo delle principali directory che compongono l’architettura a microservizi della piattaforma.
 </p>
 
 <p>
-The separation of components into independent modules facilitates code maintenance, MRI pipeline scalability, and reproducibility of radiomic analyses.
+La separazione dei componenti in moduli indipendenti facilita manutenzione del codice, scalabilità della pipeline MRI e riproducibilità delle analisi radiomiche.
 </p>
 
 
-<h2>General repository structure</h2>
+<h2>Struttura generale del repository</h2>
 
 <p>
-The repository is organized into directories dedicated to individual microservices and computational pipeline components.
+Il repository è organizzato in directory dedicate ai singoli microservizi e ai componenti della pipeline computazionale.
 </p>
 
 <div class="codeblock">
@@ -174,14 +174,14 @@ Tesi-FTD/
 <div class="service-box">
 
 <p>
-Manages user authentication, JWT token generation, and secure access to backend platform endpoints.
+Gestisce autenticazione utenti, generazione token JWT e accesso sicuro agli endpoint backend della piattaforma.
 </p>
 
 <ul>
-<li>user registration</li>
-<li>JWT login</li>
-<li>token validation</li>
-<li>REST endpoint protection</li>
+<li>registrazione utenti</li>
+<li>login JWT</li>
+<li>validazione token</li>
+<li>protezione endpoint REST</li>
 </ul>
 
 </div>
@@ -192,14 +192,14 @@ Manages user authentication, JWT token generation, and secure access to backend 
 <div class="service-box">
 
 <p>
-Coordinates asynchronous execution of MRI analyses by creating pipeline tasks and invoking Nextflow execution through the nextflow_worker service.
+Coordina l’esecuzione asincrona delle analisi MRI, creando task pipeline e invocando l’esecuzione Nextflow tramite il servizio nextflow_worker.
 </p>
 
 <ul>
-<li>asynchronous task management</li>
-<li>pipeline status monitoring</li>
-<li>Nextflow invocation</li>
-<li>backend microservices synchronization</li>
+<li>gestione task asincroni</li>
+<li>monitoraggio stato pipeline</li>
+<li>invocazione Nextflow</li>
+<li>sincronizzazione microservizi backend</li>
 </ul>
 
 </div>
@@ -210,14 +210,14 @@ Coordinates asynchronous execution of MRI analyses by creating pipeline tasks an
 <div class="service-box">
 
 <p>
-Manages access to the MLflow Model Registry hosted on DagsHub and prepares the diagnostic model used during inference.
+Gestisce l’accesso al Model Registry MLflow ospitato su DagsHub e prepara il modello diagnostico utilizzato durante l’inferenza.
 </p>
 
 <ul>
-<li>champion model download</li>
-<li>model versioning</li>
-<li>Model Registry integration</li>
-<li>inference input preparation</li>
+<li>download champion model</li>
+<li>versioning modelli</li>
+<li>integrazione Model Registry</li>
+<li>preparazione input per inferenza</li>
 </ul>
 
 </div>
@@ -228,14 +228,14 @@ Manages access to the MLflow Model Registry hosted on DagsHub and prepares the d
 <div class="service-box">
 
 <p>
-Implements the context-aware AI assistant based on Spatial RAG to support clinical interpretation and explainability of diagnostic results.
+Implementa l’assistente AI context-aware basato su Spatial RAG per supportare interpretazione clinica e explainability dei risultati diagnostici.
 </p>
 
 <ul>
-<li>radiomic feature interpretation</li>
-<li>UMAP diagnostic cluster analysis</li>
-<li>multi-turn conversational memory</li>
-<li>guided clinical interaction</li>
+<li>interpretazione feature radiomiche</li>
+<li>analisi cluster diagnostici UMAP</li>
+<li>memoria conversazionale multi-turno</li>
+<li>interazione clinica guidata</li>
 </ul>
 
 </div>
@@ -246,14 +246,14 @@ Implements the context-aware AI assistant based on Spatial RAG to support clinic
 <div class="service-box">
 
 <p>
-Statistical engine implemented in R using Plumber that performs KNN classification and projection of the patient into the three-dimensional UMAP latent space.
+Motore statistico implementato in R tramite Plumber che esegue classificazione KNN e proiezione del paziente nello spazio latente UMAP tridimensionale.
 </p>
 
 <ul>
-<li>KNN classification</li>
-<li>clinical similarity computation</li>
-<li>3D UMAP embedding</li>
-<li>nearest neighbors identification</li>
+<li>classificazione KNN</li>
+<li>calcolo similarità clinica</li>
+<li>embedding UMAP 3D</li>
+<li>identificazione nearest neighbors</li>
 </ul>
 
 </div>
@@ -264,14 +264,14 @@ Statistical engine implemented in R using Plumber that performs KNN classificati
 <div class="service-box">
 
 <p>
-Executes the structural MRI pipeline through Nextflow using dedicated containers for anatomical segmentation and radiomic feature extraction.
+Esegue la pipeline MRI strutturale tramite Nextflow utilizzando container dedicati per segmentazione anatomica ed estrazione delle feature radiomiche.
 </p>
 
 <ul>
-<li>FreeSurfer / FastSurfer segmentation</li>
-<li>brain ROI extraction</li>
-<li>PyRadiomics feature extraction</li>
-<li>containerized Nextflow workflow</li>
+<li>segmentazione FreeSurfer / FastSurfer</li>
+<li>estrazione ROI cerebrali</li>
+<li>estrazione feature radiomiche PyRadiomics</li>
+<li>workflow Nextflow containerizzato</li>
 </ul>
 
 </div>
@@ -282,15 +282,15 @@ Executes the structural MRI pipeline through Nextflow using dedicated containers
 <div class="service-box">
 
 <p>
-Clinical dashboard developed in React for managing MRI analyses and interactive visualization of diagnostic results.
+Dashboard clinica sviluppata in React per la gestione delle analisi MRI e la visualizzazione interattiva dei risultati diagnostici.
 </p>
 
 <ul>
-<li>MRI upload</li>
-<li>multiplanar viewer (NiiVue)</li>
-<li>UMAP latent space visualization</li>
-<li>analysis history</li>
-<li>integrated AI assistant</li>
+<li>upload MRI</li>
+<li>viewer multiplanare (NiiVue)</li>
+<li>visualizzazione spazio latente UMAP</li>
+<li>storico analisi</li>
+<li>assistente AI integrato</li>
 </ul>
 
 </div>
@@ -301,13 +301,13 @@ Clinical dashboard developed in React for managing MRI analyses and interactive 
 <div class="service-box">
 
 <p>
-Contains the platform’s technical documentation, including architectural diagrams, user manual, and MRI pipeline documentation.
+Contiene la documentazione tecnica della piattaforma, inclusi diagrammi architetturali, manuale utente e descrizione della pipeline MRI.
 </p>
 
 <ul>
-<li>architectural diagram</li>
-<li>user manual</li>
-<li>pipeline documentation</li>
+<li>diagramma architetturale</li>
+<li>manuale utente</li>
+<li>documentazione pipeline</li>
 </ul>
 
 </div>

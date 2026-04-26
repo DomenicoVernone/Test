@@ -76,15 +76,17 @@ Docs » Microservices Overview
 
 <h1>Microservices Overview</h1>
 
+
 <p>
-Clinical Twin è progettato secondo un’architettura a microservizi
-containerizzati orchestrati tramite Docker Compose. Ogni servizio è
-responsabile di uno specifico componente della pipeline neuroimaging
-e comunica tramite API REST.
+Clinical Twin adopts a containerized microservices architecture orchestrated through Docker Compose. Each service implements an independent functional component and communicates with the others through internal REST APIs.
 </p>
 
 
-<h2>Panoramica dello stack</h2>
+<h2>Stack overview</h2>
+
+<p>
+The following diagram represents the logical sequence of services involved during MRI processing, from user management to visualization of diagnostic results.
+</p>
 
 <div class="codeblock">
 api_gateway → orchestrator → nextflow_worker → model_service → inference_engine → frontend
@@ -98,15 +100,14 @@ api_gateway → orchestrator → nextflow_worker → model_service → inference
 <h2>api_gateway</h2>
 
 <p>
-Gestisce autenticazione utenti e sicurezza delle richieste tramite JWT.
-Rappresenta il punto di ingresso principale per l’interazione con il sistema.
+The api_gateway service manages user authentication, JWT-based authorization, and secure access to platform endpoints. It represents the main entry point for all client requests.
 </p>
 
 <ul>
-<li>registrazione utenti</li>
-<li>login autenticato</li>
-<li>gestione token JWT</li>
-<li>routing verso servizi backend</li>
+<li>user registration</li>
+<li>authenticated login</li>
+<li>JWT token generation and validation</li>
+<li>routing to backend microservices</li>
 </ul>
 
 </div>
@@ -117,15 +118,14 @@ Rappresenta il punto di ingresso principale per l’interazione con il sistema.
 <h2>orchestrator</h2>
 
 <p>
-Coordina l’esecuzione della pipeline radiomica gestendo task asincroni
-e comunicazione tra servizi computazionali.
+The orchestrator microservice coordinates asynchronous execution of MRI analyses by managing task creation and invoking the Nextflow pipeline within the nextflow_worker service.
 </p>
 
 <ul>
-<li>creazione task di analisi</li>
-<li>monitoraggio stato pipeline</li>
-<li>invocazione Nextflow</li>
-<li>gestione workflow MRI</li>
+<li>MRI analysis task creation</li>
+<li>pipeline status monitoring</li>
+<li>asynchronous workflow management</li>
+<li>error propagation between services</li>
 </ul>
 
 </div>
@@ -136,15 +136,14 @@ e comunicazione tra servizi computazionali.
 <h2>nextflow_worker</h2>
 
 <p>
-Esegue la pipeline neuroimaging strutturale utilizzando Nextflow e container
-Docker dedicati.
+The nextflow_worker service executes the structural MRI pipeline using Nextflow and dedicated containers for anatomical segmentation and radiomic feature extraction.
 </p>
 
 <ul>
-<li>preprocessing MRI</li>
-<li>segmentazione FreeSurfer / FastSurfer</li>
-<li>estrazione ROI cerebrali</li>
-<li>estrazione feature radiomiche</li>
+<li>volumetric MRI preprocessing</li>
+<li>FreeSurfer or FastSurfer segmentation</li>
+<li>brain region (ROI) extraction</li>
+<li>PyRadiomics feature computation</li>
 </ul>
 
 </div>
@@ -155,15 +154,14 @@ Docker dedicati.
 <h2>model_service</h2>
 
 <p>
-Gestisce l’accesso ai modelli salvati su MLflow Model Registry ospitato su
-DagsHub e prepara l’inferenza diagnostica.
+The model_service manages access to the MLflow Model Registry hosted on DagsHub and prepares the diagnostic model used during inference.
 </p>
 
 <ul>
-<li>download champion model</li>
-<li>versioning modelli</li>
-<li>integrazione MLflow</li>
-<li>trigger inferenza</li>
+<li>champion model download</li>
+<li>model versioning</li>
+<li>MLflow integration</li>
+<li>inference input preparation</li>
 </ul>
 
 </div>
@@ -174,15 +172,14 @@ DagsHub e prepara l’inferenza diagnostica.
 <h2>inference_engine</h2>
 
 <p>
-Implementato in R tramite Plumber, esegue classificazione KNN e proiezione
-UMAP nello spazio latente diagnostico.
+Implemented in R using Plumber, the inference_engine service performs KNN classification on radiomic features and computes the patient's position in the three-dimensional UMAP latent space.
 </p>
 
 <ul>
-<li>classificazione paziente</li>
-<li>calcolo similarità clinica</li>
-<li>embedding UMAP 3D</li>
-<li>identificazione nearest neighbors</li>
+<li>diagnostic class estimation</li>
+<li>clinical similarity computation</li>
+<li>3D UMAP embedding</li>
+<li>nearest neighbors identification</li>
 </ul>
 
 </div>
@@ -193,15 +190,14 @@ UMAP nello spazio latente diagnostico.
 <h2>llm_service</h2>
 
 <p>
-Fornisce un assistente AI context-aware basato su Spatial RAG per supportare
-l’interpretazione clinica dei risultati radiomici.
+The llm_service provides assisted clinical interpretation through a Spatial-RAG approach, integrating radiomic features, UMAP coordinates, and conversational context.
 </p>
 
 <ul>
-<li>explainability radiomica</li>
-<li>analisi cluster UMAP</li>
-<li>memoria conversazionale multi-turno</li>
-<li>integrazione Groq API</li>
+<li>radiomic feature interpretation</li>
+<li>UMAP diagnostic cluster analysis</li>
+<li>model explainability support</li>
+<li>Groq API integration</li>
 </ul>
 
 </div>
@@ -212,16 +208,15 @@ l’interpretazione clinica dei risultati radiomici.
 <h2>frontend</h2>
 
 <p>
-Dashboard clinica sviluppata in React per l’interazione con il sistema
-e la visualizzazione dei risultati.
+The React dashboard represents the platform’s clinical interface and allows management of MRI analyses and interactive exploration of diagnostic results.
 </p>
 
 <ul>
-<li>upload MRI</li>
-<li>viewer multiplanare NiiVue</li>
-<li>visualizzazione spazio UMAP</li>
-<li>storico analisi</li>
-<li>assistente AI integrato</li>
+<li>MRI upload</li>
+<li>NiiVue multiplanar viewer</li>
+<li>UMAP latent space visualization</li>
+<li>analysis history</li>
+<li>integrated AI assistant</li>
 </ul>
 
 </div>

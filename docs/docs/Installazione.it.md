@@ -105,6 +105,10 @@ Docs » Installation
 
 <h1>Installation</h1>
 
+<p>
+Questa sezione descrive i passaggi necessari per configurare l’ambiente di esecuzione di Clinical Twin, installare le dipendenze richieste e avviare lo stack completo dei microservizi.
+</p>
+
 
 <h2>GitHub</h2>
 

@@ -91,17 +91,17 @@ Docs » API Reference
 <h1>API Reference</h1>
 
 <p>
-This section describes the REST endpoints exposed by the Clinical Twin microservices
-for user authentication, MRI pipeline orchestration, diagnostic inference,
-and AI-based interpretation of results.
+Questa sezione descrive gli endpoint REST esposti dai microservizi Clinical Twin
+per autenticazione utenti, orchestrazione pipeline MRI, inferenza diagnostica
+e interpretazione AI dei risultati.
 </p>
 
 <div class="endpoint-box">
 
 <p>
-The APIs are implemented using FastAPI (Python) and Plumber (R) and enable
-integration of the platform with clinical dashboards, automated workflows,
-and neuroimaging research tools. Protected endpoints require a JWT token.
+Le API sono implementate tramite FastAPI (Python) e Plumber (R) e consentono
+l’integrazione della piattaforma con dashboard cliniche, workflow automatizzati
+e strumenti di ricerca neuroimaging. Gli endpoint protetti richiedono un token JWT.
 </p>
 
 </div>
@@ -112,14 +112,14 @@ and neuroimaging research tools. Protected endpoints require a JWT token.
 <div class="endpoint-box">
 
 <p>
-The <b>api_gateway</b> service manages user authentication, JWT generation,
-and secure access to protected endpoints.
+Il servizio <b>api_gateway</b> gestisce autenticazione utenti, generazione JWT
+e accesso sicuro agli endpoint protetti.
 </p>
 
 <h3>POST /signup</h3>
 
 <p>
-Registers a new user.
+Registra un nuovo utente.
 </p>
 
 <div class="codeblock">
@@ -132,7 +132,7 @@ Registers a new user.
 <h3>POST /login</h3>
 
 <p>
-Authenticates the user and returns a JWT token to include in subsequent requests.
+Autentica l’utente e restituisce un token JWT da includere nelle richieste successive.
 </p>
 
 <div class="codeblock">
@@ -145,7 +145,7 @@ Authenticates the user and returns a JWT token to include in subsequent requests
 <h3>GET /me</h3>
 
 <p>
-Returns information about the user associated with the current JWT token.
+Restituisce le informazioni dell’utente associato al token JWT corrente.
 </p>
 
 </div>
@@ -156,15 +156,15 @@ Returns information about the user associated with the current JWT token.
 <div class="endpoint-box">
 
 <p>
-The <b>orchestrator</b> microservice starts and monitors execution of the
-Nextflow pipeline on MRI datasets uploaded to the shared volume.
+Il microservizio <b>orchestrator</b> avvia e monitora l’esecuzione della pipeline
+Nextflow su dataset MRI caricati nel volume condiviso.
 </p>
 
 <h3>POST /analyze</h3>
 
 <p>
-Starts a new analysis on an MRI already available in the shared Docker volume.
-Requires JWT authentication.
+Avvia una nuova analisi su una MRI già disponibile nel volume condiviso Docker.
+Richiede autenticazione JWT.
 </p>
 
 <div class="codeblock">
@@ -176,13 +176,13 @@ Requires JWT authentication.
 <h3>GET /task/{task_id}</h3>
 
 <p>
-Returns the processing status (queued, running, completed, failed).
+Restituisce lo stato dell’elaborazione (queued, running, completed, failed).
 </p>
 
 <h3>GET /tasks</h3>
 
 <p>
-Returns the list of analyses started by the authenticated user.
+Restituisce l’elenco delle analisi avviate dall’utente autenticato.
 </p>
 
 </div>
@@ -193,21 +193,21 @@ Returns the list of analyses started by the authenticated user.
 <div class="endpoint-box">
 
 <p>
-The <b>model_service</b> retrieves diagnostic models from the MLflow registry
-and manages prediction preparation using extracted radiomic features.
+Il servizio <b>model_service</b> recupera i modelli diagnostici dal registry MLflow
+e gestisce la preparazione delle predizioni sulle feature radiomiche estratte.
 </p>
 
 <h3>POST /load-model</h3>
 
 <p>
-Downloads and initializes the champion model from the MLflow/DagsHub Model Registry.
+Scarica e inizializza il champion model dal Model Registry MLflow/DagsHub.
 </p>
 
 <h3>POST /predict</h3>
 
 <p>
-Receives preprocessed radiomic features and returns the diagnostic prediction
-using the active model.
+Riceve feature radiomiche preprocessate e restituisce la predizione diagnostica
+utilizzando il modello attivo.
 </p>
 
 </div>
@@ -218,15 +218,15 @@ using the active model.
 <div class="endpoint-box">
 
 <p>
-The <b>inference_engine</b> microservice (Plumber/R) performs KNN classification
-and UMAP projection in the diagnostic latent space.
+Il microservizio <b>inference_engine</b> (Plumber/R) esegue classificazione KNN
+e proiezione UMAP nello spazio latente diagnostico.
 </p>
 
 <h3>POST /knn</h3>
 
 <p>
-Returns the estimated diagnostic class and corresponding confidence score
-based on similarity with the reference dataset.
+Restituisce la classe diagnostica stimata e il relativo confidence score
+basati sulla similarità con il dataset di riferimento.
 </p>
 
 <div class="codeblock">
@@ -239,8 +239,8 @@ based on similarity with the reference dataset.
 <h3>POST /umap</h3>
 
 <p>
-Computes the patient's three-dimensional coordinates in the UMAP space used
-for visualization and analysis of diagnostic clusters.
+Calcola le coordinate tridimensionali del paziente nello spazio UMAP utilizzato
+per visualizzazione e analisi dei cluster diagnostici.
 </p>
 
 </div>
@@ -251,15 +251,15 @@ for visualization and analysis of diagnostic clusters.
 <div class="endpoint-box">
 
 <p>
-The <b>llm_service</b> provides explainability features through a Spatial-RAG–based
-AI assistant.
+Il servizio <b>llm_service</b> fornisce funzionalità di explainability tramite
+assistente AI basato su Spatial-RAG.
 </p>
 
 <h3>POST /chat</h3>
 
 <p>
-Sends a textual request to the AI assistant to obtain clinical interpretations
-based on radiomic features, UMAP position, and diagnostic context.
+Invia una richiesta testuale all’assistente AI per ottenere interpretazioni
+cliniche basate su feature radiomiche, posizione UMAP e contesto diagnostico.
 </p>
 
 <div class="codeblock">
@@ -276,8 +276,8 @@ based on radiomic features, UMAP position, and diagnostic context.
 <div class="endpoint-box">
 
 <p>
-The complete interactive documentation is available via Swagger UI
-for each FastAPI microservice running in the stack.
+La documentazione interattiva completa è disponibile tramite Swagger UI
+per ciascun microservizio FastAPI attivo nello stack.
 </p>
 
 <div class="codeblock">
@@ -288,8 +288,9 @@ http://localhost:8003/docs
 </div>
 
 <p>
-Swagger allows testing endpoints, inspecting JSON request/response structures,
-and monitoring service behavior during development and debugging.
+Swagger consente di testare gli endpoint, verificare le strutture JSON
+di request/response e monitorare il comportamento dei servizi durante sviluppo
+e debugging.
 </p>
 
 </div>

@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Clinical Twin – Introduction</title>
+<title>Clinical Twin – Introduzione</title>
 
 <style>
 
@@ -105,57 +105,57 @@ ul {
 <div class="content">
 
 <div class="breadcrumb">
-Docs » Introduction
+Docs » Introduzione
 </div>
 
-<h1>Introduction</h1>
+<h1>Introduzione</h1>
 
 
-<h2>Description</h2>
+<h2>Descrizione</h2>
 
 <div class="service-box">
 
 <p>
-Clinical Twin is a clinical decision support platform designed
-for the differential diagnosis of Frontotemporal Dementia (FTD) variants
-through radiomic analysis of structural brain MRI scans.
+Clinical Twin è una piattaforma di supporto alle decisioni cliniche progettata
+per la diagnosi differenziale delle varianti di Demenza Frontotemporale (FTD)
+attraverso l’analisi radiomica di risonanze magnetiche cerebrali strutturali.
 </p>
 
 <p>
-The system integrates an automated neuroimaging pipeline based on
-FreeSurfer / FastSurfer and PyRadiomics, a statistical inference engine
-implemented in R, a context-aware AI assistant based on Spatial RAG,
-and an interactive dashboard developed in React for multiplanar image
-visualization and exploration of the latent diagnostic space
-generated using UMAP.
+Il sistema integra una pipeline automatizzata di neuroimaging basata su
+FreeSurfer / FastSurfer e PyRadiomics, un motore di inferenza statistica
+implementato in R, un assistente AI context-aware basato su Spatial RAG
+e una dashboard interattiva sviluppata in React per la visualizzazione
+multiplanare delle immagini e l’esplorazione dello spazio diagnostico latente
+generato tramite UMAP.
 </p>
 
 </div>
 
 
-<h2>Main features</h2>
+<h2>Funzionalità principali</h2>
 
 <div class="service-box">
 
 <ul>
-<li>Automatic MRI segmentation using FreeSurfer or FastSurfer</li>
-<li>Radiomic feature extraction with PyRadiomics</li>
-<li>KNN-based statistical inference engine implemented in R</li>
-<li>Projection into a 3D latent space using UMAP</li>
-<li>Spatial RAG clinical assistant for interpretability support</li>
-<li>Interactive multiplanar MRI viewer (NiiVue integration)</li>
-<li>Microservices architecture orchestrated with Docker Compose</li>
-<li>Model versioning and tracking using MLflow and DagsHub</li>
+<li>Segmentazione automatica MRI tramite FreeSurfer o FastSurfer</li>
+<li>Estrazione di feature radiomiche con PyRadiomics</li>
+<li>Motore di inferenza statistica basato su KNN implementato in R</li>
+<li>Proiezione nello spazio latente 3D tramite UMAP</li>
+<li>Assistente clinico Spatial RAG per supporto all’interpretabilità</li>
+<li>Viewer MRI multiplanare interattivo (integrazione NiiVue)</li>
+<li>Architettura a microservizi orchestrata con Docker Compose</li>
+<li>Versionamento e tracciamento modelli tramite MLflow e DagsHub</li>
 </ul>
 
 </div>
 
 
-<h2>Source code</h2>
+<h2>Codice sorgente</h2>
 
 <div class="service-box">
 
-<p>GitHub repository:</p>
+<p>Repository GitHub:</p>
 
 <div class="codeblock">
 https://github.com/carlosto033/Tesi-FTD
@@ -164,48 +164,48 @@ https://github.com/carlosto033/Tesi-FTD
 </div>
 
 
-<h2>Adding the FreeSurfer license</h2>
+<h2>Aggiunta della licenza FreeSurfer</h2>
 
 <div class="service-box">
 
 <p>
-FreeSurfer requires a valid license file to execute the neuroimaging
-segmentation pipeline. Download the license from:
+FreeSurfer richiede un file di licenza valido per eseguire la pipeline di
+segmentazione neuroimaging. Scaricare la licenza da:
 </p>
 
 <div class="codeblock">
 https://surfer.nmr.mgh.harvard.edu/registration.html
 </div>
 
-<p>After downloading, run:</p>
+<p>Dopo il download eseguire:</p>
 
 <div class="codeblock">
 cp /path/to/license.txt nextflow_worker/license.txt
 </div>
 
 <p>
-Without this file, the segmentation pipeline cannot be started.
+Senza questo file la pipeline di segmentazione non può essere avviata.
 </p>
 
 </div>
 
 
-<h2>Contributions</h2>
+<h2>Contributi</h2>
 
 <div class="service-box">
 
 <p>
-Clinical Twin is currently developed as an academic research project.
-Contributions related to the following areas are welcome:
+Clinical Twin è attualmente sviluppato come progetto accademico di ricerca.
+Sono benvenuti contributi relativi a:
 </p>
 
 <ul>
-<li>radiomics workflows</li>
-<li>neuroimaging pipelines</li>
-<li>clinical explainable AI</li>
+<li>workflow radiomici</li>
+<li>pipeline di neuroimaging</li>
+<li>explainable AI in ambito clinico</li>
 </ul>
 
-<p>Issue reporting:</p>
+<p>Segnalazione issue:</p>
 
 <div class="codeblock">
 https://github.com/carlosto033/Tesi-FTD/issues

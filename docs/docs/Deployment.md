@@ -87,51 +87,50 @@ Docs » Deployment
 
 <h1>Deployment</h1>
 
+<p>
+This section describes the deployment modes of the Clinical Twin platform in local environments, research servers, and dedicated GPU infrastructures.
+</p>
+
 <div class="service-box">
 
 <p>
-Clinical Twin può essere distribuito in diversi ambienti operativi,
-dal computer locale per attività di sviluppo fino a server GPU dedicati
-per l’esecuzione efficiente della pipeline neuroimaging su dataset clinici.
-</p>
-
-<p>
-L’architettura containerizzata basata su Docker Compose garantisce
-portabilità, riproducibilità sperimentale e scalabilità computazionale.
+Clinical Twin can be executed both on local workstations for development and testing,
+and on dedicated Linux servers for processing large-scale MRI datasets.
+The containerized architecture based on Docker Compose ensures portability,
+reproducibility, and isolation of microservices.
 </p>
 
 </div>
 
 
-<h2>Deployment locale (Docker Desktop)</h2>
+<h2>Local deployment (Docker Desktop)</h2>
 
 <div class="service-box">
 
 <p>
-Configurazione consigliata per sviluppo, test funzionali e validazione
-della pipeline su singoli dataset MRI.
+Recommended configuration for development, functional validation, and testing on single MRI datasets.
 </p>
 
-<p>Compatibile con:</p>
+<p>Compatible with:</p>
 
 <ul>
-<li>Windows (tramite WSL2)</li>
+<li>Windows (WSL2)</li>
 <li>macOS</li>
 <li>Linux</li>
 </ul>
 
-<p>Avvio completo dello stack applicativo:</p>
+<p>Start the application stack:</p>
 
 <div class="codeblock">
 docker compose up -d --build
 </div>
 
 <p>
-Questo comando inizializza API Gateway, orchestrator, Nextflow worker,
-motore di inferenza, servizio LLM e dashboard React.
+This command initializes the API Gateway, orchestrator, Nextflow worker,
+inference engine, LLM service, and React dashboard.
 </p>
 
-<p>Accesso alla dashboard clinica:</p>
+<p>Access the dashboard:</p>
 
 <div class="codeblock">
 http://localhost:5173
@@ -140,34 +139,34 @@ http://localhost:5173
 </div>
 
 
-<h2>Deployment su server Linux</h2>
+<h2>Deployment on Linux server</h2>
 
 <div class="service-box">
 
 <p>
-Configurazione consigliata per ambienti di laboratorio, infrastrutture
-di ricerca o server dipartimentali dedicati all’elaborazione radiomica.
+Recommended configuration for laboratory environments or departmental servers
+dedicated to automated MRI dataset processing.
 </p>
 
-<p>Prerequisiti hardware/software:</p>
+<p>Prerequisites:</p>
 
 <ul>
-<li>Docker Engine installato</li>
+<li>Docker Engine installed</li>
 <li>Docker Compose</li>
-<li>CPU multicore</li>
-<li>≥16 GB RAM consigliati</li>
+<li>multicore CPU</li>
+<li>≥16 GB RAM recommended</li>
 </ul>
 
 <p>
-Configurare la directory condivisa utilizzata dalla pipeline Nextflow
-per l’accesso ai volumi MRI:
+On Linux bare-metal systems it is necessary to configure the shared directory
+used by the Nextflow pipeline:
 </p>
 
 <div class="codeblock">
 HOST_SHARED_VOLUME_DIR=/mnt/shared_volume
 </div>
 
-<p>Avvio servizi:</p>
+<p>Start services:</p>
 
 <div class="codeblock">
 docker compose up -d
@@ -176,32 +175,31 @@ docker compose up -d
 </div>
 
 
-<h2>Deployment con GPU NVIDIA</h2>
+<h2>Deployment with NVIDIA GPU</h2>
 
 <div class="service-box">
 
 <p>
-L’utilizzo di GPU NVIDIA consente l’accelerazione della segmentazione
-cerebrale tramite FastSurfer, riducendo significativamente i tempi di
-elaborazione rispetto alla modalità CPU.
+Using an NVIDIA GPU accelerates anatomical segmentation through FastSurfer,
+significantly reducing processing time compared to CPU mode.
 </p>
 
-<p>Prerequisiti:</p>
+<p>Prerequisites:</p>
 
 <ul>
-<li>Driver NVIDIA aggiornati</li>
-<li>CUDA Toolkit compatibile</li>
+<li>updated NVIDIA drivers</li>
+<li>compatible CUDA</li>
 <li>NVIDIA Container Toolkit</li>
 </ul>
 
-<p>Verifica disponibilità GPU:</p>
+<p>Verify GPU availability:</p>
 
 <div class="codeblock">
 nvidia-smi
 </div>
 
 <p>
-Abilitazione accelerazione GPU nella pipeline:
+Enable GPU in the Nextflow pipeline:
 </p>
 
 <div class="codeblock">
@@ -211,88 +209,85 @@ params.fastsurfer_device=cuda
 </div>
 
 
-<h2>Deployment con GPU MIG (Multi-Instance GPU)</h2>
+<h2>Deployment with MIG GPU (Multi-Instance GPU)</h2>
 
 <div class="service-box">
 
 <p>
-Su sistemi HPC o server multi-utente dotati di GPU partizionabili,
-è possibile assegnare una specifica MIG instance alla pipeline
-Clinical Twin per isolare le risorse computazionali.
+On multi-user HPC systems it is possible to assign a specific MIG instance
+to the pipeline to isolate GPU resources between concurrent jobs.
 </p>
 
-<p>Configurazione variabile ambiente:</p>
+<p>Environment variable configuration:</p>
 
 <div class="codeblock">
 MIG_DEVICE=MIG-xxxxxxxxxxxxxxxx
 </div>
 
 <p>
-Lasciare il parametro vuoto su sistemi senza partizionamento GPU.
+Leave empty on systems without GPU partitioning.
 </p>
 
 </div>
 
 
-<h2>Deployment pipeline Nextflow</h2>
+<h2>Nextflow pipeline deployment</h2>
 
 <div class="service-box">
 
 <p>
-Clinical Twin utilizza un modello Docker-out-of-Docker (DooD) per
-l’esecuzione modulare dei componenti della pipeline neuroimaging.
+Clinical Twin uses a Docker-out-of-Docker (DooD) model to allow
+the nextflow_worker service to execute dedicated containers for segmentation,
+MRI preprocessing, and radiomic feature extraction.
 </p>
 
 <p>
-Prima dell’avvio della pipeline è necessario costruire le immagini
-container utilizzate dai worker Nextflow:
+Before running the pipeline it is necessary to build the worker images:
 </p>
 
 <div class="codeblock">
-docker build -t clinical-freesurfer -f nextflow_worker/freesurfer.dockerfile nextflow_worker/
+docker build -t clinical-freesurfer -f nextflow_worker/dockerfiles/freesurfer.dockerfile nextflow_worker/
 
-docker build -t clinical-fsl -f nextflow_worker/fsl.dockerfile nextflow_worker/
+docker build -t clinical-fsl -f nextflow_worker/dockerfiles/fsl.dockerfile nextflow_worker/
 
-docker build -t clinical-pyradiomics -f nextflow_worker/pyradiomics.dockerfile nextflow_worker/
+docker build -t clinical-pyradiomics -f nextflow_worker/dockerfiles/pyradiomics.dockerfile nextflow_worker/
 </div>
 
 <p>
-Queste immagini includono gli strumenti di segmentazione anatomica,
-preprocessing MRI ed estrazione feature radiomiche.
+These images are automatically used by the Nextflow processes.
 </p>
 
 </div>
 
 
-<h2>Deployment in produzione (consigliato)</h2>
+<h2>Production deployment (recommended)</h2>
 
 <div class="service-box">
 
 <p>
-Per ambienti clinici o dataset di grandi dimensioni è consigliata una
-configurazione server dedicata con accelerazione GPU.
+For analysis on large clinical datasets, a dedicated Linux server configuration
+with GPU acceleration and persistent storage for MRI datasets and radiomic outputs is recommended.
 </p>
 
-<p>Configurazione suggerita:</p>
+<p>Suggested configuration:</p>
 
 <ul>
-<li>server Linux dedicato</li>
-<li>GPU NVIDIA compatibile CUDA</li>
+<li>dedicated Linux server</li>
+<li>CUDA-compatible NVIDIA GPU</li>
 <li>Docker Engine</li>
-<li>volume condiviso persistente per dataset MRI</li>
-<li>sistema di backup per dataset radiomici e modelli</li>
+<li>persistent volume for MRI datasets</li>
+<li>backup system for radiomic features and models</li>
 </ul>
 
-<p>Architettura logica dei servizi:</p>
+<p>Logical service architecture:</p>
 
 <div class="codeblock">
 Frontend → API Gateway → Orchestrator → Nextflow Worker → Inference Engine → LLM Service
 </div>
 
 <p>
-Questa configurazione garantisce scalabilità della pipeline,
-separazione dei microservizi e supporto a workflow clinico-radiomici
-riproducibili.
+This configuration ensures microservice isolation,
+pipeline scalability, and support for reproducible radiomics workflows.
 </p>
 
 </div>
