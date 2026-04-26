@@ -15,14 +15,14 @@ plugins:
   - i18n:
       default_language: en
       languages:
-        en:
+        - locale: en
           name: English
           build: true
-        it:
+        - locale: it
           name: Italiano
           build: true
       add_selector: true
-      fallback_to_default: true 
+      fallback_to_default: true
 
 nav:
   - Introduction: index.md
