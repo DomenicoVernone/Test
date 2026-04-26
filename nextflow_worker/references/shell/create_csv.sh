@@ -1,23 +1,33 @@
-#!/bin/sh
-lista_roi=/root/pipeline/data/all_freesurfer_labels.txt
+#!/usr/bin/env bash
+set -euo pipefail
 
-mkdir -p /root/pipeline/data/output/features
-echo 'Image' > /root/pipeline/data/output/features/brain_esempio.txt
+lista_roi="$1"
+subjects_dir="$2"
+target_file="$3"
+output_dir="$4"
 
-find /root/pipeline/data/output/subjects_directory_output_of_freesurfer/ -iname 'nu.nii' | sort -n >> /root/pipeline/data/output/features/brain_esempio.txt
+mkdir -p "${output_dir}"
 
-cat ${lista_roi} | while read riga ; do
+echo 'Image' > "${output_dir}/brain_esempio.txt"
 
-    	name=`echo ${riga} | awk '{print$2}' | awk 'NR ==1 {print $1}'` ;
+find "${subjects_dir}" -iname 'nu.nii' | sort -n \
+    >> "${output_dir}/brain_esempio.txt"
 
-        echo 'Mask' > /root/pipeline/data/output/features/${name}_roi.txt
+cat "${lista_roi}" | while read riga ; do
 
-        find /root/pipeline/data/output/subjects_directory_output_of_freesurfer/ -iname ${name}.nii.gz | sort -n >> /root/pipeline/data/output/features/${name}_roi.txt
+    name=$(echo "${riga}" | awk '{print $2}')
 
-    	paste -d "," /root/pipeline/data/output/features/brain_esempio.txt /root/pipeline/data/output/features/${name}_roi.txt /root/pipeline/data/output/subjects_directory_output_of_freesurfer/target_esempio.txt > /root/pipeline/data/output/features/${name}_esempio.csv
+    echo 'Mask' > "${output_dir}/${name}_roi.txt"
+
+    find "${subjects_dir}" -iname "${name}.nii.gz" | sort -n \
+        >> "${output_dir}/${name}_roi.txt"
+
+    paste -d "," \
+        "${output_dir}/brain_esempio.txt" \
+        "${output_dir}/${name}_roi.txt" \
+        "${target_file}" \
+        > "${output_dir}/${name}_esempio.csv"
 
 done
 
-rm /root/pipeline/data/output/features/*_roi.txt
-
-
+rm "${output_dir}"/*_roi.txt

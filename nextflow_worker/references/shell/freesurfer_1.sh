@@ -1,20 +1,23 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -euo pipefail
 
-export SUBJECTS_DIR=/root/pipeline/data/output/subjects_directory_output_of_freesurfer
+export SUBJECTS_DIR="$1"
+lista="$2"
+logfile="$3"
 
-lista=/root/pipeline/data/lista_esempio.txt
-filerisultati=/root/pipeline/data/output/subjects_directory_output_of_freesurfer/output_processo.txt
+cat "${lista}" | while read riga ; do
 
+    dirnifti=$(echo "${riga}" | awk '{print $1}')
+    sub=$(echo "${riga}" | awk '{print $2}')
 
-cat ${lista} | while read riga ; do
+    echo "Start ${sub} $(date)" >> "${logfile}"
 
-    dirnifti=`echo ${riga} | awk '{print$1}' | awk 'NR ==1 {print $1}'` ;
-    sub=`echo ${riga} | awk '{print$2}' | awk 'NR ==1 {print $1}'` ;
+    recon-all \
+        -subject "${sub}" \
+        -i "${dirnifti}" \
+        -all \
+        -openmp 8
 
-    echo comincio ${sub} - `date`  >> ${filerisultati}
-    cd /root/pipeline/data/output/subjects_directory_output_of_freesurfer
-    recon-all -subject ${sub} -i ${dirnifti} -all
-    echo terminato ${sub} - `date`  >> ${filerisultati}
-
+    echo "End ${sub} $(date)" >> "${logfile}"
 
 done
