@@ -46,11 +46,15 @@ async def lifespan(app: FastAPI):
     # ROI_labels.tsv viene copiato sia in /tmp (fallback per NF_LABELS in nextflow.config)
     # che nel volume condiviso (per inference_engine, che lo legge tramite NF_LABELS).
     # pyradiomics.yaml viene copiato in /tmp come fallback per NF_SETTINGS.
+    # freesurfer_license.txt viene copiato in /tmp perche' nextflow.config lo monta
+    # nei container via runOptions (-v /tmp/freesurfer_license.txt:/app/license.txt).
+    # Se il file non esiste al momento del mount, Docker crea una directory al suo posto.
     try:
         shutil.copy2("/app/data/external/ROI_labels.tsv", "/tmp/ROI_labels.tsv")
         shutil.copy2("/app/data/external/ROI_labels.tsv", "/shared_data/ROI_labels.tsv")
         shutil.copy2("/app/license.txt", "/tmp/freesurfer_license.txt")
         shutil.copy2("/app/nextflow/configs/pyradiomics.yaml", "/tmp/pyradiomics.yaml")
+        shutil.copy2("/app/license.txt", "/tmp/freesurfer_license.txt")
         logger.info("File statici copiati in /tmp e nel volume condiviso.")
     except OSError as e:
         logger.error(f"File statico mancante al bootstrap: {e}. Verificare la directory data/.")
