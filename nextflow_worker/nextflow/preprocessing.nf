@@ -36,7 +36,8 @@ workflow {
             }
     }
 
-    labels_file_ch = channel.fromPath(params.labels)
+    //labels_file_ch = channel.fromPath(params.labels)
+    labels_file_ch = Channel.value(file(params.labels))
     params_file_ch = channel.fromPath(params.settings)
 
     if (params.brain_segmenter == "freesurfer") {
@@ -49,7 +50,9 @@ workflow {
 
     nifti_out = nifti_converter(segmenter_out, params.segmenter_folder_output)
 
-    roi = roi_creator(nifti_out.combine(labels_file_ch), params.segmenter_folder_output)
+    roi = roi_creator(
+    nifti_out.combine(labels_file_ch)
+    )
 
     csv_out = csv_collector(
         nifti_out.join(roi).combine(labels_file_ch)
@@ -134,46 +137,51 @@ process nifti_converter {
 
     output:
     tuple val(subject), val(FTD_group), path("nu.nii"), path("aparc+aseg.nii")
-
+    //export FS_LICENSE=/app/license.txt
     script:
     """
-    export FS_LICENSE=/app/license.txt
+
     mri_convert ${subject_dir}/mri/nu.mgz nu.nii
     mri_convert ${subject_dir}/mri/aparc+aseg.mgz aparc+aseg.nii
     """
-}
+    }
 
 process roi_creator {
-    container 'clinical-fsl'
-    errorStrategy params.error_strategy
-    publishDir "${params.segmenter_folder_output}/${FTD_group}/${subject}/mri", mode: 'copy', pattern: "ROI"
 
-    input:
-    tuple val(subject), val(FTD_group), path(nu_nii), path(aparc_aseg_nii), path(labels_file)
-    val segmenter_folder_output
+        container 'clinical-fsl'
+        errorStrategy params.error_strategy
 
-    output:
-    tuple val(subject), path("ROI")
+        input:
+        tuple val(subject), val(FTD_group), path(nu), path(aparc), path(labels_file)
 
-    script:
-    """
-    mkdir -p ROI
-    cd ROI
-    while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
-        if [[ -z "\$label" || "\$label" == "#"* ]]; then
-            continue
-        fi
-        clean_name=\$(echo "\$name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
-        if [[ -z "\$clean_name" ]]; then
-            continue
-        fi
-        fslmaths ../${aparc_aseg_nii} -thr \$label -uthr \$label \${clean_name}.nii.gz
-        if [[ -f "\${clean_name}.nii.gz" ]]; then
-            fslmaths \${clean_name}.nii.gz -bin \${clean_name}.nii.gz
-        fi
-    done < ../${labels_file}
-    """
-}
+        output:
+        tuple val(subject), path("ROI")
+
+         script:
+         """
+         mkdir -p ROI
+         cd ROI
+
+         while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
+            if [[ -z "\$label" || "\$label" == "#"* ]]; then
+                continue
+            fi
+
+            clean_name=\$(echo "\$name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
+
+            if [[ -z "\$clean_name" ]]; then
+                continue
+            fi
+
+            fslmaths ../aparc+aseg.nii -thr \$label -uthr \$label \${clean_name}.nii.gz
+
+            if [[ -f "\${clean_name}.nii.gz" ]]; then
+                fslmaths \${clean_name}.nii.gz -bin \${clean_name}.nii.gz
+            fi
+
+         done < \$labels_file
+         """
+    }
 
 process csv_collector {
     container 'clinical-pyradiomics'
