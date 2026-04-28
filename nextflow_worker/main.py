@@ -49,7 +49,8 @@ async def lifespan(app: FastAPI):
     try:
         shutil.copy2("/app/data/external/ROI_labels.tsv", "/tmp/ROI_labels.tsv")
         shutil.copy2("/app/data/external/ROI_labels.tsv", "/shared_data/ROI_labels.tsv")
-        shutil.copy2("/app/license.txt", "/tmp/freesurfer_license.txt")
+        os.makedirs("/tmp/nextflow_work", exist_ok=True)
+        shutil.copy2("/app/license.txt", "/tmp/nextflow_work/freesurfer_license.txt")
         shutil.copy2("/app/nextflow/configs/pyradiomics.yaml", "/tmp/pyradiomics.yaml")
         logger.info("File statici copiati in /tmp e nel volume condiviso.")
     except OSError as e:
@@ -97,9 +98,10 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
     if not os.path.exists(tmp_nifti):
         shutil.copy2(input_path, tmp_nifti)
 
-    # La licenza FreeSurfer viene copiata in /tmp/freesurfer_license.txt
+    # La licenza FreeSurfer viene copiata in /tmp/nextflow_work/freesurfer_license.txt
     # perche' nextflow.config la monta li' nel container via runOptions.
-    shutil.copy2("/app/license.txt", "/tmp/freesurfer_license.txt")
+    os.makedirs("/tmp/nextflow_work", exist_ok=True)
+    shutil.copy2("/app/license.txt", "/tmp/nextflow_work/freesurfer_license.txt")
 
     cmd = [
         "nextflow", "run", "/app/nextflow/preprocessing.nf",
