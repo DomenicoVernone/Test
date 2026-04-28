@@ -49,6 +49,7 @@ async def lifespan(app: FastAPI):
     try:
         shutil.copy2("/app/data/external/ROI_labels.tsv", "/tmp/ROI_labels.tsv")
         shutil.copy2("/app/data/external/ROI_labels.tsv", "/shared_data/ROI_labels.tsv")
+        shutil.copy2("/app/license.txt", "/tmp/freesurfer_license.txt")
         shutil.copy2("/app/nextflow/configs/pyradiomics.yaml", "/tmp/pyradiomics.yaml")
         logger.info("File statici copiati in /tmp e nel volume condiviso.")
     except OSError as e:
