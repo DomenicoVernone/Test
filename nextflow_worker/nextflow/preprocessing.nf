@@ -1,3 +1,4 @@
+
 // ==========================================
 // 0. PARAMETRI DI DEFAULT
 // ==========================================
@@ -50,10 +51,8 @@ workflow {
 
     nifti_out = nifti_converter(segmenter_out, params.segmenter_folder_output)
 
-    roi = roi_creator(
-    nifti_out.combine(labels_file_ch)
-    )
-
+    //roi = roi_creator(nifti_out.combine(labels_file_ch))
+    roi = roi_creator(nifti_out.combine(labels_file_ch).map { subject, group, nu, aparc, labels ->tuple(subject, group, nu, aparc, labels)})
     csv_out = csv_collector(
         nifti_out.join(roi).combine(labels_file_ch)
     )
@@ -61,7 +60,8 @@ workflow {
     feature_extraction(
         csv_out,
         nifti_out.map { subject, FTD_group, nu_nii, aparc_aseg_nii -> nu_nii }.collect(),
-        roi.map { subject, roi_dir -> roi_dir }.collect(),
+        roi.map { subject, group, roi_dir -> roi_dir }.collect(),
+        //roi.map { subject, roi_dir -> roi_dir }.collect(),
         labels_file_ch,
         params_file_ch
     )
@@ -155,14 +155,13 @@ process roi_creator {
         tuple val(subject), val(FTD_group), path(nu), path(aparc), path(labels_file)
 
         output:
-        tuple val(subject), path("ROI")
-
+        tuple val(subject), val(FTD_group), path("ROI")
+        //fslmaths ${aparc} -thr \$label -uthr \$label \${clean_name}.nii.gz
          script:
          """
          mkdir -p ROI
-         cd ROI
 
-         while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
+         while IFS=\$'\\t' read -r roi_id label name || [[ -n "\$label" ]]; do
             if [[ -z "\$label" || "\$label" == "#"* ]]; then
                 continue
             fi
@@ -173,13 +172,14 @@ process roi_creator {
                 continue
             fi
 
-            fslmaths ../aparc+aseg.nii -thr \$label -uthr \$label \${clean_name}.nii.gz
+            fslmaths ${aparc} -thr \$label -uthr \$label ROI/\${clean_name}.nii.gz
+            
 
-            if [[ -f "\${clean_name}.nii.gz" ]]; then
-                fslmaths \${clean_name}.nii.gz -bin \${clean_name}.nii.gz
+            if [[ -f "ROI/\${clean_name}.nii.gz" ]]; then
+                fslmaths ROI/\${clean_name}.nii.gz -bin ROI/\${clean_name}.nii.gz
             fi
 
-         done < \$labels_file
+         done < "${labels_file}"
          """
     }
 
