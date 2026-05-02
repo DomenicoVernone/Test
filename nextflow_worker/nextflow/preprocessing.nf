@@ -51,11 +51,19 @@ workflow {
 
     nifti_out = nifti_converter(segmenter_out, params.segmenter_folder_output)
 
-    //roi = roi_creator(nifti_out.combine(labels_file_ch))
-    roi = roi_creator(nifti_out.combine(labels_file_ch).map { subject, group, nu, aparc, labels ->tuple(subject, group, nu, aparc, labels)})
-    csv_out = csv_collector(
-        nifti_out.join(roi).combine(labels_file_ch)
-    )
+    roi = roi_creator(nifti_out.combine(labels_file_ch))
+    //roi = roi_creator(nifti_out.combine(labels_file_ch).map { subject, group, nu, aparc, labels ->tuple(subject, group, nu, aparc, labels)})
+    //roi = roi_creator(nifti_out.combine(labels_file_ch).map { subject, group, nu, aparc, labels ->tuple(subject, group, nu, aparc, labels)})
+    //roi = roi_creator(nifti_out.map { subject, group, nu, aparc ->tuple(subject, group, nu, aparc, file(params.labels))})
+    
+    //csv_out = csv_collector(nifti_out.join(roi).combine(labels_file_ch))
+csv_out = csv_collector(
+    nifti_out.join(roi)
+        .map { subject, group, nu, aparc, group2, roi_dir ->
+            tuple(subject, group, nu, aparc, roi_dir)
+        }
+        .combine(labels_file_ch)
+)
 
     feature_extraction(
         csv_out,
@@ -159,32 +167,36 @@ process roi_creator {
         //fslmaths ${aparc} -thr \$label -uthr \$label \${clean_name}.nii.gz
          script:
          """
-         mkdir -p ROI
+        source \$FSLDIR/etc/fslconf/fsl.sh
 
-         while IFS=\$'\\t' read -r roi_id label name || [[ -n "\$label" ]]; do
-            if [[ -z "\$label" || "\$label" == "#"* ]]; then
-                continue
-            fi
+        mkdir -p ROI
 
-            clean_name=\$(echo "\$name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
+        while IFS=\$'\\t' read -r label_id label_name || [[ -n "\$label_name" ]]; do
 
-            if [[ -z "\$clean_name" ]]; then
-                continue
-            fi
+            [[ "\$label_id" == "Index" ]] && continue
+            [[ -z "\$label_id" ]] && continue
 
-            fslmaths ${aparc} -thr \$label -uthr \$label ROI/\${clean_name}.nii.gz
-            
+            clean_name=\$(echo "\$label_name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
 
-            if [[ -f "ROI/\${clean_name}.nii.gz" ]]; then
-                fslmaths ROI/\${clean_name}.nii.gz -bin ROI/\${clean_name}.nii.gz
-            fi
+            fslmaths ${aparc} \
+                -thr \$label_id \
+                -uthr \$label_id \
+                -bin \
+                ROI/\${clean_name}.nii.gz
 
-         done < "${labels_file}"
+        done < ${labels_file}
+
+        # sicurezza: fallisce se nessuna ROI generata
+        n_files=\$(ls ROI/*.nii.gz 2>/dev/null | wc -l)
+        if [[ \$n_files -eq 0 ]]; then
+            echo "ERROR: No ROI masks generated"
+            exit 1
+        fi
          """
     }
 
 process csv_collector {
-    container 'clinical-pyradiomics'
+    container 'pyradiomics'
     errorStrategy params.error_strategy
     publishDir "${params.features_output}", mode: 'copy'
 
@@ -194,28 +206,32 @@ process csv_collector {
     output:
     path("*.csv")
 
+
     script:
     """
-    while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
-        if [[ -z "\$label" || "\$label" == "#"* ]]; then
-            continue
-        fi
-        clean_name=\$(echo "\$name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
-        if [[ -z "\$clean_name" ]]; then
-            continue
-        fi
+    while IFS=\$'\\t' read -r label_id label_name || [[ -n "\$label_name" ]]; do
+
+        [[ "\$label_id" == "Index" ]] && continue
+        [[ -z "\$label_name" ]] && continue
+
+        clean_name=\$(echo "\$label_name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
+
         mask_path="${roi_dir}/\${clean_name}.nii.gz"
+
         if [[ -f "\${mask_path}" ]]; then
             echo "Image,Mask" > \${clean_name}.csv
-            echo "${nu_nii},\${mask_path}" >> \${clean_name}.csv
+            echo "nu.nii,ROI/\${clean_name}.nii.gz" >> \${clean_name}.csv
         fi
+
     done < ${labels_file}
     """
 }
 
 process feature_extraction {
+
     container 'clinical-pyradiomics'
     errorStrategy params.error_strategy
+
     publishDir "${params.outdir}", mode: 'copy', pattern: 'radiomics_features.csv'
 
     input:
@@ -227,55 +243,81 @@ process feature_extraction {
 
     output:
     path("*_feat.csv"), optional: true
-    path("radiomics_features.csv"), optional: true
+    path("radiomics_features.csv")
 
     script:
     """
-    while IFS='\t' read -r roi_id label name || [[ -n "\$label" ]]; do
-        if [[ -z "\$label" || "\$label" == "#"* ]]; then
-            continue
-        fi
-        clean_name=\$(echo "\$name" | tr -d '[:space:]' | tr -cd '[:alnum:]_-')
-        if [[ -z "\$clean_name" ]]; then
-            continue
-        fi
-        input_csv="\${clean_name}.csv"
-        if [[ -f "\${input_csv}" ]]; then
-            pyradiomics "\${input_csv}" -o "\${clean_name}_feat.csv" --param "${settings}" -f csv --jobs ${params.pyradiomics_jobs}
-        fi
-    done < "${labels_file}"
+    echo "=== Avvio feature_extraction ==="
+    generated_any=false
+    for input_csv in *.csv; do
+
+    [[ "\$input_csv" == *_feat.csv ]] && continue
+    [[ "\$input_csv" == radiomics_features.csv ]] && continue
+
+        roi_name=\$(basename "\$input_csv" .csv)
+
+        echo "Processing \$roi_name"
+
+        pyradiomics "\$input_csv" \
+            -o "\${roi_name}_feat.csv" \
+            --param "${settings}" \
+            -f csv \
+            --jobs ${params.pyradiomics_jobs}
+
+        generated_any=true
+
+    done
+
+
+    if [ "\$generated_any" = false ]; then
+        echo "ERROR: nessun file feature generato"
+        exit 1
+    fi
+
+    echo "=== Aggregazione feature ==="
 
     cat << 'EOF' > aggregate.py
-import csv
-import glob
+    import csv
+    import glob
 
-all_files = glob.glob('*_feat.csv')
-if not all_files:
-    print('Nessun file _feat.csv trovato.')
-    open('radiomics_features.csv', 'w').close()
-else:
+    all_files = glob.glob('*_feat.csv')
+
+    if not all_files:
+        print('Errore: nessun file _feat.csv generato.')
+        exit(1)
+
     rows = {}
     all_keys = ['Image']
+
     for f in sorted(all_files):
         roi = f.replace('_feat.csv', '')
+
         with open(f) as fh:
             reader = csv.DictReader(fh)
+
             for row in reader:
                 img = row.get('Image', '')
+
                 if img not in rows:
                     rows[img] = {'Image': img}
+
                 for k, v in row.items():
                     if k not in ('Image', 'Mask') and not k.startswith('diagnostics_'):
                         new_key = f'{roi}_{k}'
                         rows[img][new_key] = v
+
                         if new_key not in all_keys:
                             all_keys.append(new_key)
+
     with open('radiomics_features.csv', 'w', newline='') as out:
         writer = csv.DictWriter(out, fieldnames=all_keys, extrasaction='ignore')
         writer.writeheader()
         writer.writerows(rows.values())
-    print('radiomics_features.csv generato.')
-EOF
+
+    print('radiomics_features.csv generato correttamente.')
+    EOF
+
+
     python3 aggregate.py
     """
 }
