@@ -9,82 +9,79 @@
    <title>Pipeline MLOps Radiomica</title>
 
    <style>
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 40px;
+    background-color: #f9f9f9;
+    color: #333;
+}
 
-       body {
+h1, h2, h3 {
+    color: #2c3e50;
+}
 
-           font-family: Arial, sans-serif;
+h1 {
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+}
 
-           line-height: 1.6;
+pre {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+}
 
-           margin: 40px;
+.section {
+    margin-bottom: 40px;
+}
 
-           background-color: #f9f9f9;
+.box {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
 
-           color: #333;
+ul {
+    margin-left: 20px;
+}
 
-       }
+/* ===== TABLE STYLE UNIFICATO ===== */
 
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
+    font-size: 14px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+}
 
+th {
+    background-color: #2c3e50;
+    color: white;
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+}
 
-       h1, h2, h3 {
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
 
-           color: #2c3e50;
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
 
-       }
-
-
-
-       h1 {
-
-           border-bottom: 2px solid #ccc;
-
-           padding-bottom: 10px;
-
-       }
-
-
-
-       pre {
-
-           background-color: #eee;
-
-           padding: 15px;
-
-           border-radius: 5px;
-
-           overflow-x: auto;
-
-       }
-
-
-
-       .section {
-
-           margin-bottom: 40px;
-
-       }
-
-
-
-       .box {
-
-           background-color: #ffffff;
-
-           padding: 20px;
-
-           border-radius: 8px;
-
-           box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-
-       }
-
-
-
-       ul {
-
-           margin-left: 20px;
-
-       }
+tr:hover {
+    background-color: #eef2f5;
+}
 
    </style>
 

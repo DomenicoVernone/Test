@@ -1,104 +1,88 @@
 <!DOCTYPE html>
+
 <html lang="it">
 
 <head>
-
 <meta charset="UTF-8">
 <title>MLOps – Introduzione</title>
 
 <style>
-
-/* ===== GLOBAL ===== */
-
 body {
-    margin: 0;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    background: #f5f6f7;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 40px;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-/* ===== CONTENT ===== */
-
-.content {
-    margin-left: 0px;
-    padding: 40px;
-    max-width: 900px;
+h1, h2, h3 {
+    color: #2c3e50;
 }
-
-/* ===== BREADCRUMB ===== */
-
-.breadcrumb {
-    color: #6c6c6c;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-/* ===== HEADINGS ===== */
 
 h1 {
-    font-size: 36px;
-    margin-bottom: 25px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
 }
 
-h2 {
-    margin-top: 40px;
-    font-size: 26px;
+pre {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
 }
 
-/* ===== SERVICE BOX ===== */
+.section {
+    margin-bottom: 40px;
+}
 
-.service-box {
-    background: white;
-    padding: 18px;
+.box {
+    background-color: #ffffff;
+    padding: 20px;
     border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
-
-/* ===== CODE BLOCK ===== */
-
-.codeblock {
-    background: #eeeeee;
-    padding: 14px;
-    border-radius: 6px;
-    font-family: monospace;
-    margin: 15px 0;
-    white-space: pre-line;
-}
-
-/* ===== LIST ===== */
 
 ul {
-    margin-top: 10px;
+    margin-left: 20px;
 }
 
-/* ===== NAV BUTTONS ===== */
+/* ===== TABLE STYLE UNIFICATO ===== */
 
-.nav-buttons {
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.button {
-    background: #e0e0e0;
-    border-radius: 6px;
-    padding: 10px 15px;
-    text-decoration: none;
-    color: black;
-}
-
-/* ===== FOOTER ===== */
-
-.footer {
-    margin-top: 50px;
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
     font-size: 14px;
-    color: gray;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
+th {
+    background-color: #2c3e50;
+    color: white;
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+tr:hover {
+    background-color: #eef2f5;
+}
 </style>
 
 </head>
-
 
 <body>
 
@@ -110,111 +94,201 @@ Docs » Introduzione
 
 <h1>Introduzione</h1>
 
-
-<h2>Descrizione</h2>
+<h2>Panoramica del sistema</h2>
 
 <div class="service-box">
 
 <p>
-MLOps è una piattaforma di supporto alle decisioni cliniche progettata
+MLOps è una piattaforma avanzata di supporto alle decisioni cliniche progettata
 per la diagnosi differenziale delle varianti di Demenza Frontotemporale (FTD)
-attraverso l’analisi radiomica di risonanze magnetiche cerebrali strutturali.
+attraverso l’analisi automatizzata di immagini di risonanza magnetica (MRI)
+strutturale.
 </p>
 
 <p>
-Il sistema integra una pipeline automatizzata di neuroimaging basata su
-FreeSurfer / FastSurfer e PyRadiomics, un motore di inferenza statistica
-implementato in R, un assistente AI context-aware basato su Spatial RAG
-e una dashboard interattiva sviluppata in React per la visualizzazione
-multiplanare delle immagini e l’esplorazione dello spazio diagnostico latente
-generato tramite UMAP.
+Il sistema integra una pipeline completa di processamento neuroimaging,
+estrazione radiomica, inferenza statistica e interpretazione assistita
+tramite modelli AI, seguendo i principi dell’ingegneria MLOps:
+riproducibilità, scalabilità e modularità.
+</p>
+
+<p>
+L’obiettivo è trasformare dati di imaging complessi in informazioni cliniche
+strutturate e interpretabili, riducendo la variabilità operatore-dipendente
+e supportando il processo decisionale medico.
 </p>
 
 </div>
 
+<h2>Architettura logica</h2>
 
-<h2>Funzionalità principali</h2>
+<div class="service-box">
+
+<p>
+La piattaforma è costruita secondo un’architettura a microservizi containerizzati,
+in cui ogni componente implementa una responsabilità ben definita all’interno
+del workflow diagnostico.
+</p>
+
+<p>
+I principali moduli del sistema includono:
+</p>
+
+<ul>
+<li><b>Pipeline neuroimaging</b> (Nextflow) per preprocessing MRI e radiomica</li>
+<li><b>Orchestrator</b> per la gestione dei task asincroni</li>
+<li><b>Model service</b> per accesso e versioning dei modelli ML</li>
+<li><b>Inference engine</b> per classificazione diagnostica e embedding UMAP</li>
+<li><b>LLM service</b> per interpretazione clinica (Spatial RAG)</li>
+<li><b>Frontend React</b> per visualizzazione e interazione clinica</li>
+</ul>
+
+<p>
+Questa separazione consente un’elevata scalabilità del sistema e facilita
+l’integrazione di nuovi modelli o componenti senza impattare il resto
+dell’architettura.
+</p>
+
+</div>
+
+<h2>Flusso operativo end-to-end</h2>
+
+<div class="service-box">
+
+<p>
+Il sistema implementa un workflow completamente automatizzato che parte
+dal caricamento della MRI e termina con la produzione di una diagnosi
+assistita e interpretabile.
+</p>
+
+<div class="codeblock">
+1. Upload MRI (frontend)
+2. Autenticazione e routing (api_gateway)
+3. Creazione task analisi (orchestrator)
+4. Esecuzione pipeline radiomica (nextflow_worker)
+5. Generazione feature radiomiche (CSV)
+6. Caricamento modello ML (model_service)
+7. Inferenza diagnostica (inference_engine)
+8. Proiezione nello spazio latente UMAP
+9. Interpretazione AI (llm_service)
+10. Visualizzazione risultati (frontend)
+</div>
+
+<p>
+Questo flusso garantisce coerenza tra i diversi componenti e consente
+l’esecuzione riproducibile delle analisi su dataset clinici.
+</p>
+
+</div>
+
+<h2>Pipeline neuroimaging e radiomica</h2>
+
+<div class="service-box">
+
+<p>
+La pipeline implementa una sequenza deterministica di operazioni per
+l’elaborazione delle immagini MRI strutturali:
+</p>
+
+<ul>
+<li>segmentazione anatomica (FreeSurfer / FastSurfer)</li>
+<li>estrazione delle regioni di interesse (ROI)</li>
+<li>calcolo delle feature radiomiche (PyRadiomics)</li>
+</ul>
+
+<p>
+Il risultato è un vettore di feature quantitative che rappresenta
+le caratteristiche morfologiche e testurali delle strutture cerebrali.
+</p>
+
+<p>
+Queste feature costituiscono l’input per il modello di inferenza
+diagnostica.
+</p>
+
+</div>
+
+<h2>Inferenza e interpretabilità</h2>
+
+<div class="service-box">
+
+<p>
+Il sistema utilizza un approccio di inferenza basato su:
+</p>
+
+<ul>
+<li>classificazione K-Nearest Neighbors (KNN)</li>
+<li>proiezione nello spazio latente tridimensionale (UMAP)</li>
+</ul>
+
+<p>
+Questo consente non solo di ottenere una predizione diagnostica,
+ma anche di posizionare il paziente in uno spazio interpretabile
+basato sulla similarità clinica.
+</p>
+
+<p>
+L’assistente AI (LLM service) arricchisce il processo fornendo
+spiegazioni contestualizzate basate su:
+</p>
+
+<ul>
+<li>feature radiomiche</li>
+<li>posizione nello spazio UMAP</li>
+<li>cluster diagnostici</li>
+</ul>
+
+<p>
+Questo approccio migliora significativamente l’explainability del sistema,
+rendendo le predizioni più comprensibili per l’utente clinico.
+</p>
+
+</div>
+
+<h2>Caratteristiche principali</h2>
 
 <div class="service-box">
 
 <ul>
-<li>Segmentazione automatica MRI tramite FreeSurfer o FastSurfer</li>
-<li>Estrazione di feature radiomiche con PyRadiomics</li>
-<li>Motore di inferenza statistica basato su KNN implementato in R</li>
-<li>Proiezione nello spazio latente 3D tramite UMAP</li>
-<li>Assistente clinico Spatial RAG per supporto all’interpretabilità</li>
-<li>Viewer MRI multiplanare interattivo (integrazione NiiVue)</li>
-<li>Architettura a microservizi orchestrata con Docker Compose</li>
-<li>Versionamento e tracciamento modelli tramite MLflow e DagsHub</li>
+<li>Pipeline MRI completamente automatizzata</li>
+<li>Architettura a microservizi containerizzata</li>
+<li>Riproducibilità garantita tramite Nextflow</li>
+<li>Integrazione con MLflow e Model Registry</li>
+<li>Inferenza interpretabile (KNN + UMAP)</li>
+<li>Explainability tramite LLM (Spatial RAG)</li>
+<li>Dashboard clinica interattiva in React</li>
 </ul>
 
 </div>
 
-
-<h2>Codice sorgente</h2>
-
-<div class="service-box">
-
-<p>Repository GitHub:</p>
-
-<div class="codeblock">
-https://github.com/carlosto033/Tesi-FTD
-</div>
-
-</div>
-
-
-<h2>Aggiunta della licenza FreeSurfer</h2>
+<h2>Contesto applicativo</h2>
 
 <div class="service-box">
 
 <p>
-FreeSurfer richiede un file di licenza valido per eseguire la pipeline di
-segmentazione neuroimaging. Scaricare la licenza da:
+La piattaforma è sviluppata come progetto accademico nell’ambito della
+ricerca su sistemi di supporto decisionale clinico e applicazioni di
+machine learning al neuroimaging.
 </p>
 
-<div class="codeblock">
-https://surfer.nmr.mgh.harvard.edu/registration.html
-</div>
-
-<p>Dopo il download eseguire:</p>
-
-<div class="codeblock">
-cp /path/to/license.txt nextflow_worker/license.txt
-</div>
-
 <p>
-Senza questo file la pipeline di segmentazione non può essere avviata.
-</p>
-
-</div>
-
-
-<h2>Contributi</h2>
-
-<div class="service-box">
-
-<p>
-MLOps è attualmente sviluppato come progetto accademico di ricerca.
-Sono benvenuti contributi relativi a:
+Il sistema è progettato per essere utilizzato in:
 </p>
 
 <ul>
-<li>workflow radiomici</li>
-<li>pipeline di neuroimaging</li>
-<li>explainable AI in ambito clinico</li>
+<li>contesti di ricerca neuroimaging</li>
+<li>ambienti accademici</li>
+<li>workflow sperimentali di diagnosi assistita</li>
 </ul>
 
-<p>Segnalazione issue:</p>
-
-<div class="codeblock">
-https://github.com/carlosto033/Tesi-FTD/issues
-</div>
+<p>
+Non è destinato all’uso clinico diretto senza validazione regolatoria.
+</p>
 
 </div>
-
 
 </div>
 
 </body>
+
 </html>
