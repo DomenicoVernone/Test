@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Clinical Twin – Installation</title>
+<title>MLOps – Installation</title>
 
 <style>
 
@@ -106,7 +106,7 @@ Docs » Installation
 <h1>Installation</h1>
 
 <p>
-This section describes the steps required to configure the Clinical Twin runtime environment, install the required dependencies, and start the complete microservices stack.
+This section describes the steps required to configure the MLOps runtime environment, install the required dependencies, and start the complete microservices stack.
 </p>
 
 
@@ -115,7 +115,7 @@ This section describes the steps required to configure the Clinical Twin runtime
 <div class="service-box">
 
 <p>
-The Clinical Twin source code is available on GitHub. The repository
+The MLOps source code is available on GitHub. The repository
 includes all platform microservices, the Nextflow-based neuroimaging
 pipeline, statistical inference models, and the clinical dashboard
 for exploring the latent diagnostic space.
@@ -171,7 +171,7 @@ the brain segmentation stage of the neuroimaging pipeline.
 <div class="service-box">
 
 <p>
-Clinical Twin uses dedicated <code>.env</code> files for each microservice
+MLOps uses dedicated <code>.env</code> files for each microservice
 to configure authentication parameters, model access, inference endpoints,
 and integration with external services.
 </p>

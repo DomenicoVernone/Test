@@ -5,7 +5,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Clinical Twin – Test Plan</title>
+<title>MLOps – Test Plan</title>
 
 <style>
 
@@ -102,7 +102,7 @@ th {
 Docs » Test Plan
 </div>
 
-<h1>Piano di test completo – Clinical Twin</h1>
+<h1>Piano di test completo – MLOps</h1>
 
 <div class="service-box">
 

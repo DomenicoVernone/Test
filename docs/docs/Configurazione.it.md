@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Clinical Twin – Configuration</title>
+<title>MLOps – Configuration</title>
 
 <style>
 
@@ -106,13 +106,13 @@ Docs » Configuration
 <h1>Configuration</h1>
 
 <p>
-Questa sezione descrive le principali variabili di configurazione utilizzate dai microservizi Clinical Twin per gestire autenticazione, accesso ai modelli, integrazione con servizi AI e parametri della pipeline radiomica.
+Questa sezione descrive le principali variabili di configurazione utilizzate dai microservizi MLOps per gestire autenticazione, accesso ai modelli, integrazione con servizi AI e parametri della pipeline radiomica.
 </p>
 
 <div class="service-box">
 
 <p>
-Clinical Twin utilizza file di configurazione distribuiti tra i diversi
+MLOps utilizza file di configurazione distribuiti tra i diversi
 microservizi della piattaforma per gestire autenticazione, orchestrazione
 della pipeline neuroimaging, accesso ai modelli registrati e integrazione
 con servizi di inferenza basati su modelli linguistici.

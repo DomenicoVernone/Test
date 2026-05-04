@@ -3,7 +3,7 @@
 
 <head>
 <meta charset="UTF-8">
-<title>Clinical Twin – Microservices Overview</title>
+<title>MLOps – Microservices Overview</title>
 
 <style>
 
@@ -78,7 +78,7 @@ Docs » Microservices Overview
 
 
 <p>
-Clinical Twin adopts a containerized microservices architecture orchestrated through Docker Compose. Each service implements an independent functional component and communicates with the others through internal REST APIs.
+MLOps adopts a containerized microservices architecture orchestrated through Docker Compose. Each service implements an independent functional component and communicates with the others through internal REST APIs.
 </p>
 
 

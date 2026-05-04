@@ -53,7 +53,7 @@
 <div class="section">
 <h2>1. Introduction</h2>
 <p>
-Within the Clinical Twin system, an automated pipeline has been designed and implemented for processing brain magnetic resonance imaging (MRI) data and extracting quantitative biomarkers.
+Within the MLOps system, an automated pipeline has been designed and implemented for processing brain magnetic resonance imaging (MRI) data and extracting quantitative biomarkers.
 The pipeline is implemented using Nextflow and is part of a distributed microservices architecture, with the goal of ensuring reproducibility, modularity, and scalability according to MLOps principles.
 </p>
 <p>
@@ -241,7 +241,7 @@ This file contains structured radiomic features and represents the input for the
 </div>
 
 <div class="section">
-<h2>6. Integration into the Clinical Twin System</h2>
+<h2>6. Integration into the MLOps System</h2>
 
 <pre>
 Nextflow pipeline
@@ -288,7 +288,7 @@ These changes have transformed the pipeline from an experimental prototype into 
 <div class="section">
 <h2>8. Conclusions</h2>
 <p>
-The developed pipeline represents a central component of the Clinical Twin system, enabling the automated transformation of complex imaging data into structured and interpretable features.
+The developed pipeline represents a central component of the MLOps system, enabling the automated transformation of complex imaging data into structured and interpretable features.
 </p>
 
 <p>

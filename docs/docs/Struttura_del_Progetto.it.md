@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Clinical Twin – Project Structure</title>
+<title>MLOps – Project Structure</title>
 
 <style>
 
@@ -137,7 +137,7 @@ Docs » Project Structure
 <h1>Project Structure</h1>
 
 <p>
-Questa sezione descrive l’organizzazione del repository Clinical Twin e il ruolo delle principali directory che compongono l’architettura a microservizi della piattaforma.
+Questa sezione descrive l’organizzazione del repository MLOps e il ruolo delle principali directory che compongono l’architettura a microservizi della piattaforma.
 </p>
 
 <p>

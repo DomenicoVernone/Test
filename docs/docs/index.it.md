@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Clinical Twin – Introduzione</title>
+<title>MLOps – Introduzione</title>
 
 <style>
 
@@ -116,7 +116,7 @@ Docs » Introduzione
 <div class="service-box">
 
 <p>
-Clinical Twin è una piattaforma di supporto alle decisioni cliniche progettata
+MLOps è una piattaforma di supporto alle decisioni cliniche progettata
 per la diagnosi differenziale delle varianti di Demenza Frontotemporale (FTD)
 attraverso l’analisi radiomica di risonanze magnetiche cerebrali strutturali.
 </p>
@@ -195,7 +195,7 @@ Senza questo file la pipeline di segmentazione non può essere avviata.
 <div class="service-box">
 
 <p>
-Clinical Twin è attualmente sviluppato come progetto accademico di ricerca.
+MLOps è attualmente sviluppato come progetto accademico di ricerca.
 Sono benvenuti contributi relativi a:
 </p>
 

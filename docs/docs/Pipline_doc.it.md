@@ -4,89 +4,89 @@
 
 <head>
 
-&#x20;   <meta charset="UTF-8">
+   <meta charset="UTF-8">
 
-&#x20;   <title>Pipeline MLOps Radiomica</title>
+   <title>Pipeline MLOps Radiomica</title>
 
-&#x20;   <style>
+   <style>
 
-&#x20;       body {
+       body {
 
-&#x20;           font-family: Arial, sans-serif;
+           font-family: Arial, sans-serif;
 
-&#x20;           line-height: 1.6;
+           line-height: 1.6;
 
-&#x20;           margin: 40px;
+           margin: 40px;
 
-&#x20;           background-color: #f9f9f9;
+           background-color: #f9f9f9;
 
-&#x20;           color: #333;
+           color: #333;
 
-&#x20;       }
-
-
-
-&#x20;       h1, h2, h3 {
-
-&#x20;           color: #2c3e50;
-
-&#x20;       }
+       }
 
 
 
-&#x20;       h1 {
+       h1, h2, h3 {
 
-&#x20;           border-bottom: 2px solid #ccc;
+           color: #2c3e50;
 
-&#x20;           padding-bottom: 10px;
-
-&#x20;       }
+       }
 
 
 
-&#x20;       pre {
+       h1 {
 
-&#x20;           background-color: #eee;
+           border-bottom: 2px solid #ccc;
 
-&#x20;           padding: 15px;
+           padding-bottom: 10px;
 
-&#x20;           border-radius: 5px;
-
-&#x20;           overflow-x: auto;
-
-&#x20;       }
+       }
 
 
 
-&#x20;       .section {
+       pre {
 
-&#x20;           margin-bottom: 40px;
+           background-color: #eee;
 
-&#x20;       }
+           padding: 15px;
 
+           border-radius: 5px;
 
+           overflow-x: auto;
 
-&#x20;       .box {
-
-&#x20;           background-color: #ffffff;
-
-&#x20;           padding: 20px;
-
-&#x20;           border-radius: 8px;
-
-&#x20;           box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-
-&#x20;       }
+       }
 
 
 
-&#x20;       ul {
+       .section {
 
-&#x20;           margin-left: 20px;
+           margin-bottom: 40px;
 
-&#x20;       }
+       }
 
-&#x20;   </style>
+
+
+       .box {
+
+           background-color: #ffffff;
+
+           padding: 20px;
+
+           border-radius: 8px;
+
+           box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+
+       }
+
+
+
+       ul {
+
+           margin-left: 20px;
+
+       }
+
+   </style>
 
 </head>
 
@@ -108,7 +108,7 @@
 
 <p>
 
-Nel contesto del sistema Clinical Twin, è stata progettata e implementata una pipeline automatizzata per il processamento di immagini di risonanza magnetica (MRI) cerebrale e l’estrazione di biomarcatori quantitativi.
+Nel contesto del sistema MLOps, è stata progettata e implementata una pipeline automatizzata per il processamento di immagini di risonanza magnetica (MRI) cerebrale e l’estrazione di biomarcatori quantitativi.
 
 La pipeline è realizzata mediante Nextflow e si inserisce all’interno di un’architettura distribuita a microservizi, con l’obiettivo di garantire riproducibilità, modularità e scalabilità secondo i principi dell’MLOps.
 
@@ -142,31 +142,31 @@ La pipeline implementa una sequenza deterministica di operazioni, ciascuna incap
 
 MRI (.nii)
 
-&#x20;  ↓
+  ↓
 
 Segmentazione cerebrale (FreeSurfer / FastSurfer)
 
-&#x20;  ↓
+  ↓
 
 Conversione in formato NIfTI
 
-&#x20;  ↓
+  ↓
 
 Estrazione ROI (Region of Interest)
 
-&#x20;  ↓
+  ↓
 
 Costruzione mapping per PyRadiomics
 
-&#x20;  ↓
+  ↓
 
 Estrazione feature radiomiche
 
-&#x20;  ↓
+  ↓
 
 Aggregazione finale
 
-&#x20;  ↓
+  ↓
 
 radiomics\_features.csv
 
@@ -234,11 +234,11 @@ Il processo roi\_creator, basato su FSL, genera maschere binarie per ciascuna re
 
 ROI/
 
-&#x20;├── hippocampus.nii.gz
+├── hippocampus.nii.gz
 
-&#x20;├── amygdala.nii.gz
+├── amygdala.nii.gz
 
-&#x20;├── thalamus.nii.gz
+├── thalamus.nii.gz
 
 </pre>
 
@@ -484,7 +484,7 @@ Questo file contiene feature radiomiche strutturate e rappresenta l’input per 
 
 <div class="section">
 
-<h2>6. Integrazione nel sistema Clinical Twin</h2>
+<h2>6. Integrazione nel sistema MLOps</h2>
 
 
 
@@ -492,23 +492,23 @@ Questo file contiene feature radiomiche strutturate e rappresenta l’input per 
 
 Nextflow pipeline
 
-&#x20;  ↓
+  ↓
 
 radiomics\_features.csv
 
-&#x20;  ↓
+  ↓
 
 model\_service (MLflow / DagsHub)
 
-&#x20;  ↓
+  ↓
 
 inference\_engine (R)
 
-&#x20;  ↓
+  ↓
 
 Predizione + UMAP
 
-&#x20;  ↓
+  ↓
 
 Frontend (visualizzazione clinica)
 
@@ -578,7 +578,7 @@ Questi interventi hanno trasformato la pipeline da prototipo sperimentale a comp
 
 <p>
 
-La pipeline sviluppata rappresenta un elemento centrale del sistema Clinical Twin, consentendo la trasformazione automatizzata di dati di imaging complessi in feature strutturate e interpretabili.
+La pipeline sviluppata rappresenta un elemento centrale del sistema MLOps, consentendo la trasformazione automatizzata di dati di imaging complessi in feature strutturate e interpretabili.
 
 </p>
 

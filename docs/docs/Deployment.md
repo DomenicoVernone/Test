@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Clinical Twin – Deployment</title>
+<title>MLOps – Deployment</title>
 
 <style>
 
@@ -88,13 +88,13 @@ Docs » Deployment
 <h1>Deployment</h1>
 
 <p>
-This section describes the deployment modes of the Clinical Twin platform in local environments, research servers, and dedicated GPU infrastructures.
+This section describes the deployment modes of the MLOps platform in local environments, research servers, and dedicated GPU infrastructures.
 </p>
 
 <div class="service-box">
 
 <p>
-Clinical Twin can be executed both on local workstations for development and testing,
+MLOps can be executed both on local workstations for development and testing,
 and on dedicated Linux servers for processing large-scale MRI datasets.
 The containerized architecture based on Docker Compose ensures portability,
 reproducibility, and isolation of microservices.
@@ -236,7 +236,7 @@ Leave empty on systems without GPU partitioning.
 <div class="service-box">
 
 <p>
-Clinical Twin uses a Docker-out-of-Docker (DooD) model to allow
+MLOps uses a Docker-out-of-Docker (DooD) model to allow
 the nextflow_worker service to execute dedicated containers for segmentation,
 MRI preprocessing, and radiomic feature extraction.
 </p>

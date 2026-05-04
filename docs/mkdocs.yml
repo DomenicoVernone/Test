@@ -1,4 +1,4 @@
-site_name: Clinical Twin – FTD Radiomics Pipeline Documentation
+site_name: MLOps – FTD Radiomics Pipeline Documentation
 
 theme:
   name: material
@@ -29,7 +29,7 @@ plugins:
 nav:
   - Introduction: index.md
   - Architecture:
-      - Clinical Twin Architecture: Architettura.md
+      - MLOps Architecture: Architettura.md
       - Microservices Overview: Microservizi.md
       - Project Structure: Struttura_del_Progetto.md
   - Environment Setup:

@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Clinical Twin – API Reference</title>
+<title>MLOps – API Reference</title>
 
 <style>
 
@@ -91,7 +91,7 @@ Docs » API Reference
 <h1>API Reference</h1>
 
 <p>
-Questa sezione descrive gli endpoint REST esposti dai microservizi Clinical Twin
+Questa sezione descrive gli endpoint REST esposti dai microservizi MLOps
 per autenticazione utenti, orchestrazione pipeline MRI, inferenza diagnostica
 e interpretazione AI dei risultati.
 </p>

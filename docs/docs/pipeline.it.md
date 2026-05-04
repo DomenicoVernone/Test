@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Clinical Twin – Pipeline Workflow</title>
+<title>MLOps – Pipeline Workflow</title>
 
 <style>
 
@@ -88,13 +88,13 @@ Docs » Pipeline Workflow
 <h1>Pipeline Workflow</h1>
 
 <p>
-Questa sezione descrive il workflow completo della pipeline radiomica Clinical Twin, dall’acquisizione della MRI fino alla generazione della predizione diagnostica e alla visualizzazione dei risultati nella dashboard clinica.
+Questa sezione descrive il workflow completo della pipeline radiomica MLOps, dall’acquisizione della MRI fino alla generazione della predizione diagnostica e alla visualizzazione dei risultati nella dashboard clinica.
 </p>
 
 <div class="service-box">
 
 <p>
-La pipeline Clinical Twin implementa un workflow automatizzato di analisi
+La pipeline MLOps implementa un workflow automatizzato di analisi
 radiomica su risonanze magnetiche strutturali T1-weighted finalizzato alla
 diagnosi differenziale delle varianti della Frontotemporal Dementia (FTD).
 </p>
@@ -267,7 +267,7 @@ che esegue la classificazione diagnostica nello spazio delle feature.
 </ul>
 
 <p>
-Questa fase rappresenta il core decisionale del sistema Clinical Twin.
+Questa fase rappresenta il core decisionale del sistema MLOps.
 </p>
 
 </div>

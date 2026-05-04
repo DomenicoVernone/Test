@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Clinical Twin – System Architecture</title>
+<title>MLOps – System Architecture</title>
 
 <style>
 
@@ -143,7 +143,7 @@ Docs » System Architecture
 <div class="service-box">
 
 <p>
-Clinical Twin è progettato come una piattaforma modulare basata su
+MLOps è progettato come una piattaforma modulare basata su
 microservizi containerizzati orchestrati tramite Docker Compose.
 L’architettura separa chiaramente preprocessing neuroimaging, inferenza
 statistica, gestione modelli e interfaccia clinica.
@@ -158,13 +158,13 @@ statistica, gestione modelli e interfaccia clinica.
 
 <p>
 Il diagramma seguente rappresenta la struttura logica dei microservizi e
-il flusso dei dati all’interno della pipeline Clinical Twin.
+il flusso dei dati all’interno della pipeline MLOps.
 </p>
 
 <div class="arch-image">
-<img src="../assets/architecture.png" alt="Clinical Twin architecture diagram">
+<img src="../assets/architecture.png" alt="MLOps architecture diagram">
 <div class="caption">
-Figura: Architettura a microservizi della piattaforma Clinical Twin
+Figura: Architettura a microservizi della piattaforma MLOps
 </div>
 </div>
 

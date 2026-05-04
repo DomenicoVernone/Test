@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Clinical Twin – Quickstart</title>
+<title>MLOps – Quickstart</title>
 
 <style>
 
@@ -89,7 +89,7 @@ Docs » Quickstart
 <h1>Quickstart</h1>
 
 <p>
-Questa guida descrive i passaggi essenziali per eseguire la prima analisi MRI con Clinical Twin dopo aver completato le fasi di installazione e configurazione dell’ambiente.
+Questa guida descrive i passaggi essenziali per eseguire la prima analisi MRI con MLOps dopo aver completato le fasi di installazione e configurazione dell’ambiente.
 </p>
 
 <div class="service-box">

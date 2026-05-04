@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Clinical Twin – Introduction</title>
+<title>MLOps – Introduction</title>
 
 <style>
 
@@ -116,7 +116,7 @@ Docs » Introduction
 <div class="service-box">
 
 <p>
-Clinical Twin is a clinical decision support platform designed
+MLOps is a clinical decision support platform designed
 for the differential diagnosis of Frontotemporal Dementia (FTD) variants
 through radiomic analysis of structural brain MRI scans.
 </p>
@@ -195,7 +195,7 @@ Without this file, the segmentation pipeline cannot be started.
 <div class="service-box">
 
 <p>
-Clinical Twin is currently developed as an academic research project.
+MLOps is currently developed as an academic research project.
 Contributions related to the following areas are welcome:
 </p>
 
