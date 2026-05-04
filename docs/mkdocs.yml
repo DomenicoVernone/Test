@@ -2,7 +2,7 @@ site_name: MLOps – FTD Radiomics Pipeline Documentation
 
 theme:
   name: material
-  language: en  # Lingua predefinita per l'interfaccia (Inglese)
+  language: en
   palette:
     primary: indigo
     accent: indigo
@@ -25,18 +25,28 @@ plugins:
       add_selector: true
       fallback_to_default: true
 
-
 nav:
   - Introduction: index.md
+
   - Architecture:
-      - MLOps Architecture: Architettura.md
-      - Microservices Overview: Microservizi.md
-      - Project Structure: Struttura_del_Progetto.md
-  - Environment Setup:
+      - System Architecture: SYSTEM_ARCHITECTURE.md
+      - Components & Structure: COMPONENTS_&_STRUCTURE.md
+
+  - Setup:
       - Installation: Installazione.md
       - Configuration: Configurazione.md
-  - Radiomic Feature Extraction Pipeline: Pipline_doc.md
-  - Quick Guide: Guida_Rapida.md
-  - API Reference: api.md
-  - Deployment: Deployment.md
-  - Testing: testing.md
+
+  - Pipeline:
+      - Radiomics Pipeline: Pipeline_doc.md
+
+  - Usage:
+      - Quickstart: Guida_Rapida.md
+
+  - API:
+      - API Reference: api.md
+
+  - Deployment:
+      - Deployment Guide: Deployment.md
+
+  - Testing:
+      - Test Plan: testing.md
