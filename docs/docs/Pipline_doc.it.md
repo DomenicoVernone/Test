@@ -168,7 +168,7 @@ Aggregazione finale
 
   ↓
 
-radiomics\_features.csv
+radiomics_features.csv
 
 </pre>
 
@@ -194,7 +194,7 @@ Il risultato finale è un file strutturato contenente feature quantitative per c
 
 <p>
 
-Il primo step utilizza FreeSurfer oppure FastSurfer per eseguire la segmentazione anatomica del cervello.
+Il primo step utilizza <b>FreeSurfer</b> oppure <b>FastSurfer</b> per eseguire la segmentazione anatomica del cervello.
 
 </p>
 
@@ -214,7 +214,7 @@ L’output principale è il file aparc+aseg.mgz.
 
 I file generati da FreeSurfer sono in formato .mgz, non compatibile con gli strumenti radiomici.
 
-Il processo nifti\_converter converte tali file in formato .nii, rendendoli utilizzabili dagli step successivi.
+Il processo <b>nifti_converter</b> converte tali file in formato .nii, rendendoli utilizzabili dagli step successivi.
 
 </p>
 
@@ -224,7 +224,7 @@ Il processo nifti\_converter converte tali file in formato .nii, rendendoli util
 
 <p>
 
-Il processo roi\_creator, basato su FSL, genera maschere binarie per ciascuna regione cerebrale.
+Il processo <b>roi_creator</b>, basato su FSL, genera maschere binarie per ciascuna regione cerebrale.
 
 </p>
 
@@ -256,7 +256,7 @@ Questo step è fondamentale per isolare le singole strutture anatomiche su cui v
 
 <p>
 
-Il processo csv\_collector costruisce file CSV di mapping nel formato richiesto da PyRadiomics:
+Il processo <b>csv_collector</b> costruisce file CSV di mapping nel formato richiesto da PyRadiomics:
 
 </p>
 
@@ -284,7 +284,7 @@ Ogni file CSV rappresenta una specifica regione di interesse.
 
 <p>
 
-Il processo feature\_extraction utilizza PyRadiomics per calcolare feature quantitative per ciascuna ROI.
+Il processo <b>feature_extraction</b> utilizza PyRadiomics per calcolare feature quantitative per ciascuna ROI.
 
 </p>
 
@@ -314,7 +314,7 @@ Le feature generate per ciascuna ROI vengono aggregate in un unico file:
 
 
 
-<pre>radiomics\_features.csv</pre>
+<pre>radiomics_features.csv</pre>
 
 
 
@@ -372,7 +372,7 @@ Questo garantisce che la pipeline venga interrotta immediatamente in caso di err
 
 <p>
 
-I file statici (come ROI\_labels.tsv) vengono gestiti tramite:
+I file statici (come ROI_labels.tsv) vengono gestiti tramite:
 
 </p>
 
@@ -468,7 +468,7 @@ L’output principale è il file:
 
 
 
-<pre>radiomics\_features.csv</pre>
+<pre>radiomics_features.csv</pre>
 
 
 
@@ -494,15 +494,15 @@ Nextflow pipeline
 
   ↓
 
-radiomics\_features.csv
+radiomics_features.csv
 
   ↓
 
-model\_service (MLflow / DagsHub)
+model_service (MLflow / DagsHub)
 
   ↓
 
-inference\_engine (R)
+inference_engine (R)
 
   ↓
 
