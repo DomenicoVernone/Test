@@ -35,7 +35,7 @@ nav:
   - Environment Setup:
       - Installation: Installazione.md
       - Configuration: Configurazione.md
-  - Radiomic Feature Extraction Pipeline: Pipeline_docs.md
+  - Radiomic Feature Extraction Pipeline: Pipline_doc.md
   - Quick Guide: Guida_Rapida.md
   - API Reference: api.md
   - Deployment: Deployment.md
