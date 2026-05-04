@@ -95,7 +95,7 @@ tr:hover {
 
 
 
-<h1>📄 Pipeline MLOps per l’estrazione di feature radiomiche</h1>
+<h1>Pipeline MLOps per l’estrazione di feature radiomiche</h1>
 
 
 

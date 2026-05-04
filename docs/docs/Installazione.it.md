@@ -91,7 +91,7 @@ tr:hover {
 
 <div class="box">
 
-<h1>⚙️ Installazione della piattaforma MLOps</h1>
+<h1>Installazione della piattaforma MLOps</h1>
 
 <div class="section">
 <h2>1. Introduzione</h2>

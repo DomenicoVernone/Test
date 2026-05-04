@@ -80,24 +80,18 @@ tr:nth-child(even) {
 tr:hover {
     background-color: #eef2f5;
 }
-
 </style>
 
 </head>
 
 <body>
 
-<div class="content">
-
-<div class="breadcrumb">
-Docs » System Architecture
-</div>
+<div class="box">
 
 <h1>System Architecture</h1>
 
-<h2>Visione generale</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>1. Visione generale</h2>
 
 <p>
 La piattaforma MLOps è progettata come un sistema distribuito basato su
@@ -120,9 +114,8 @@ Questo approccio consente:
 
 </div>
 
-<h2>Flusso dati end-to-end</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>2. Flusso dati end-to-end</h2>
 
 <p>
 Il sistema implementa un flusso dati sequenziale orchestrato tra i
@@ -130,7 +123,7 @@ microservizi, dalla ricezione della MRI fino alla produzione del risultato
 diagnostico e della sua interpretazione.
 </p>
 
-<div class="codeblock">
+<pre>
 Frontend
   ↓
 API Gateway (autenticazione JWT)
@@ -146,7 +139,7 @@ Inference Engine (KNN + UMAP)
 LLM Service (explainability)
   ↓
 Frontend (visualizzazione clinica)
-</div>
+</pre>
 
 <p>
 Ogni passaggio è progettato per essere indipendente e comunicare tramite
@@ -155,9 +148,8 @@ API REST o file condivisi, garantendo modularità e fault isolation.
 
 </div>
 
-<h2>Struttura dei microservizi</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>3. Struttura dei microservizi</h2>
 
 <table>
 
@@ -213,9 +205,8 @@ API REST o file condivisi, garantendo modularità e fault isolation.
 
 </div>
 
-<h2>Ruoli e responsabilità dei servizi</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>4. Ruoli e responsabilità dei servizi</h2>
 
 <h3>api_gateway</h3>
 <p>
@@ -239,148 +230,65 @@ Produce feature radiomiche strutturate a partire da immagini MRI.
 <h3>inference_engine</h3>
 <p>
 Esegue l’inferenza diagnostica utilizzando le feature radiomiche.
-Implementa:
-</p>
-
-<ul>
-<li>classificazione KNN</li>
-<li>proiezione nello spazio latente UMAP</li>
-</ul>
-
-<p>
-Questo servizio rappresenta il cuore computazionale della diagnosi.
+Implementa classificazione KNN e proiezione nello spazio latente UMAP.
 </p>
 
 <h3>model_service</h3>
 <p>
-Gestisce il Model Registry MLflow e fornisce accesso ai modelli
-versionati. Non esegue direttamente inferenza, ma prepara i modelli
-per l’utilizzo da parte dell’inference_engine.
+Gestisce il Model Registry MLflow e fornisce accesso ai modelli versionati.
 </p>
 
 <h3>llm_service</h3>
 <p>
-Fornisce interpretazione clinica delle predizioni. Viene invocato:
-</p>
-
-<ul>
-<li>dopo l’inferenza</li>
-<li>su richiesta dell’utente (chat)</li>
-</ul>
-
-<p>
-Utilizza feature radiomiche, coordinate UMAP e contesto diagnostico
-per generare spiegazioni contestualizzate.
+Fornisce interpretazione clinica delle predizioni tramite explainability AI.
 </p>
 
 <h3>frontend</h3>
 <p>
-Fornisce interfaccia utente per:
+Fornisce interfaccia utente per upload MRI, visualizzazione e interazione.
 </p>
-
-<ul>
-<li>upload MRI</li>
-<li>visualizzazione segmentazioni</li>
-<li>esplorazione spazio UMAP</li>
-<li>interazione con assistente AI</li>
-</ul>
 
 </div>
 
-<h2>Comunicazione tra servizi</h2>
-
-<div class="service-box">
-
-<p>
-I microservizi comunicano tramite:
-</p>
+<div class="section">
+<h2>5. Comunicazione tra servizi</h2>
 
 <ul>
 <li>API REST (HTTP/JSON)</li>
-<li>volumi condivisi Docker (file MRI e output pipeline)</li>
-</ul>
-
-<p>
-Questa architettura ibrida consente:
-</p>
-
-<ul>
-<li>trasferimento efficiente di file voluminosi (MRI)</li>
-<li>interoperabilità tra servizi eterogenei (Python, R)</li>
+<li>volumi condivisi Docker</li>
 </ul>
 
 </div>
 
-<h2>Gestione dello stato</h2>
+<div class="section">
+<h2>6. Gestione dello stato</h2>
 
-<div class="service-box">
-
-<p>
-Lo stato delle analisi MRI è gestito dal servizio orchestrator.
-Ogni task attraversa il seguente ciclo:
-</p>
-
-<div class="codeblock">
+<pre>
 pending → running → completed / failed
-</div>
-
-<p>
-Questo approccio consente monitoraggio e gestione robusta dei workflow,
-inclusa la propagazione degli errori tra i servizi.
-</p>
+</pre>
 
 </div>
 
-<h2>Scelte architetturali</h2>
-
-<div class="service-box">
-
-<h3>Microservizi</h3>
-<p>
-La decomposizione in microservizi consente indipendenza di sviluppo,
-deploy e scaling dei singoli componenti.
-</p>
-
-<h3>Containerizzazione</h3>
-<p>
-L’utilizzo di Docker garantisce isolamento delle dipendenze e
-riproducibilità dell’ambiente di esecuzione.
-</p>
-
-<h3>Nextflow per pipeline</h3>
-<p>
-Nextflow consente gestione deterministica e parallela dei workflow
-scientifici, fondamentale per applicazioni radiomiche.
-</p>
-
-<h3>Separazione inferenza / modelli</h3>
-<p>
-La distinzione tra model_service e inference_engine permette
-gestione indipendente del ciclo di vita dei modelli e della logica
-di inferenza.
-</p>
-
-</div>
-
-<h2>Scalabilità e estendibilità</h2>
-
-<div class="service-box">
-
-<p>
-L’architettura è progettata per supportare:
-</p>
+<div class="section">
+<h2>7. Scelte architetturali</h2>
 
 <ul>
-<li>integrazione di nuovi modelli diagnostici</li>
-<li>sostituzione dell’inference engine</li>
-<li>aggiunta di nuovi moduli AI</li>
-<li>scaling orizzontale dei servizi</li>
+<li>microservizi → modularità</li>
+<li>Docker → isolamento</li>
+<li>Nextflow → riproducibilità</li>
+<li>separazione model/inference</li>
 </ul>
 
-<p>
-Questo rende la piattaforma adatta sia a contesti di ricerca che
-a scenari di produzione su larga scala.
-</p>
+</div>
+
+<div class="section">
+<h2>8. Scalabilità</h2>
+
+<ul>
+<li>scaling servizi indipendente</li>
+<li>parallelizzazione pipeline</li>
+<li>supporto ambienti HPC</li>
+</ul>
 
 </div>
 

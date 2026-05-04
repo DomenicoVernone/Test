@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="it">
 
 <head>
@@ -7,293 +8,475 @@
 <title>MLOps – API Reference</title>
 
 <style>
-
-/* ===== GLOBAL ===== */
-
 body {
-    margin: 0;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    background: #f5f6f7;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 40px;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-/* ===== CONTENT ===== */
-
-.content {
-    margin-left: 0px;
-    padding: 40px;
-    max-width: 900px;
+h1, h2, h3 {
+    color: #2c3e50;
 }
-
-/* ===== BREADCRUMB ===== */
-
-.breadcrumb {
-    color: #6c6c6c;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-/* ===== HEADINGS ===== */
 
 h1 {
-    font-size: 36px;
-    margin-bottom: 25px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
 }
 
-h2 {
-    margin-top: 40px;
-    font-size: 26px;
+pre {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
 }
 
-h3 {
-    margin-top: 15px;
+.section {
+    margin-bottom: 40px;
 }
 
-/* ===== SERVICE BLOCK ===== */
-
-.endpoint-box {
-    background: white;
-    padding: 18px;
+.box {
+    background-color: #ffffff;
+    padding: 20px;
     border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* ===== CODE BLOCK ===== */
-
-.codeblock {
-    background: #eeeeee;
-    padding: 14px;
-    border-radius: 6px;
-    font-family: monospace;
-    margin: 15px 0;
-    white-space: pre-line;
+ul {
+    margin-left: 20px;
 }
 
-/* ===== FOOTER ===== */
+/* ===== TABLE STYLE UNIFICATO ===== */
 
-.footer {
-    margin-top: 50px;
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
     font-size: 14px;
-    color: gray;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
+th {
+    background-color: #2c3e50;
+    color: white;
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+tr:hover {
+    background-color: #eef2f5;
+}
 </style>
+
 </head>
 
 <body>
 
-<div class="content">
+<div class="box">
 
-<div class="breadcrumb">
-Docs » API Reference
+<h1>REST API – MLOps System</h1>
+
+<div class="section">
+<h2>1. Introduction</h2>
+
+<p>
+The MLOps system exposes a set of REST APIs that enable communication
+between microservices and interaction with the clinical frontend.
+</p>
+
+<p>
+APIs represent the integration layer of the entire platform and
+define the contract between:
+</p>
+
+<ul>
+<li>user and system (frontend → backend)</li>
+<li>internal microservices</li>
+<li>pipeline and inference engine</li>
+</ul>
+
+<p>
+Endpoints are mainly implemented using FastAPI (Python)
+and Plumber (R), and use JSON as the standard format for requests and responses.
+</p>
+
 </div>
 
-<h1>API Reference</h1>
+<div class="section">
+<h2>2. API Architecture</h2>
 
 <p>
-This section describes the REST endpoints exposed by the MLOps microservices
-for user authentication, MRI pipeline orchestration, diagnostic inference,
-and AI-based interpretation of results.
+The APIs follow a distributed model where each microservice exposes
+specific endpoints for its functional domain.
 </p>
 
-<div class="endpoint-box">
+<pre>
+Frontend
+   ↓
+API Gateway (authentication)
+   ↓
+Orchestrator (pipeline tasks)
+   ↓
+Nextflow Worker (pipeline)
+   ↓
+Inference Engine (KNN + UMAP)
+   ↓
+LLM Service (explainability)
+</pre>
 
 <p>
-The APIs are implemented using FastAPI (Python) and Plumber (R) and enable
-integration of the platform with clinical dashboards, automated workflows,
-and neuroimaging research tools. Protected endpoints require a JWT token.
+The API Gateway represents the main entry point and manages
+authentication through JWT tokens.
 </p>
 
 </div>
 
-
-<h2>api_gateway</h2>
-
-<div class="endpoint-box">
+<div class="section">
+<h2>3. Authentication and Security</h2>
 
 <p>
-The <b>api_gateway</b> service manages user authentication, JWT generation,
-and secure access to protected endpoints.
+The system uses JSON Web Token (JWT)-based authentication
+to protect endpoints.
 </p>
-
-<h3>POST /signup</h3>
 
 <p>
-Registers a new user.
+Authentication flow:
 </p>
 
-<div class="codeblock">
+<pre>
+1. User logs in
+2. Server generates JWT
+3. Token included in subsequent requests
+4. Services validate the token
+</pre>
+
+<p>
+Required header:
+</p>
+
+<pre>
+Authorization: Bearer &lt;token&gt;
+</pre>
+
+</div>
+
+<div class="section">
+<h2>4. api_gateway API</h2>
+
+<h3>4.1 User Registration</h3>
+
+<pre>
+POST /signup
+</pre>
+
+<p>Request:</p>
+
+<pre>
 {
   "username": "user",
   "password": "password"
 }
-</div>
+</pre>
 
-<h3>POST /login</h3>
+<p>Response:</p>
 
-<p>
-Authenticates the user and returns a JWT token to include in subsequent requests.
-</p>
-
-<div class="codeblock">
+<pre>
 {
-  "username": "user",
-  "password": "password"
+  "message": "User created successfully"
 }
+</pre>
+
+<h3>4.2 Login</h3>
+
+<pre>
+POST /login
+</pre>
+
+<p>Response:</p>
+
+<pre>
+{
+  "access_token": "jwt_token",
+  "token_type": "bearer"
+}
+</pre>
+
+<h3>4.3 User Information</h3>
+
+<pre>
+GET /me
+</pre>
+
+<p>Response:</p>
+
+<pre>
+{
+  "username": "user"
+}
+</pre>
+
 </div>
 
-<h3>GET /me</h3>
+<div class="section">
+<h2>5. orchestrator API</h2>
 
-<p>
-Returns information about the user associated with the current JWT token.
-</p>
+<h3>5.1 Start MRI Analysis</h3>
 
-</div>
+<pre>
+POST /analyze
+</pre>
 
+<p>Request:</p>
 
-<h2>orchestrator</h2>
-
-<div class="endpoint-box">
-
-<p>
-The <b>orchestrator</b> microservice starts and monitors execution of the
-Nextflow pipeline on MRI datasets uploaded to the shared volume.
-</p>
-
-<h3>POST /analyze</h3>
-
-<p>
-Starts a new analysis on an MRI already available in the shared Docker volume.
-Requires JWT authentication.
-</p>
-
-<div class="codeblock">
+<pre>
 {
   "filename": "subject01.nii.gz"
 }
+</pre>
+
+<p>Response:</p>
+
+<pre>
+{
+  "task_id": "12345",
+  "status": "pending"
+}
+</pre>
+
+<h3>5.2 Task Status</h3>
+
+<pre>
+GET /task/{task_id}
+</pre>
+
+<p>Response:</p>
+
+<pre>
+{
+  "task_id": "12345",
+  "status": "running",
+  "created_at": "timestamp"
+}
+</pre>
+
+<h3>5.3 Task List</h3>
+
+<pre>
+GET /tasks
+</pre>
+
+<p>
+Returns all analyses associated with the authenticated user.
+</p>
+
 </div>
 
-<h3>GET /task/{task_id}</h3>
+<div class="section">
+<h2>6. inference_engine API</h2>
 
-<p>
-Returns the processing status (queued, running, completed, failed).
-</p>
+<h3>6.1 KNN Classification</h3>
 
-<h3>GET /tasks</h3>
+<pre>
+POST /knn
+</pre>
 
-<p>
-Returns the list of analyses started by the authenticated user.
-</p>
+<p>Response:</p>
 
-</div>
-
-
-<h2>model_service</h2>
-
-<div class="endpoint-box">
-
-<p>
-The <b>model_service</b> retrieves diagnostic models from the MLflow registry
-and manages prediction preparation using extracted radiomic features.
-</p>
-
-<h3>POST /load-model</h3>
-
-<p>
-Downloads and initializes the champion model from the MLflow/DagsHub Model Registry.
-</p>
-
-<h3>POST /predict</h3>
-
-<p>
-Receives preprocessed radiomic features and returns the diagnostic prediction
-using the active model.
-</p>
-
-</div>
-
-
-<h2>inference_engine</h2>
-
-<div class="endpoint-box">
-
-<p>
-The <b>inference_engine</b> microservice (Plumber/R) performs KNN classification
-and UMAP projection in the diagnostic latent space.
-</p>
-
-<h3>POST /knn</h3>
-
-<p>
-Returns the estimated diagnostic class and corresponding confidence score
-based on similarity with the reference dataset.
-</p>
-
-<div class="codeblock">
+<pre>
 {
   "prediction": "bvFTD",
   "confidence": 0.81
 }
-</div>
+</pre>
 
-<h3>POST /umap</h3>
+<h3>6.2 UMAP Projection</h3>
 
-<p>
-Computes the patient's three-dimensional coordinates in the UMAP space used
-for visualization and analysis of diagnostic clusters.
-</p>
+<pre>
+POST /umap
+</pre>
 
-</div>
+<p>Response:</p>
 
-
-<h2>llm_service</h2>
-
-<div class="endpoint-box">
-
-<p>
-The <b>llm_service</b> provides explainability features through a Spatial-RAG–based
-AI assistant.
-</p>
-
-<h3>POST /chat</h3>
-
-<p>
-Sends a textual request to the AI assistant to obtain clinical interpretations
-based on radiomic features, UMAP position, and diagnostic context.
-</p>
-
-<div class="codeblock">
+<pre>
 {
-  "message": "Explain this patient's cluster position"
+  "x": 1.23,
+  "y": -0.45,
+  "z": 2.11
 }
-</div>
+</pre>
 
 </div>
 
+<div class="section">
+<h2>7. model_service API</h2>
 
-<h2>Swagger UI</h2>
+<h3>7.1 Model Loading</h3>
 
-<div class="endpoint-box">
+<pre>
+POST /load-model
+</pre>
 
 <p>
-The complete interactive documentation is available via Swagger UI
-for each FastAPI microservice running in the stack.
+Downloads the model from the MLflow Model Registry and makes it available
+to the inference_engine.
 </p>
 
-<div class="codeblock">
+<h3>7.2 Prediction (optional)</h3>
+
+<pre>
+POST /predict
+</pre>
+
+<p>
+Optional endpoint for direct inference (not used in the main workflow).
+</p>
+
+</div>
+
+<div class="section">
+<h2>8. llm_service API</h2>
+
+<h3>8.1 AI Chat</h3>
+
+<pre>
+POST /chat
+</pre>
+
+<p>Request:</p>
+
+<pre>
+{
+  "message": "Explain this patient's diagnosis"
+}
+</pre>
+
+<p>Response:</p>
+
+<pre>
+{
+  "response": "The patient is located near..."
+}
+</pre>
+
+<p>
+This endpoint uses radiomic features and UMAP coordinates
+to generate contextual clinical explanations.
+</p>
+
+</div>
+
+<div class="section">
+<h2>9. Data Contract Between Services</h2>
+
+<p>
+APIs define a clear data contract between system components.
+</p>
+
+<p>
+Core element:
+</p>
+
+<pre>
+radiomics_features.csv
+</pre>
+
+<p>
+This file represents the standard input for the inference_engine
+and ensures consistency between pipeline and inference.
+</p>
+
+<p>
+Inference output:
+</p>
+
+<pre>
+{
+  "prediction": "...",
+  "confidence": 0.XX,
+  "umap_coordinates": [x, y, z]
+}
+</pre>
+
+</div>
+
+<div class="section">
+<h2>10. Swagger and Testing</h2>
+
+<p>
+Each FastAPI microservice exposes interactive documentation
+via Swagger UI:
+</p>
+
+<pre>
 http://localhost:8000/docs
 http://localhost:8001/docs
 http://localhost:8002/docs
-http://localhost:8003/docs
-</div>
+</pre>
 
 <p>
-Swagger allows testing endpoints, inspecting JSON request/response structures,
-and monitoring service behavior during development and debugging.
+Swagger allows:
+</p>
+
+<ul>
+<li>endpoint testing</li>
+<li>JSON validation</li>
+<li>quick debugging</li>
+</ul>
+
+</div>
+
+<div class="section">
+<h2>11. Error Handling</h2>
+
+<p>
+APIs follow standard HTTP conventions:
+</p>
+
+<ul>
+<li>200 → success</li>
+<li>401 → unauthorized</li>
+<li>404 → resource not found</li>
+<li>500 → internal error</li>
+</ul>
+
+<p>
+Errors are propagated across services to ensure
+workflow consistency.
 </p>
 
 </div>
 
+<div class="section">
+<h2>12. Conclusions</h2>
+
+<p>
+APIs represent the communication backbone of the MLOps system,
+ensuring interoperability between microservices and integration
+with the frontend.
+</p>
+
+<p>
+Clear definition of data contracts and endpoints enables
+modular system evolution and facilitates the development
+of new features.
+</p>
+
+</div>
 
 </div>
 

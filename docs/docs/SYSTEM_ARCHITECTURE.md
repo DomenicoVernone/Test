@@ -1,305 +1,307 @@
 <!DOCTYPE html>
+
 <html lang="it">
-
 <head>
-
 <meta charset="UTF-8">
-<title>MLOps – System Architecture</title>
+<title>MLOps – Components & Project Structure</title>
 
 <style>
-
-/* ===== GLOBAL ===== */
-
 body {
-    margin: 0;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    background: #f5f6f7;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 40px;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-/* ===== CONTENT ===== */
-
-.content {
-    margin-left: 0px;
-    padding: 40px;
-    max-width: 900px;
+h1, h2, h3 {
+    color: #2c3e50;
 }
-
-/* ===== BREADCRUMB ===== */
-
-.breadcrumb {
-    color: #6c6c6c;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-/* ===== HEADINGS ===== */
 
 h1 {
-    font-size: 36px;
-    margin-bottom: 25px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
 }
 
-h2 {
-    margin-top: 40px;
-    font-size: 26px;
+pre {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
 }
 
-/* ===== SERVICE BOX ===== */
+.section {
+    margin-bottom: 40px;
+}
 
-.service-box {
-    background: white;
-    padding: 18px;
+.box {
+    background-color: #ffffff;
+    padding: 20px;
     border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* ===== CODE BLOCK ===== */
-
-.codeblock {
-    background: #eeeeee;
-    padding: 14px;
-    border-radius: 6px;
-    font-family: monospace;
-    margin: 15px 0;
-    white-space: pre-line;
+ul {
+    margin-left: 20px;
 }
 
-/* ===== TABLE ===== */
+/* ===== TABLE STYLE UNIFICATO ===== */
 
 table {
     border-collapse: collapse;
     width: 100%;
-    margin-top: 10px;
-}
-
-th, td {
+    margin-top: 15px;
+    font-size: 14px;
+    background-color: #fff;
     border: 1px solid #ddd;
-    padding: 10px;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
 th {
-    background: #f0f0f0;
+    background-color: #2c3e50;
+    color: white;
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
 }
 
-/* ===== IMAGE BLOCK ===== */
-
-.arch-image {
-    text-align: center;
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
 }
 
-.arch-image img {
-    max-width: 100%;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
+tr:nth-child(even) {
+    background-color: #f8f9fa;
 }
 
-.caption {
-    font-size: 14px;
-    color: gray;
-    margin-top: 10px;
+tr:hover {
+    background-color: #eef2f5;
 }
-
-/* ===== NAV BUTTONS ===== */
-
-.nav-buttons {
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.button {
-    background: #e0e0e0;
-    border-radius: 6px;
-    padding: 10px 15px;
-    text-decoration: none;
-    color: black;
-}
-
-/* ===== FOOTER ===== */
-
-.footer {
-    margin-top: 50px;
-    font-size: 14px;
-    color: gray;
-}
-
 </style>
 
 </head>
 
-
 <body>
 
-<div class="content">
+<div class="box">
 
-<div class="breadcrumb">
-Docs » System Architecture
-</div>
+<h1>System Components & Project Structure</h1>
 
-<h1>System Architecture</h1>
-
-
-<div class="service-box">
+<div class="section">
+<h2>1. Introduction</h2>
 
 <p>
-MLOps is designed as a modular platform based on containerized
-microservices orchestrated through Docker Compose.
-The architecture clearly separates neuroimaging preprocessing,
-statistical inference, model management, and the clinical interface.
+The MLOps platform is organized as a distributed system composed of
+independent microservices, each responsible for a specific stage of the
+radiomics workflow.
+</p>
+
+<p>
+The project structure reflects this architectural design, enabling
+modularity, scalability, and clear separation of responsibilities
+between components.
 </p>
 
 </div>
 
-
-<h2>General overview</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>2. Repository Structure</h2>
 
 <p>
-The following diagram represents the logical structure of the microservices
-and the data flow within the MLOps pipeline.
+The repository is organized into multiple directories, each corresponding
+to a microservice or core system component:
 </p>
 
-<div class="arch-image">
-<img src="../assets/architecture.png" alt="MLOps architecture diagram">
-<div class="caption">
-Figure: Microservices architecture of the MLOps platform
+<pre>
+Tesi-FTD/
+├── api_gateway/
+├── orchestrator/
+├── model_service/
+├── llm_service/
+├── inference_engine/
+├── nextflow_worker/
+└── frontend/
+</pre>
+
+<p>
+Each directory contains the source code, configuration files, and Docker
+setup required for the execution of the corresponding service.
+</p>
+
 </div>
-</div>
 
-<p>Main operational workflow:</p>
-
-<div class="codeblock">
-MRI → Segmentation → Radiomic extraction → KNN inference → UMAP embedding → Clinical dashboard
-</div>
-
-</div>
-
-
-<h2>Microservices architecture</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>3. Microservices Overview</h2>
 
 <table>
-
 <tr>
 <th>Service</th>
+<th>Role</th>
 <th>Technology</th>
-<th>Port</th>
-<th>Function</th>
 </tr>
 
 <tr>
 <td>api_gateway</td>
+<td>Authentication, authorization, and request routing</td>
 <td>FastAPI, JWT</td>
-<td>8000</td>
-<td>User authentication and request routing</td>
 </tr>
 
 <tr>
 <td>orchestrator</td>
+<td>Workflow management and pipeline coordination</td>
 <td>FastAPI</td>
-<td>8001</td>
-<td>Asynchronous pipeline task management</td>
-</tr>
-
-<tr>
-<td>llm_service</td>
-<td>FastAPI, Spatial RAG</td>
-<td>8002</td>
-<td>Context-aware AI assistant</td>
-</tr>
-
-<tr>
-<td>model_service</td>
-<td>FastAPI, MLflow</td>
-<td>8003</td>
-<td>Champion model management</td>
-</tr>
-
-<tr>
-<td>inference_engine</td>
-<td>R, Plumber</td>
-<td>8004</td>
-<td>KNN inference and UMAP projection</td>
 </tr>
 
 <tr>
 <td>nextflow_worker</td>
-<td>Nextflow, FreeSurfer</td>
-<td>8005</td>
-<td>MRI segmentation and radiomics extraction</td>
+<td>Execution of MRI preprocessing and radiomics pipeline</td>
+<td>Nextflow, Docker</td>
+</tr>
+
+<tr>
+<td>inference_engine</td>
+<td>Diagnostic inference and UMAP embedding</td>
+<td>R, Plumber</td>
+</tr>
+
+<tr>
+<td>model_service</td>
+<td>Model registry and versioning</td>
+<td>FastAPI, MLflow</td>
+</tr>
+
+<tr>
+<td>llm_service</td>
+<td>AI-based explainability and clinical interpretation</td>
+<td>FastAPI, LLM API</td>
 </tr>
 
 <tr>
 <td>frontend</td>
-<td>React, Plotly, NiiVue</td>
-<td>5173</td>
-<td>Interactive clinical dashboard</td>
+<td>User interface and clinical visualization</td>
+<td>React</td>
 </tr>
 
 </table>
 
 </div>
 
+<div class="section">
+<h2>4. Service Description</h2>
 
-<h2>Neuroimaging pipeline</h2>
-
-<div class="service-box">
-
+<h3>api_gateway</h3>
 <p>
-Main stages of the preprocessing and radiomic analysis pipeline applied
-to structural MRI images.
+Acts as the entry point of the platform. It handles authentication using JWT
+tokens and routes incoming requests to the appropriate internal services.
 </p>
 
-<ul>
-<li>volumetric MRI preprocessing</li>
-<li>FreeSurfer / FastSurfer anatomical segmentation</li>
-<li>brain ROI extraction</li>
-<li>PyRadiomics feature extraction</li>
-</ul>
+<h3>orchestrator</h3>
+<p>
+Coordinates the execution of MRI analyses. It manages task states
+(pending, running, completed, failed) and triggers the radiomics pipeline.
+</p>
+
+<h3>nextflow_worker</h3>
+<p>
+Executes the neuroimaging pipeline using Nextflow. It processes MRI data,
+performs segmentation, extracts radiomic features, and generates structured outputs.
+</p>
+
+<h3>inference_engine</h3>
+<p>
+Performs diagnostic inference using machine learning models.
+It applies KNN classification and projects data into a latent space using UMAP.
+</p>
+
+<h3>model_service</h3>
+<p>
+Handles model lifecycle management through MLflow, including model retrieval,
+versioning, and integration with external registries such as DagsHub.
+</p>
+
+<h3>llm_service</h3>
+<p>
+Provides explainability through AI models. It generates contextual clinical
+interpretations based on radiomic features and inference results.
+</p>
+
+<h3>frontend</h3>
+<p>
+Implements the user interface using React. It allows MRI upload,
+pipeline monitoring, and visualization of diagnostic results.
+</p>
 
 </div>
 
-
-<h2>inference_engine</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>5. Service Communication</h2>
 
 <p>
-Implements KNN classification and 3D UMAP projection
-to represent the patient within the diagnostic latent space.
+Microservices communicate through a hybrid approach:
 </p>
 
 <ul>
-<li>clinical nearest neighbors</li>
-<li>diagnostic clusters</li>
-<li>interpretable decision support</li>
+<li>REST APIs (HTTP/JSON) for control and orchestration</li>
+<li>shared Docker volumes for MRI data and pipeline outputs</li>
 </ul>
-
-</div>
-
-
-<h2>Context-aware AI assistant</h2>
-
-<div class="service-box">
 
 <p>
-Provides interpretative support for model predictions by integrating
-radiomic features, UMAP embeddings, and conversational clinical context.
+This design enables efficient handling of large imaging files while
+maintaining interoperability between heterogeneous services.
 </p>
-
-<ul>
-<li>radiomic feature interpretation</li>
-<li>position analysis in the UMAP space</li>
-<li>clinical explainability support</li>
-<li>multi-turn conversational memory</li>
-</ul>
 
 </div>
 
+<div class="section">
+<h2>6. End-to-End Flow</h2>
 
+<p>
+The interaction between components follows a structured workflow:
+</p>
+
+<pre>
+Frontend
+   ↓
+API Gateway
+   ↓
+Orchestrator
+   ↓
+Nextflow Worker
+   ↓
+Radiomics Features (CSV)
+   ↓
+Inference Engine
+   ↓
+LLM Service
+   ↓
+Frontend
+</pre>
+
+<p>
+Each component operates independently while contributing to a
+cohesive and reproducible analysis pipeline.
+</p>
+
+</div>
+
+<div class="section">
+<h2>7. Design Considerations</h2>
+
+<ul>
+<li>Microservices → modularity and independent scaling</li>
+<li>Docker → reproducibility and dependency isolation</li>
+<li>Nextflow → deterministic scientific workflows</li>
+<li>Separation of concerns → clear system boundaries</li>
+</ul>
+
+<p>
+These design choices ensure that the system remains maintainable,
+extensible, and suitable for both research and production environments.
+</p>
+
+</div>
 
 </div>
 

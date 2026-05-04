@@ -90,7 +90,7 @@ tr:hover {
 
 <div class="box">
 
-<h1>🧪 Test Plan – Validazione del sistema MLOps</h1>
+<h1>Test Plan – Validazione del sistema MLOps</h1>
 
 <div class="section">
 <h2>1. Introduzione</h2>

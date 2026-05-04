@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="it">
 
 <head>
@@ -7,70 +8,78 @@
 <title>MLOps – Deployment</title>
 
 <style>
-
-/* ===== GLOBAL ===== */
-
 body {
-    margin: 0;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    background: #f5f6f7;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 40px;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-/* ===== CONTENT ===== */
-
-.content {
-    margin-left: 0px;
-    padding: 40px;
-    max-width: 900px;
+h1, h2, h3 {
+    color: #2c3e50;
 }
-
-/* ===== BREADCRUMB ===== */
-
-.breadcrumb {
-    color: #6c6c6c;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-/* ===== HEADINGS ===== */
 
 h1 {
-    font-size: 36px;
-    margin-bottom: 25px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
 }
 
-h2 {
-    margin-top: 40px;
-    font-size: 26px;
+pre {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
 }
 
-/* ===== SERVICE BLOCK ===== */
+.section {
+    margin-bottom: 40px;
+}
 
-.service-box {
-    background: white;
-    padding: 18px;
+.box {
+    background-color: #ffffff;
+    padding: 20px;
     border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* ===== CODE BLOCK ===== */
-
-.codeblock {
-    background: #eeeeee;
-    padding: 14px;
-    border-radius: 6px;
-    font-family: monospace;
-    margin: 15px 0;
-    white-space: pre-line;
+ul {
+    margin-left: 20px;
 }
 
-/* ===== FOOTER ===== */
+/* ===== TABLE STYLE UNIFICATO ===== */
 
-.footer {
-    margin-top: 50px;
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
     font-size: 14px;
-    color: gray;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+th {
+    background-color: #2c3e50;
+    color: white;
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+tr:hover {
+    background-color: #eef2f5;
 }
 
 </style>
@@ -79,39 +88,51 @@ h2 {
 
 <body>
 
-<div class="content">
+<div class="box">
 
-<div class="breadcrumb">
-Docs » Deployment
+<h1>MLOps Platform Deployment</h1>
+
+<div class="section">
+<h2>1. Introduction</h2>
+
+<p>
+This section describes the deployment strategies of the MLOps platform
+across different operational contexts, from local testing to
+dedicated server infrastructures.
+</p>
+
+<p>
+The entire system is designed to run using Docker containers,
+ensuring dependency isolation, portability, and reproducibility
+of the execution environment.
+</p>
+
 </div>
 
-<h1>Deployment</h1>
+<div class="section">
+<h2>2. Architectural Context</h2>
 
 <p>
-This section describes the deployment modes of the MLOps platform in local environments, research servers, and dedicated GPU infrastructures.
+The platform is based on a microservices architecture described
+in detail in the <b>System Architecture</b> section.
 </p>
 
-<div class="service-box">
-
 <p>
-MLOps can be executed both on local workstations for development and testing,
-and on dedicated Linux servers for processing large-scale MRI datasets.
-The containerized architecture based on Docker Compose ensures portability,
-reproducibility, and isolation of microservices.
+In the deployment context, services are orchestrated using Docker Compose
+and communicate via REST APIs and shared volumes for managing
+MRI data and pipeline outputs.
 </p>
 
 </div>
 
-
-<h2>Local deployment (Docker Desktop)</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>3. Local Deployment (Development)</h2>
 
 <p>
-Recommended configuration for development, functional validation, and testing on single MRI datasets.
+Local mode is used for development, debugging, and functional testing.
 </p>
 
-<p>Compatible with:</p>
+<p>Compatibility:</p>
 
 <ul>
 <li>Windows (WSL2)</li>
@@ -119,33 +140,30 @@ Recommended configuration for development, functional validation, and testing on
 <li>Linux</li>
 </ul>
 
-<p>Start the application stack:</p>
+<p>Stack startup:</p>
 
-<div class="codeblock">
+<pre>
 docker compose up -d --build
-</div>
+</pre>
 
 <p>
-This command initializes the API Gateway, orchestrator, Nextflow worker,
-inference engine, LLM service, and React dashboard.
+This command builds the images and starts all microservices.
 </p>
 
-<p>Access the dashboard:</p>
+<p>Access:</p>
 
-<div class="codeblock">
-http://localhost:5173
+<pre>
+Frontend → http://localhost:5173  
+API → http://localhost:8000/docs
+</pre>
+
 </div>
 
-</div>
-
-
-<h2>Deployment on Linux server</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>4. Deployment on Linux Server</h2>
 
 <p>
-Recommended configuration for laboratory environments or departmental servers
-dedicated to automated MRI dataset processing.
+Recommended configuration for processing large MRI datasets.
 </p>
 
 <p>Prerequisites:</p>
@@ -153,141 +171,247 @@ dedicated to automated MRI dataset processing.
 <ul>
 <li>Docker Engine installed</li>
 <li>Docker Compose</li>
-<li>multicore CPU</li>
+<li>Multicore CPU</li>
 <li>≥16 GB RAM recommended</li>
 </ul>
 
+<p>Shared volume configuration:</p>
+
+<pre>
+HOST_SHARED_VOLUME_DIR=/mnt/shared_volume
+</pre>
+
 <p>
-On Linux bare-metal systems it is necessary to configure the shared directory
-used by the Nextflow pipeline:
+This directory is used to share data between containers
+during pipeline execution.
 </p>
 
-<div class="codeblock">
-HOST_SHARED_VOLUME_DIR=/mnt/shared_volume
-</div>
+<p>Service startup:</p>
 
-<p>Start services:</p>
-
-<div class="codeblock">
+<pre>
 docker compose up -d
-</div>
+</pre>
 
 </div>
 
-
-<h2>Deployment with NVIDIA GPU</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>5. Deployment with NVIDIA GPU</h2>
 
 <p>
-Using an NVIDIA GPU accelerates anatomical segmentation through FastSurfer,
-significantly reducing processing time compared to CPU mode.
+Using NVIDIA GPUs enables acceleration of anatomical segmentation
+through FastSurfer, significantly reducing processing time.
 </p>
 
 <p>Prerequisites:</p>
 
 <ul>
-<li>updated NVIDIA drivers</li>
-<li>compatible CUDA</li>
+<li>Updated NVIDIA drivers</li>
+<li>Compatible CUDA version</li>
 <li>NVIDIA Container Toolkit</li>
 </ul>
 
-<p>Verify GPU availability:</p>
+<p>GPU availability check:</p>
 
-<div class="codeblock">
+<pre>
 nvidia-smi
-</div>
+</pre>
 
-<p>
-Enable GPU in the Nextflow pipeline:
-</p>
+<p>Enable GPU in the pipeline:</p>
 
-<div class="codeblock">
+<pre>
 params.fastsurfer_device=cuda
-</div>
-
-</div>
-
-
-<h2>Deployment with MIG GPU (Multi-Instance GPU)</h2>
-
-<div class="service-box">
+</pre>
 
 <p>
-On multi-user HPC systems it is possible to assign a specific MIG instance
-to the pipeline to isolate GPU resources between concurrent jobs.
+This parameter enables GPU usage for segmentation processes.
 </p>
 
-<p>Environment variable configuration:</p>
+</div>
 
-<div class="codeblock">
+<div class="section">
+<h2>6. Deployment with GPU MIG (Multi-Instance GPU)</h2>
+
+<p>
+On multi-user HPC systems, it is possible to use
+Multi-Instance GPU (MIG) technology to partition an NVIDIA GPU
+into multiple isolated instances.
+</p>
+
+<p>
+This approach allows assigning a dedicated portion of GPU
+to each pipeline job, improving resource isolation and
+management of concurrent workloads.
+</p>
+
+<p>
+Within the radiomics pipeline, MIG can be used to:
+</p>
+
+<ul>
+<li>run multiple segmentations in parallel</li>
+<li>avoid interference between concurrent jobs</li>
+<li>optimize GPU resource utilization</li>
+</ul>
+
+<p>
+Environment variable configuration:
+</p>
+
+<pre>
 MIG_DEVICE=MIG-xxxxxxxxxxxxxxxx
-</div>
+</pre>
 
 <p>
-Leave empty on systems without GPU partitioning.
+This variable identifies the specific GPU instance assigned to the container.
+</p>
+
+<p>
+On systems without GPU partitioning or in CPU-only mode,
+this variable can be left empty.
 </p>
 
 </div>
 
-
-<h2>Nextflow pipeline deployment</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>7. Multi-Environment Deployment</h2>
 
 <p>
-MLOps uses a Docker-out-of-Docker (DooD) model to allow
-the nextflow_worker service to execute dedicated containers for segmentation,
-MRI preprocessing, and radiomic feature extraction.
+The system supports multiple environments:
 </p>
+
+<ul>
+<li><b>development</b> → development and debugging</li>
+<li><b>staging</b> → pre-production validation</li>
+<li><b>production</b> → large-scale usage</li>
+</ul>
 
 <p>
-Before running the pipeline it is necessary to build the worker images:
+The main differences concern:
 </p>
 
-<div class="codeblock">
+<ul>
+<li>logging configuration</li>
+<li>credential management</li>
+<li>hardware resource allocation</li>
+</ul>
+
+</div>
+
+<div class="section">
+<h2>8. Pipeline Image Build</h2>
+
+<p>
+Before executing the pipeline, it is necessary to build
+the Docker images used by Nextflow processes.
+</p>
+
+<pre>
 docker build -t clinical-freesurfer -f nextflow_worker/dockerfiles/freesurfer.dockerfile nextflow_worker/
 
 docker build -t clinical-fsl -f nextflow_worker/dockerfiles/fsl.dockerfile nextflow_worker/
 
 docker build -t clinical-pyradiomics -f nextflow_worker/dockerfiles/pyradiomics.dockerfile nextflow_worker/
-</div>
+</pre>
 
 <p>
-These images are automatically used by the Nextflow processes.
+These images are dynamically invoked during pipeline execution.
 </p>
 
 </div>
 
-
-<h2>Production deployment (recommended)</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>9. Data and Volume Management</h2>
 
 <p>
-For analysis on large clinical datasets, a dedicated Linux server configuration
-with GPU acceleration and persistent storage for MRI datasets and radiomic outputs is recommended.
+MRI data and pipeline outputs are managed through Docker volumes
+shared across services.
 </p>
-
-<p>Suggested configuration:</p>
 
 <ul>
-<li>dedicated Linux server</li>
-<li>CUDA-compatible NVIDIA GPU</li>
-<li>Docker Engine</li>
-<li>persistent volume for MRI datasets</li>
-<li>backup system for radiomic features and models</li>
+<li>MRI input uploaded via frontend</li>
+<li>radiomic outputs generated by the pipeline</li>
+<li>intermediate processing files</li>
 </ul>
 
-<p>Logical service architecture:</p>
+<p>
+This approach avoids transferring large files via APIs,
+improving overall system performance.
+</p>
 
-<div class="codeblock">
-Frontend → API Gateway → Orchestrator → Nextflow Worker → Inference Engine → LLM Service
 </div>
 
+<div class="section">
+<h2>10. Scalability</h2>
+
 <p>
-This configuration ensures microservice isolation,
-pipeline scalability, and support for reproducible radiomics workflows.
+The architecture allows independent scaling of services:
+</p>
+
+<ul>
+<li>Nextflow pipeline parallelization</li>
+<li>concurrent execution of multiple MRI analyses</li>
+<li>scaling of the inference engine</li>
+</ul>
+
+<p>
+The system can be extended to handle high workloads
+in research or production environments.
+</p>
+
+</div>
+
+<div class="section">
+<h2>11. Logging and Monitoring</h2>
+
+<p>
+The system uses multiple logging layers:
+</p>
+
+<ul>
+<li>Docker logs for microservices</li>
+<li>Nextflow logs for the pipeline</li>
+<li>task state managed by the orchestrator</li>
+</ul>
+
+<p>
+This enables comprehensive monitoring and effective debugging.
+</p>
+
+</div>
+
+<div class="section">
+<h2>12. Security</h2>
+
+<p>
+Sensitive credentials are managed via environment variables:
+</p>
+
+<ul>
+<li>SECRET_KEY</li>
+<li>DAGSHUB_TOKEN</li>
+<li>GROQ_API_KEY</li>
+</ul>
+
+<p>
+Keys must not be included in the source code and should be
+configured via .env files.
+</p>
+
+</div>
+
+<div class="section">
+<h2>13. Conclusions</h2>
+
+<p>
+Container-based deployment allows running the platform
+consistently across different environments, maintaining
+isolation and reproducibility.
+</p>
+
+<p>
+The architecture is designed to support both local usage and
+deployment on dedicated infrastructures, making the system scalable
+and ready for real-world scenarios.
 </p>
 
 </div>

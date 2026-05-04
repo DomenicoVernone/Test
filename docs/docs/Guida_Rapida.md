@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="it">
 
 <head>
@@ -8,254 +9,283 @@
 
 <style>
 
-/* ===== GLOBAL ===== */
-
 body {
-    margin: 0;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    background: #f5f6f7;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 40px;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-/* ===== CONTENT ===== */
-
-.content {
-    margin-left: 0px;
-    padding: 40px;
-    max-width: 900px;
+h1, h2, h3 {
+    color: #2c3e50;
 }
-
-/* ===== BREADCRUMB ===== */
-
-.breadcrumb {
-    color: #6c6c6c;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-/* ===== HEADINGS ===== */
 
 h1 {
-    font-size: 36px;
-    margin-bottom: 25px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
 }
 
-h2 {
-    margin-top: 40px;
-    font-size: 26px;
+pre {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
 }
 
-/* ===== SERVICE BLOCK ===== */
+.section {
+    margin-bottom: 40px;
+}
 
-.service-box {
-    background: white;
-    padding: 18px;
+.box {
+    background-color: #ffffff;
+    padding: 20px;
     border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* ===== CODE BLOCK ===== */
-
-.codeblock {
-    background: #eeeeee;
-    padding: 14px;
-    border-radius: 6px;
-    font-family: monospace;
-    margin: 15px 0;
-    white-space: pre-line;
+ul {
+    margin-left: 20px;
 }
 
-/* ===== FOOTER ===== */
+/* ===== TABLE STYLE UNIFICATO ===== */
 
-.footer {
-    margin-top: 50px;
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
     font-size: 14px;
-    color: gray;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
+th {
+    background-color: #2c3e50;
+    color: white;
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+tr:hover {
+    background-color: #eef2f5;
+}
 </style>
 
 </head>
 
-
 <body>
 
-<div class="content">
+<div class="box">
 
-<div class="breadcrumb">
-Docs » Quickstart
+<h1>Quickstart – MLOps Platform Quick Start</h1>
+
+<div class="section">
+<h2>1. Introduction</h2>
+
+<p>
+This guide describes the essential steps to perform the first MRI analysis
+using the MLOps platform.
+</p>
+
+<p>
+The workflow includes starting the microservices, initial configuration,
+and executing the full radiomics pipeline up to the visualization
+of diagnostic results.
+</p>
+
 </div>
 
-<h1>Quickstart</h1>
+<div class="section">
+<h2>2. Starting the Stack</h2>
 
 <p>
-This guide describes the essential steps required to run the first MRI analysis with MLOps after completing the installation and environment configuration phases.
+After completing installation and configuration, start
+the entire system using Docker Compose:
 </p>
 
-<div class="service-box">
-
-<p>
-The workflow includes starting the microservices, creating the first user,
-uploading the MRI, and automatically executing the segmentation pipeline,
-radiomic feature extraction, and diagnostic inference.
-</p>
-
-</div>
-
-
-<h2>1. Start the Docker stack</h2>
-
-<div class="service-box">
-
-<p>
-Start the entire architecture using Docker Compose. The command initializes
-the API Gateway, orchestrator, Nextflow pipeline, inference engine, LLM service,
-and clinical dashboard.
-</p>
-
-<div class="codeblock">
+<pre>
 docker compose up -d --build
-</div>
+</pre>
 
 <p>
-Wait until all containers are active before proceeding.
+Wait until all containers are running.
 </p>
 
 </div>
 
-
-<h2>2. Access the dashboard</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>3. Accessing the Platform</h2>
 
 <p>
-Once the services are running, the React dashboard is available through the browser.
-The interface allows MRI upload, visualization of the UMAP diagnostic space,
-and interaction with the AI assistant.
+Once the stack is running, the dashboard is available at:
 </p>
 
-<div class="codeblock">
+<pre>
 http://localhost:5173
-</div>
-
-</div>
-
-
-<h2>3. Create the first user</h2>
-
-<div class="service-box">
+</pre>
 
 <p>
-At first startup it is necessary to register a user through Swagger UI exposed
-by the API Gateway. This step enables authenticated access to the dashboard.
+APIs are accessible via Swagger UI:
 </p>
 
-<div class="codeblock">
+<pre>
 http://localhost:8000/docs
+</pre>
+
 </div>
 
-<p>Execute the request:</p>
+<div class="section">
+<h2>4. Creating the First User</h2>
 
-<div class="codeblock">
+<p>
+At first startup, it is necessary to register a user via the API Gateway.
+</p>
+
+<pre>
 POST /signup
-</div>
+</pre>
 
 <p>
-After registration it will be possible to log in and start MRI analyses.
+After registration, it is possible to log in and access
+the platform features.
 </p>
 
 </div>
 
-
-<h2>4. Upload an MRI scan</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>5. MRI Upload</h2>
 
 <p>
-After login it is possible to upload a structural T1-weighted brain MRI
-to automatically start the analysis pipeline.
+After login, it is possible to upload an MRI
+in the following formats:
 </p>
 
 <ul>
-<li>open the upload section</li>
-<li>select a .nii or .nii.gz file</li>
-<li>confirm processing</li>
+<li>.nii</li>
+<li>.nii.gz</li>
 </ul>
 
 <p>
-The dataset is stored in the shared Docker volume and registered as an
-asynchronous task managed by the orchestrator.
+The file is stored in the shared volume and registered
+as an asynchronous task.
 </p>
 
 </div>
 
-
-<h2>5. Pipeline execution</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>6. Pipeline Execution</h2>
 
 <p>
-After upload, the pipeline runs automatically through Nextflow
-in the nextflow_worker service.
+After upload, the pipeline is automatically started
+by the orchestrator service.
 </p>
 
-<p>Main processing stages include:</p>
+<p>Main steps:</p>
 
 <ul>
-<li>volumetric MRI preprocessing</li>
-<li>anatomical segmentation (FreeSurfer or FastSurfer)</li>
-<li>brain ROI extraction</li>
-<li>radiomic feature extraction with PyRadiomics</li>
-<li>KNN classification</li>
-<li>projection into the UMAP latent space</li>
+<li>anatomical segmentation</li>
+<li>ROI extraction</li>
+<li>radiomic feature extraction</li>
+<li>diagnostic inference</li>
+<li>UMAP projection</li>
 </ul>
 
+<p>
+The pipeline status can be monitored via the dashboard.
+</p>
+
 </div>
 
-
-<h2>6. View results</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>7. Results Visualization</h2>
 
 <p>
-Once processing is complete, results are available in the clinical
-dashboard for interactive patient case analysis.
+Once processing is completed, results are available in the dashboard.
 </p>
 
 <ul>
-<li>multiplanar ROI segmentation (NiiVue viewer)</li>
-<li>patient position in the UMAP latent space</li>
-<li>estimated diagnostic class</li>
-<li>classifier confidence score</li>
-<li>clinically similar nearest neighbors</li>
+<li>MRI segmentation (multiplanar viewer)</li>
+<li>diagnostic class</li>
+<li>confidence score</li>
+<li>position in UMAP space</li>
+<li>nearest neighbors</li>
 </ul>
 
 </div>
 
-
-<h2>7. Query the AI assistant</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>8. AI Assistant Interaction</h2>
 
 <p>
-The context-aware AI assistant supports interpretation of radiomic results
-by combining extracted features, position in the UMAP space,
-and clinical context through a Spatial-RAG approach.
+The AI assistant allows obtaining clinical explanations
+of the results.
+</p>
+
+<p>
+It is possible to:
 </p>
 
 <ul>
-<li>interpretation of relevant radiomic features</li>
-<li>analysis of position within diagnostic clusters</li>
-<li>support for clinical interpretation of predictive results</li>
+<li>interpret radiomic features</li>
+<li>analyze position within the diagnostic cluster</li>
+<li>request contextual explanations</li>
 </ul>
 
+</div>
+
+<div class="section">
+<h2>9. Complete Workflow</h2>
+
+<pre>
+Login
+   ↓
+Upload MRI
+   ↓
+Radiomics pipeline
+   ↓
+KNN inference
+   ↓
+UMAP embedding
+   ↓
+Dashboard visualization
+   ↓
+AI explainability
+</pre>
+
 <p>
-This module improves model interpretability and facilitates
-evaluation of the patient case.
+This flow represents the complete analysis cycle
+supported by the platform.
 </p>
 
 </div>
 
+<div class="section">
+<h2>10. Conclusions</h2>
+
+<p>
+The Quickstart allows rapid execution of a complete
+radiomics pipeline without advanced configuration.
+</p>
+
+<p>
+For more advanced use cases (scalability, GPU, multi-environment
+configuration), refer to the Deployment and Configuration sections.
+</p>
+
+</div>
 
 </div>
 

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="it">
 
 <head>
@@ -8,198 +9,190 @@
 
 <style>
 
-/* ===== GLOBAL ===== */
-
 body {
-    margin: 0;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    background: #f5f6f7;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 40px;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-/* ===== CONTENT ===== */
-
-.content {
-    margin-left: 0px;
-    padding: 40px;
-    max-width: 900px;
+h1, h2, h3 {
+    color: #2c3e50;
 }
-
-/* ===== BREADCRUMB ===== */
-
-.breadcrumb {
-    color: #6c6c6c;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-/* ===== HEADINGS ===== */
 
 h1 {
-    font-size: 36px;
-    margin-bottom: 25px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
 }
 
-h2 {
-    margin-top: 40px;
-    font-size: 26px;
+pre {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
 }
 
-/* ===== SERVICE BOX ===== */
+.section {
+    margin-bottom: 40px;
+}
 
-.service-box {
-    background: white;
-    padding: 18px;
+.box {
+    background-color: #ffffff;
+    padding: 20px;
     border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* ===== CODE BLOCK ===== */
-
-.codeblock {
-    background: #eeeeee;
-    padding: 14px;
-    border-radius: 6px;
-    font-family: monospace;
-    margin: 15px 0;
-    white-space: pre-line;
+ul {
+    margin-left: 20px;
 }
 
-/* ===== TABLE ===== */
+/* ===== TABLE STYLE UNIFICATO ===== */
 
 table {
     border-collapse: collapse;
     width: 100%;
     margin-top: 15px;
-}
-
-th, td {
+    font-size: 14px;
+    background-color: #fff;
     border: 1px solid #ddd;
-    padding: 10px;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
 th {
-    background: #f0f0f0;
+    background-color: #2c3e50;
+    color: white;
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
 }
 
-/* ===== FOOTER ===== */
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
 
-.footer {
-    margin-top: 50px;
-    font-size: 14px;
-    color: gray;
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+tr:hover {
+    background-color: #eef2f5;
 }
 
 </style>
 
 </head>
 
-
 <body>
 
-<div class="content">
+<div class="box">
 
-<div class="breadcrumb">
-Docs » Installation
-</div>
+<h1>MLOps Platform Installation</h1>
 
-<h1>Installation</h1>
-
-<p>
-This section describes the steps required to configure the MLOps runtime environment, install the required dependencies, and start the complete microservices stack.
-</p>
-
-
-<h2>GitHub</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>1. Introduction</h2>
 
 <p>
-The MLOps source code is available on GitHub. The repository
-includes all platform microservices, the Nextflow-based neuroimaging
-pipeline, statistical inference models, and the clinical dashboard
-for exploring the latent diagnostic space.
+This section describes the steps required to configure
+the execution environment of the MLOps platform and start
+the complete microservices stack.
 </p>
 
-<div class="codeblock">
-https://github.com/carlosto033/Tesi-FTD.git
+<p>
+The installation is designed to be simple and reproducible,
+based on Docker containers and dedicated configuration files
+for each service.
+</p>
+
 </div>
 
-<p>Clone the repository locally:</p>
+<div class="section">
+<h2>2. Repository</h2>
 
-<div class="codeblock">
+<p>
+The platform source code is available on GitHub
+and includes all microservices, the Nextflow pipeline,
+and the frontend dashboard.
+</p>
+
+<pre>
 git clone https://github.com/carlosto033/Tesi-FTD.git
 cd Tesi-FTD
-</div>
-
-</div>
-
-
-<h2>Prerequisites</h2>
-
-<div class="service-box">
+</pre>
 
 <p>
-Before starting the platform, it is necessary to configure the runtime
-environment by installing the required components for managing Docker
-containers and executing the MRI segmentation pipeline.
+The repository contains:
 </p>
 
 <ul>
-<li>Docker – execution of containerized microservices</li>
-<li>Docker Compose – orchestration of the application stack</li>
-<li>Git – cloning the source repository</li>
-<li>NVIDIA GPU (optional) – FastSurfer acceleration</li>
-<li>WSL2 + CUDA drivers (Windows) – GPU support in Docker environment</li>
-<li>FreeSurfer license file – required for anatomical segmentation</li>
+<li>backend microservices</li>
+<li>Nextflow radiomics pipeline</li>
+<li>React frontend</li>
+<li>Docker configuration files</li>
 </ul>
 
-<div class="codeblock">
+</div>
+
+<div class="section">
+<h2>3. Prerequisites</h2>
+
+<p>
+Before installation, the following components are required:
+</p>
+
+<ul>
+<li>Docker</li>
+<li>Docker Compose</li>
+<li>Git</li>
+</ul>
+
+<p>
+Optional components:
+</p>
+
+<ul>
+<li>NVIDIA GPU (for FastSurfer acceleration)</li>
+<li>CUDA + NVIDIA Container Toolkit</li>
+</ul>
+
+<p>
+It is also necessary to download the FreeSurfer license:
+</p>
+
+<pre>
 https://surfer.nmr.mgh.harvard.edu/registration.html
-</div>
-
-<p>
-The FreeSurfer license file is mandatory to correctly execute
-the brain segmentation stage of the neuroimaging pipeline.
-</p>
+</pre>
 
 </div>
 
-
-<h2>Environment configuration</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>4. Environment Configuration</h2>
 
 <p>
-MLOps uses dedicated <code>.env</code> files for each microservice
-to configure authentication parameters, model access, inference endpoints,
-and integration with external services.
+The platform uses <code>.env</code> files to configure
+microservice parameters.
 </p>
 
 <p>
-Copy the provided templates and customize them before starting the stack:
+Copy the example files:
 </p>
 
-<div class="codeblock">
+<pre>
 cp .env.example .env
 cp api_gateway/.env.example api_gateway/.env
 cp orchestrator/.env.example orchestrator/.env
 cp model_service/.env.example model_service/.env
 cp llm_service/.env.example llm_service/.env
 cp frontend/.env.example frontend/.env
-</div>
-
-</div>
-
-
-<h2>Main variables</h2>
-
-<div class="service-box">
+</pre>
 
 <p>
-The following variables represent the main parameters used
-for authentication between microservices, access to the model registry,
-and integration with the AI inference service.
+Then configure the main environment variables used
+for communication between microservices and integration with external services:
 </p>
 
 <table>
@@ -213,7 +206,7 @@ and integration with the AI inference service.
 <tr>
 <td>SECRET_KEY</td>
 <td>api_gateway, orchestrator, llm_service</td>
-<td>Shared key for generating and validating JWT tokens between microservices</td>
+<td>Shared key for generating and validating JWT tokens across microservices</td>
 </tr>
 
 <tr>
@@ -225,7 +218,7 @@ and integration with the AI inference service.
 <tr>
 <td>MLFLOW_TRACKING_URI</td>
 <td>model_service</td>
-<td>MLflow server endpoint used to retrieve registered models</td>
+<td>MLflow server endpoint for retrieving registered models</td>
 </tr>
 
 <tr>
@@ -238,101 +231,158 @@ and integration with the AI inference service.
 
 </div>
 
-
-<h2>FreeSurfer license</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>5. FreeSurfer License</h2>
 
 <p>
-The brain segmentation pipeline requires the presence of the FreeSurfer
-license file in the Nextflow worker directory. Without this file,
-the MRI preprocessing stage cannot be executed.
+The segmentation pipeline requires a valid FreeSurfer license.
 </p>
 
-<div class="codeblock">
+<p>
+After downloading the file:
+</p>
+
+<pre>
 cp /path/to/license.txt nextflow_worker/license.txt
-</div>
-
-</div>
-
-
-<h2>Build Docker images</h2>
-
-<div class="service-box">
+</pre>
 
 <p>
-These commands build the Docker images required to execute
-the radiomics pipeline modules, including anatomical segmentation,
-volumetric preprocessing, and PyRadiomics feature extraction.
+Without this file, the pipeline cannot be executed.
 </p>
 
-<div class="codeblock">
+</div>
 
+<div class="section">
+<h2>6. Docker Image Build</h2>
+
+<p>
+It is necessary to build the images used by the radiomics pipeline.
+</p>
+
+<pre>
 docker build -t clinical-freesurfer -f nextflow_worker/dockerfiles/freesurfer.dockerfile nextflow_worker/
 
 docker build -t clinical-fsl -f nextflow_worker/dockerfiles/fsl.dockerfile nextflow_worker/
 
 docker build -t clinical-pyradiomics -f nextflow_worker/dockerfiles/pyradiomics.dockerfile nextflow_worker/
-</div>
-
-</div>
-
-
-<h2>Start the stack</h2>
-
-<div class="service-box">
+</pre>
 
 <p>
-Starting the Docker stack initializes all platform microservices,
-including the API Gateway, orchestrator, Nextflow pipeline,
-inference engine, LLM service, and frontend interface.
+These images will be automatically used by Nextflow.
 </p>
 
-<div class="codeblock">
+</div>
+
+<div class="section">
+<h2>7. Stack Startup</h2>
+
+<p>
+Once the configuration is complete, the entire system can be started.
+</p>
+
+<pre>
 docker compose up -d --build
-</div>
+</pre>
 
 <p>
-Once container startup is complete, the clinical dashboard will be
-available at:
+This command initializes:
 </p>
 
-<div class="codeblock">
-http://localhost:5173
-</div>
+<ul>
+<li>API Gateway</li>
+<li>Orchestrator</li>
+<li>Nextflow Worker</li>
+<li>Inference Engine</li>
+<li>LLM Service</li>
+<li>Frontend</li>
+</ul>
 
 </div>
 
-
-<h2>Create first user</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>8. Installation Verification</h2>
 
 <p>
-At the first platform startup, it is necessary to register a user through
-the Swagger UI exposed by the API Gateway. This enables access to the
-clinical dashboard and execution of radiomic analyses.
+After startup, verify:
 </p>
 
-<div class="codeblock">
-http://localhost:8000/docs
+<ul>
+<li>running containers (docker ps)</li>
+<li>absence of errors in logs</li>
+<li>frontend accessibility</li>
+</ul>
+
+<p>Service access:</p>
+
+<pre>
+Frontend → http://localhost:5173
+Swagger → http://localhost:8000/docs
+</pre>
+
 </div>
 
-<p>Execute the request:</p>
+<div class="section">
+<h2>9. First User Creation</h2>
 
-<div class="codeblock">
+<p>
+On first startup, it is necessary to create a user via the API Gateway.
+</p>
+
+<pre>
 POST /signup
-</div>
+</pre>
 
 <p>
-After registration, it will be possible to authenticate and use the platform
-for automated MRI image analysis.
+After registration, it will be possible to access the platform
+and start MRI analyses.
 </p>
 
 </div>
 
+<div class="section">
+<h2>10. First Analysis Execution</h2>
+
+<p>
+Once logged in:
+</p>
+
+<ul>
+<li>upload an MRI (.nii or .nii.gz)</li>
+<li>start the pipeline</li>
+<li>monitor the status via the dashboard</li>
+</ul>
+
+<p>
+The system will automatically perform:
+</p>
+
+<ul>
+<li>segmentation</li>
+<li>radiomic extraction</li>
+<li>inference</li>
+<li>result visualization</li>
+</ul>
+
+</div>
+
+<div class="section">
+<h2>11. Conclusions</h2>
+
+<p>
+The MLOps platform installation is designed to be
+fast and reproducible thanks to Docker and centralized
+configurations.
+</p>
+
+<p>
+Once completed, the system is ready to execute full
+radiomics pipelines and support clinical analysis workflows.
+</p>
+
+</div>
 
 </div>
 
 </body>
+
 </html>

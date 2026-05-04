@@ -1,220 +1,234 @@
 <!DOCTYPE html>
+
 <html lang="it">
 
 <head>
-
 <meta charset="UTF-8">
 <title>MLOps – Introduction</title>
 
 <style>
-
-/* ===== GLOBAL ===== */
-
 body {
-    margin: 0;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    background: #f5f6f7;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 40px;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-/* ===== CONTENT ===== */
-
-.content {
-    margin-left: 0px;
-    padding: 40px;
-    max-width: 900px;
+h1, h2, h3 {
+    color: #2c3e50;
 }
-
-/* ===== BREADCRUMB ===== */
-
-.breadcrumb {
-    color: #6c6c6c;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-/* ===== HEADINGS ===== */
 
 h1 {
-    font-size: 36px;
-    margin-bottom: 25px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
 }
 
-h2 {
-    margin-top: 40px;
-    font-size: 26px;
+pre {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
 }
 
-/* ===== SERVICE BOX ===== */
+.section {
+    margin-bottom: 40px;
+}
 
-.service-box {
-    background: white;
-    padding: 18px;
+.box {
+    background-color: #ffffff;
+    padding: 20px;
     border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
-
-/* ===== CODE BLOCK ===== */
-
-.codeblock {
-    background: #eeeeee;
-    padding: 14px;
-    border-radius: 6px;
-    font-family: monospace;
-    margin: 15px 0;
-    white-space: pre-line;
-}
-
-/* ===== LIST ===== */
 
 ul {
-    margin-top: 10px;
+    margin-left: 20px;
 }
 
-/* ===== NAV BUTTONS ===== */
+/* ===== TABLE STYLE UNIFICATO ===== */
 
-.nav-buttons {
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.button {
-    background: #e0e0e0;
-    border-radius: 6px;
-    padding: 10px 15px;
-    text-decoration: none;
-    color: black;
-}
-
-/* ===== FOOTER ===== */
-
-.footer {
-    margin-top: 50px;
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
     font-size: 14px;
-    color: gray;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
+th {
+    background-color: #2c3e50;
+    color: white;
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+tr:hover {
+    background-color: #eef2f5;
+}
 </style>
 
 </head>
 
-
 <body>
 
-<div class="content">
-
-<div class="breadcrumb">
-Docs » Introduction
-</div>
+<div class="box">
 
 <h1>Introduction</h1>
 
-
-<h2>Description</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>1. System Overview</h2>
 
 <p>
-MLOps is a clinical decision support platform designed
-for the differential diagnosis of Frontotemporal Dementia (FTD) variants
-through radiomic analysis of structural brain MRI scans.
+MLOps is an advanced clinical decision support platform designed
+for the differential diagnosis of Frontotemporal Dementia (FTD)
+variants through automated analysis of magnetic resonance imaging (MRI).
 </p>
 
 <p>
-The system integrates an automated neuroimaging pipeline based on
-FreeSurfer / FastSurfer and PyRadiomics, a statistical inference engine
-implemented in R, a context-aware AI assistant based on Spatial RAG,
-and an interactive dashboard developed in React for multiplanar image
-visualization and exploration of the latent diagnostic space
-generated using UMAP.
+The system integrates a complete pipeline for neuroimaging processing,
+radiomic feature extraction, statistical inference, and AI-assisted
+interpretation, following MLOps principles of reproducibility,
+scalability, and modularity.
+</p>
+
+<p>
+The objective is to transform complex data into interpretable clinical
+information, supporting the medical decision-making process.
 </p>
 
 </div>
 
+<div class="section">
+<h2>2. Logical Architecture</h2>
 
-<h2>Main features</h2>
-
-<div class="service-box">
+<p>
+The platform is built on a containerized microservices architecture,
+where each component implements a specific responsibility within
+the diagnostic workflow.
+</p>
 
 <ul>
-<li>Automatic MRI segmentation using FreeSurfer or FastSurfer</li>
-<li>Radiomic feature extraction with PyRadiomics</li>
-<li>KNN-based statistical inference engine implemented in R</li>
-<li>Projection into a 3D latent space using UMAP</li>
-<li>Spatial RAG clinical assistant for interpretability support</li>
-<li>Interactive multiplanar MRI viewer (NiiVue integration)</li>
-<li>Microservices architecture orchestrated with Docker Compose</li>
-<li>Model versioning and tracking using MLflow and DagsHub</li>
+<li><b>Neuroimaging pipeline</b> (Nextflow)</li>
+<li><b>Orchestrator</b> (task management)</li>
+<li><b>Model Service</b> (MLflow)</li>
+<li><b>Inference Engine</b> (KNN + UMAP)</li>
+<li><b>LLM Service</b> (Explainability)</li>
+<li><b>React Frontend</b></li>
+</ul>
+
+<p>
+This separation enables scalability and ease of extension.
+</p>
+
+</div>
+
+<div class="section">
+<h2>3. End-to-End Workflow</h2>
+
+<p>
+The system implements an automated workflow from MRI input to diagnosis.
+</p>
+
+<pre>
+1. MRI Upload
+2. API Gateway (JWT)
+3. Orchestrator
+4. Nextflow Pipeline
+5. Radiomics Features (CSV)
+6. Model Service
+7. Inference Engine
+8. UMAP Projection
+9. LLM Explainability
+10. Visualization
+</pre>
+
+<p>
+The workflow ensures consistency and reproducibility of analyses.
+</p>
+
+</div>
+
+<div class="section">
+<h2>4. Neuroimaging and Radiomics Pipeline</h2>
+
+<p>
+The pipeline executes a deterministic sequence:
+</p>
+
+<ul>
+<li>segmentation (FreeSurfer / FastSurfer)</li>
+<li>ROI extraction</li>
+<li>radiomic feature extraction (PyRadiomics)</li>
+</ul>
+
+<p>
+The output is a feature vector used for inference.
+</p>
+
+</div>
+
+<div class="section">
+<h2>5. Inference and Explainability</h2>
+
+<p>
+The system uses:
+</p>
+
+<ul>
+<li>KNN for classification</li>
+<li>UMAP for 3D embedding</li>
+</ul>
+
+<p>
+The LLM provides interpretations based on features and context.
+</p>
+
+</div>
+
+<div class="section">
+<h2>6. Key Features</h2>
+
+<ul>
+<li>Fully automated MRI pipeline</li>
+<li>Microservices architecture</li>
+<li>Reproducibility with Nextflow</li>
+<li>MLflow integration</li>
+<li>AI-based explainability</li>
 </ul>
 
 </div>
 
-
-<h2>Source code</h2>
-
-<div class="service-box">
-
-<p>GitHub repository:</p>
-
-<div class="codeblock">
-https://github.com/carlosto033/Tesi-FTD
-</div>
-
-</div>
-
-
-<h2>Adding the FreeSurfer license</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>7. Application Context</h2>
 
 <p>
-FreeSurfer requires a valid license file to execute the neuroimaging
-segmentation pipeline. Download the license from:
+The platform is developed in an academic context for research
+in neuroimaging and decision support systems.
 </p>
 
-<div class="codeblock">
-https://surfer.nmr.mgh.harvard.edu/registration.html
-</div>
-
-<p>After downloading, run:</p>
-
-<div class="codeblock">
-cp /path/to/license.txt nextflow_worker/license.txt
-</div>
-
 <p>
-Without this file, the segmentation pipeline cannot be started.
+It is not intended for direct clinical use without regulatory validation.
 </p>
 
 </div>
-
-
-<h2>Contributions</h2>
-
-<div class="service-box">
-
-<p>
-MLOps is currently developed as an academic research project.
-Contributions related to the following areas are welcome:
-</p>
-
-<ul>
-<li>radiomics workflows</li>
-<li>neuroimaging pipelines</li>
-<li>clinical explainable AI</li>
-</ul>
-
-<p>Issue reporting:</p>
-
-<div class="codeblock">
-https://github.com/carlosto033/Tesi-FTD/issues
-</div>
-
-</div>
-
 
 </div>
 
 </body>
+
 </html>

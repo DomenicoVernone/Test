@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="it">
 
 <head>
@@ -7,312 +8,294 @@
 <title>MLOps – Configuration</title>
 
 <style>
-
-/* ===== GLOBAL ===== */
-
 body {
-    margin: 0;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    background: #f5f6f7;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 40px;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-/* ===== CONTENT ===== */
-
-.content {
-    margin-left: 0px;
-    padding: 40px;
-    max-width: 900px;
+h1, h2, h3 {
+    color: #2c3e50;
 }
-
-/* ===== BREADCRUMB ===== */
-
-.breadcrumb {
-    color: #6c6c6c;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-/* ===== HEADINGS ===== */
 
 h1 {
-    font-size: 36px;
-    margin-bottom: 25px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
 }
 
-h2 {
-    margin-top: 40px;
-    font-size: 26px;
+pre {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
 }
 
-/* ===== SERVICE BLOCK ===== */
+.section {
+    margin-bottom: 40px;
+}
 
-.service-box {
-    background: white;
-    padding: 18px;
+.box {
+    background-color: #ffffff;
+    padding: 20px;
     border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* ===== CODE BLOCK ===== */
-
-.codeblock {
-    background: #eeeeee;
-    padding: 14px;
-    border-radius: 6px;
-    font-family: monospace;
-    margin: 15px 0;
-    white-space: pre-line;
+ul {
+    margin-left: 20px;
 }
 
-/* ===== TABLE ===== */
+/* ===== TABLE STYLE UNIFICATO ===== */
 
 table {
     border-collapse: collapse;
     width: 100%;
     margin-top: 15px;
-}
-
-th, td {
+    font-size: 14px;
+    background-color: #fff;
     border: 1px solid #ddd;
-    padding: 10px;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
 th {
-    background: #f0f0f0;
+    background-color: #2c3e50;
+    color: white;
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
 }
 
-/* ===== FOOTER ===== */
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
 
-.footer {
-    margin-top: 50px;
-    font-size: 14px;
-    color: gray;
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+tr:hover {
+    background-color: #eef2f5;
 }
 
 </style>
 
 </head>
 
-
 <body>
 
-<div class="content">
+<div class="box">
 
-<div class="breadcrumb">
-Docs » Configuration
-</div>
+<h1>MLOps Platform Configuration</h1>
 
-<h1>Configuration</h1>
-
-<p>
-This section describes the main configuration variables used by MLOps microservices to manage authentication, model access, integration with AI services, and radiomics pipeline parameters.
-</p>
-
-<div class="service-box">
+<div class="section">
+<h2>1. Introduction</h2>
 
 <p>
-MLOps uses configuration files distributed across the different
-platform microservices to manage authentication, orchestration of the
-neuroimaging pipeline, access to registered models, and integration
-with inference services based on language models.
+The configuration of the MLOps platform is based on environment
+variables distributed across microservices.
 </p>
 
 <p>
-Proper configuration of environment variables is required to ensure
-communication between services and correct operation of the complete
-radiomics pipeline.
+This approach separates application logic from operational parameters,
+facilitating deployment across different environments
+(development, staging, production).
 </p>
 
 </div>
 
-
-<h2>Main .env files</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>2. Configuration Files</h2>
 
 <p>
-Each microservice uses a dedicated <code>.env</code> file containing
-configuration variables specific to authentication, resource access,
-and operational parameters.
+Each microservice uses a dedicated <code>.env</code> file
+to manage environment variables.
 </p>
 
-<div class="codeblock">
+<pre>
 .env
 api_gateway/.env
 orchestrator/.env
 model_service/.env
 llm_service/.env
 frontend/.env
-</div>
+</pre>
 
 <p>
-These files must be configured before starting the Docker stack.
+These files must be configured before starting the system.
 </p>
 
 </div>
 
-
-<h2>Shared variables (JWT)</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>3. Main Variables</h2>
 
 <p>
-JWT variables enable secure authentication between microservices
-through digitally signed tokens and ensure protection of internal
-platform requests.
+The following variables represent the core parameters for
+authentication between microservices, model access,
+and integration with AI services.
 </p>
 
 <table>
 
 <tr>
 <th>Variable</th>
-<th>Services</th>
+<th>Service</th>
 <th>Description</th>
 </tr>
 
 <tr>
 <td>SECRET_KEY</td>
 <td>api_gateway, orchestrator, llm_service</td>
-<td>Shared cryptographic key for generating and validating JWT tokens between services</td>
-</tr>
-
-</table>
-
-</div>
-
-
-<h2>MLflow / DagsHub configuration</h2>
-
-<div class="service-box">
-
-<p>
-These variables enable access to the MLflow Model Registry hosted
-on DagsHub and allow automatic retrieval of the champion model
-used for diagnostic inference.
-</p>
-
-<table>
-
-<tr>
-<th>Variable</th>
-<th>Description</th>
-</tr>
-
-<tr>
-<td>MLFLOW_TRACKING_URI</td>
-<td>MLflow server endpoint used to track experiments and models</td>
-</tr>
-
-<tr>
-<td>MLFLOW_TRACKING_USERNAME</td>
-<td>DagsHub account username for registry authentication</td>
-</tr>
-
-<tr>
-<td>DAGSHUB_TOKEN</td>
-<td>Access token for the remote Model Registry on DagsHub</td>
-</tr>
-
-<tr>
-<td>REPO_OWNER</td>
-<td>Username or organization that owns the MLflow repository</td>
-</tr>
-
-<tr>
-<td>REPO_NAME</td>
-<td>Name of the repository containing registered models</td>
-</tr>
-
-</table>
-
-</div>
-
-
-<h2>AI assistant configuration</h2>
-
-<div class="service-box">
-
-<p>
-The context-aware clinical assistant uses external language models
-via APIs. The following variable enables authentication with the
-LLM service used to support interpretation of radiomic results.
-</p>
-
-<table>
-
-<tr>
-<th>Variable</th>
-<th>Description</th>
+<td>Shared key for generating and validating JWT tokens across microservices</td>
 </tr>
 
 <tr>
 <td>GROQ_API_KEY</td>
-<td>API key for accessing the language model used by the AI service</td>
+<td>llm_service</td>
+<td>Access key for the LLM service used by the context-aware AI assistant</td>
+</tr>
+
+<tr>
+<td>MLFLOW_TRACKING_URI</td>
+<td>model_service</td>
+<td>MLflow server endpoint for retrieving registered models</td>
+</tr>
+
+<tr>
+<td>DAGSHUB_TOKEN</td>
+<td>model_service</td>
+<td>Authentication token for accessing the Model Registry hosted on DagsHub</td>
 </tr>
 
 </table>
 
 </div>
 
-
-<h2>GPU configuration (optional)</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>4. MLflow / Model Registry Configuration</h2>
 
 <p>
-If an NVIDIA GPU is available, FastSurfer can use CUDA acceleration
-to significantly reduce MRI segmentation processing time.
+The <b>model_service</b> uses MLflow for managing
+machine learning models.
 </p>
 
-<div class="codeblock">
-MIG_DEVICE=
-</div>
-
 <p>
-On systems with partitioned GPUs (Multi-Instance GPU), it is possible
-to specify the identifier of the MIG instance assigned to the container.
-Leave empty on CPU-only systems or standard GPU setups.
+Configured variables enable:
 </p>
 
-</div>
-
-
-<h2>Shared volumes configuration</h2>
-
-<div class="service-box">
-
-<p>
-The following variable defines the host directory used to share
-MRI datasets and intermediate outputs between containers in the
-Nextflow pipeline.
-</p>
-
-<div class="codeblock">
-HOST_SHARED_VOLUME_DIR=
-</div>
+<ul>
+<li>connection to the tracking server</li>
+<li>download of the champion model</li>
+<li>model versioning</li>
+</ul>
 
 <p>
-This parameter is mainly required on Linux bare-metal systems.
-On Docker Desktop (Windows/macOS) it may remain unset.
+This integration separates the model lifecycle
+from inference logic.
 </p>
 
 </div>
 
-
-<h2>Nextflow pipeline configuration</h2>
-
-<div class="service-box">
+<div class="section">
+<h2>5. AI Assistant Configuration</h2>
 
 <p>
-The main radiomics pipeline parameters are defined in the Nextflow
-configuration file. These settings control parallelization,
-segmentation mode, and the number of radiomics jobs executed simultaneously.
+The <b>llm_service</b> uses an external language model
+to generate clinical interpretations.
 </p>
 
-<div class="codeblock">
+<p>
+The <code>GROQ_API_KEY</code> variable enables authentication
+to the LLM service and must be correctly configured
+to activate the AI assistant.
+</p>
+
+</div>
+
+<div class="section">
+<h2>6. GPU Configuration (Optional)</h2>
+
+<p>
+If an NVIDIA GPU is available, it is possible to accelerate
+the segmentation pipeline using FastSurfer in CUDA mode.
+</p>
+
+<pre>
+params.fastsurfer_device=cuda
+</pre>
+
+<p>
+On CPU-only systems, this parameter must be set to:
+</p>
+
+<pre>
+params.fastsurfer_device=cpu
+</pre>
+
+</div>
+
+<div class="section">
+<h2>7. MIG GPU Configuration</h2>
+
+<p>
+On multi-user HPC systems, it is possible to use
+Multi-Instance GPU (MIG) technology.
+</p>
+
+<p>
+This configuration allows assigning a specific GPU instance
+to each pipeline job.
+</p>
+
+<pre>
+MIG_DEVICE=MIG-xxxxxxxxxxxxxxxx
+</pre>
+
+<p>
+If MIG is not used, the variable can be left empty.
+</p>
+
+</div>
+
+<div class="section">
+<h2>8. Shared Volume Configuration</h2>
+
+<p>
+The system uses a shared directory for data exchange
+between microservices.
+</p>
+
+<pre>
+HOST_SHARED_VOLUME_DIR=/mnt/shared_volume
+</pre>
+
+<p>
+This directory contains:
+</p>
+
+<ul>
+<li>MRI datasets</li>
+<li>radiomic outputs</li>
+<li>intermediate files</li>
+</ul>
+
+</div>
+
+<div class="section">
+<h2>9. Nextflow Pipeline Configuration</h2>
+
+<p>
+Pipeline parameters are defined in the file:
+</p>
+
+<pre>
 nextflow_worker/nextflow/configs/nextflow.config
-</div>
+</pre>
 
 <table>
 
@@ -322,36 +305,48 @@ nextflow_worker/nextflow/configs/nextflow.config
 </tr>
 
 <tr>
-<td>params.maxforks</td>
-<td>Maximum number of parallel processes that can run simultaneously</td>
+<td>maxforks</td>
+<td>Maximum number of parallel processes</td>
 </tr>
 
 <tr>
-<td>params.fastsurfer_threads</td>
-<td>Number of CPU threads used during FastSurfer segmentation</td>
+<td>pyradiomics_jobs</td>
+<td>Number of concurrent radiomics jobs</td>
 </tr>
 
 <tr>
-<td>params.fastsurfer_device</td>
-<td>Execution device: cpu or cuda</td>
+<td>fastsurfer_threads</td>
+<td>Number of CPU threads used</td>
 </tr>
 
 <tr>
-<td>params.pyradiomics_jobs</td>
-<td>Maximum number of radiomics extractions executed in parallel</td>
-</tr>
-
-<tr>
-<td>params.brain_segmenter</td>
-<td>Segmenter selection: freesurfer or fastsurfer</td>
+<td>brain_segmenter</td>
+<td>Segmenter selection (freesurfer / fastsurfer)</td>
 </tr>
 
 </table>
 
 </div>
 
+<div class="section">
+<h2>10. Conclusions</h2>
+
+<p>
+The configuration of the MLOps platform provides high
+operational flexibility, allowing adaptation to different
+environments and hardware requirements.
+</p>
+
+<p>
+The separation between configuration and application logic
+simplifies deployment and ensures a more secure and scalable
+infrastructure management.
+</p>
+
+</div>
 
 </div>
 
 </body>
+
 </html>

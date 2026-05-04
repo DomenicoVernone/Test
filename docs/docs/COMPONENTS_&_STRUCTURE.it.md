@@ -3,9 +3,10 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>MLOps – Components & Project Structure</title>
+<title>MLOps – Componenti e Struttura del Progetto</title>
 
-<style>body {
+<style>
+body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
     margin: 40px;
@@ -86,10 +87,32 @@ tr:hover {
 
 <div class="box">
 
-<h1>🧩 System Components & Project Structure</h1>
+<h1>Componenti del Sistema e Struttura del Progetto</h1>
 
 <div class="section">
-<h2>1. Struttura repository</h2>
+<h2>1. Introduzione</h2>
+
+<p>
+La piattaforma MLOps è organizzata come un sistema distribuito composto da
+microservizi indipendenti, ciascuno responsabile di una specifica fase
+del workflow radiomico.
+</p>
+
+<p>
+La struttura del progetto riflette questa architettura, consentendo
+modularità, scalabilità e una chiara separazione delle responsabilità
+tra i diversi componenti.
+</p>
+
+</div>
+
+<div class="section">
+<h2>2. Struttura del repository</h2>
+
+<p>
+Il repository è organizzato in diverse directory, ciascuna associata
+a un microservizio o a un componente principale del sistema:
+</p>
 
 <pre>
 Tesi-FTD/
@@ -102,59 +125,182 @@ Tesi-FTD/
 └── frontend/
 </pre>
 
+<p>
+Ogni directory contiene il codice sorgente, i file di configurazione
+e le definizioni Docker necessarie per l’esecuzione del servizio corrispondente.
+</p>
+
 </div>
 
 <div class="section">
-<h2>2. Panoramica microservizi</h2>
+<h2>3. Panoramica dei microservizi</h2>
 
 <table>
-<tr><th>Servizio</th><th>Ruolo</th></tr>
+<tr>
+<th>Servizio</th>
+<th>Ruolo</th>
+<th>Tecnologia</th>
+</tr>
 
-<tr><td>api_gateway</td><td>Autenticazione e sicurezza</td></tr>
-<tr><td>orchestrator</td><td>Gestione workflow</td></tr>
-<tr><td>nextflow_worker</td><td>Pipeline MRI</td></tr>
-<tr><td>inference_engine</td><td>Inferenza ML</td></tr>
-<tr><td>model_service</td><td>Gestione modelli</td></tr>
-<tr><td>llm_service</td><td>Explainability AI</td></tr>
-<tr><td>frontend</td><td>Interfaccia utente</td></tr>
+<tr>
+<td>api_gateway</td>
+<td>Autenticazione, autorizzazione e routing delle richieste</td>
+<td>FastAPI, JWT</td>
+</tr>
+
+<tr>
+<td>orchestrator</td>
+<td>Gestione workflow e coordinamento pipeline</td>
+<td>FastAPI</td>
+</tr>
+
+<tr>
+<td>nextflow_worker</td>
+<td>Esecuzione della pipeline MRI e radiomica</td>
+<td>Nextflow, Docker</td>
+</tr>
+
+<tr>
+<td>inference_engine</td>
+<td>Inferenza diagnostica e embedding UMAP</td>
+<td>R, Plumber</td>
+</tr>
+
+<tr>
+<td>model_service</td>
+<td>Gestione modelli e versioning</td>
+<td>FastAPI, MLflow</td>
+</tr>
+
+<tr>
+<td>llm_service</td>
+<td>Explainability AI e interpretazione clinica</td>
+<td>FastAPI, LLM API</td>
+</tr>
+
+<tr>
+<td>frontend</td>
+<td>Interfaccia utente e visualizzazione clinica</td>
+<td>React</td>
+</tr>
 
 </table>
 
 </div>
 
 <div class="section">
-<h2>3. Descrizione servizi</h2>
+<h2>4. Descrizione dei servizi</h2>
 
 <h3>api_gateway</h3>
-<p>Gestisce autenticazione JWT e routing.</p>
+<p>
+Rappresenta il punto di ingresso della piattaforma. Gestisce
+l’autenticazione tramite JWT e instrada le richieste verso i servizi interni.
+</p>
 
 <h3>orchestrator</h3>
-<p>Coordina pipeline e stato task.</p>
+<p>
+Coordina l’esecuzione delle analisi MRI. Gestisce lo stato dei task
+(pending, running, completed, failed) e attiva la pipeline radiomica.
+</p>
 
 <h3>nextflow_worker</h3>
-<p>Esegue pipeline radiomica.</p>
+<p>
+Esegue la pipeline di neuroimaging tramite Nextflow. Processa i dati MRI,
+esegue segmentazione, estrae feature radiomiche e genera output strutturati.
+</p>
 
 <h3>inference_engine</h3>
-<p>Esegue classificazione e UMAP.</p>
+<p>
+Esegue l’inferenza diagnostica utilizzando modelli di machine learning.
+Applica classificazione KNN e proiezione nello spazio latente tramite UMAP.
+</p>
 
 <h3>model_service</h3>
-<p>Gestisce modelli MLflow.</p>
+<p>
+Gestisce il ciclo di vita dei modelli tramite MLflow, inclusi recupero,
+versioning e integrazione con registry esterni come DagsHub.
+</p>
 
 <h3>llm_service</h3>
-<p>Explainability AI.</p>
+<p>
+Fornisce explainability tramite modelli AI, generando interpretazioni
+cliniche contestualizzate basate sulle feature radiomiche e sui risultati
+di inferenza.
+</p>
 
 <h3>frontend</h3>
-<p>Dashboard React.</p>
+<p>
+Implementa l’interfaccia utente in React, permettendo l’upload delle MRI,
+il monitoraggio della pipeline e la visualizzazione dei risultati diagnostici.
+</p>
 
 </div>
 
 <div class="section">
-<h2>4. Comunicazione</h2>
+<h2>5. Comunicazione tra servizi</h2>
+
+<p>
+I microservizi comunicano tramite un approccio ibrido:
+</p>
 
 <ul>
-<li>REST API</li>
-<li>volumi Docker</li>
+<li>API REST (HTTP/JSON) per controllo e orchestrazione</li>
+<li>volumi Docker condivisi per dati MRI e output della pipeline</li>
 </ul>
+
+<p>
+Questa architettura consente di gestire efficientemente file voluminosi
+e garantisce interoperabilità tra servizi eterogenei.
+</p>
+
+</div>
+
+<div class="section">
+<h2>6. Flusso end-to-end</h2>
+
+<p>
+L’interazione tra i componenti segue un workflow strutturato:
+</p>
+
+<pre>
+Frontend
+   ↓
+API Gateway
+   ↓
+Orchestrator
+   ↓
+Nextflow Worker
+   ↓
+Radiomics Features (CSV)
+   ↓
+Inference Engine
+   ↓
+LLM Service
+   ↓
+Frontend
+</pre>
+
+<p>
+Ogni componente opera in modo indipendente contribuendo a una pipeline
+di analisi coerente e riproducibile.
+</p>
+
+</div>
+
+<div class="section">
+<h2>7. Scelte progettuali</h2>
+
+<ul>
+<li>Microservizi → modularità e scalabilità indipendente</li>
+<li>Docker → isolamento e riproducibilità</li>
+<li>Nextflow → workflow scientifici deterministici</li>
+<li>Separazione delle responsabilità → maggiore manutenibilità</li>
+</ul>
+
+<p>
+Queste scelte progettuali garantiscono che il sistema sia estendibile,
+robusto e adatto sia a contesti di ricerca che a scenari di produzione.
+</p>
 
 </div>
 

@@ -1,222 +1,159 @@
 <!DOCTYPE html>
-<html lang="it">
 
+<html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>MLOps – Microservices Overview</title>
+<title>MLOps – Components & Project Structure</title>
 
-<style>
-
-/* ===== GLOBAL ===== */
-
-body {
-    margin: 0;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    background: #f5f6f7;
+<style>body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 40px;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-/* ===== CONTENT ===== */
-
-.content {
-    margin-left: 0px;
-    padding: 40px;
-    max-width: 900px;
+h1, h2, h3 {
+    color: #2c3e50;
 }
-
-/* ===== BREADCRUMB ===== */
-
-.breadcrumb {
-    color: #6c6c6c;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-/* ===== HEADINGS ===== */
 
 h1 {
-    font-size: 36px;
-    margin-bottom: 25px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
 }
 
-h2 {
-    margin-top: 40px;
-    font-size: 26px;
+pre {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
 }
 
-/* ===== SERVICE BLOCK ===== */
+.section {
+    margin-bottom: 40px;
+}
 
-.service-box {
-    background: white;
-    padding: 18px;
+.box {
+    background-color: #ffffff;
+    padding: 20px;
     border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* ===== CODE BLOCK ===== */
+ul {
+    margin-left: 20px;
+}
 
-.codeblock {
-    background: #eeeeee;
-    padding: 14px;
+/* ===== TABLE STYLE UNIFICATO ===== */
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
+    font-size: 14px;
+    background-color: #fff;
+    border: 1px solid #ddd;
     border-radius: 6px;
-    font-family: monospace;
-    margin: 15px 0;
+    overflow: hidden;
 }
 
+th {
+    background-color: #2c3e50;
+    color: white;
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+tr:hover {
+    background-color: #eef2f5;
+}
 </style>
+
 </head>
 
 <body>
 
-<div class="content">
+<div class="box">
 
-<div class="breadcrumb">
-Docs » Microservices Overview
+<h1>System Components & Project Structure</h1>
+
+<div class="section">
+<h2>1. Repository Structure</h2>
+
+<pre>
+Tesi-FTD/
+├── api_gateway/
+├── orchestrator/
+├── model_service/
+├── llm_service/
+├── inference_engine/
+├── nextflow_worker/
+└── frontend/
+</pre>
+
 </div>
 
-<h1>Microservices Overview</h1>
+<div class="section">
+<h2>2. Microservices Overview</h2>
 
+<table>
+<tr><th>Service</th><th>Role</th></tr>
 
-<p>
-MLOps adopts a containerized microservices architecture orchestrated through Docker Compose. Each service implements an independent functional component and communicates with the others through internal REST APIs.
-</p>
+<tr><td>api_gateway</td><td>Authentication and security</td></tr>
+<tr><td>orchestrator</td><td>Workflow management</td></tr>
+<tr><td>nextflow_worker</td><td>MRI pipeline execution</td></tr>
+<tr><td>inference_engine</td><td>Machine learning inference</td></tr>
+<tr><td>model_service</td><td>Model management</td></tr>
+<tr><td>llm_service</td><td>AI explainability</td></tr>
+<tr><td>frontend</td><td>User interface</td></tr>
 
+</table>
 
-<h2>Stack overview</h2>
-
-<p>
-The following diagram represents the logical sequence of services involved during MRI processing, from user management to visualization of diagnostic results.
-</p>
-
-<div class="codeblock">
-api_gateway → orchestrator → nextflow_worker → model_service → inference_engine → frontend
-                                     ↓
-                               llm_service
 </div>
 
+<div class="section">
+<h2>3. Service Description</h2>
 
-<div class="service-box">
+<h3>api_gateway</h3>
+<p>Handles JWT authentication and request routing.</p>
 
-<h2>api_gateway</h2>
+<h3>orchestrator</h3>
+<p>Coordinates pipeline execution and task state management.</p>
 
-<p>
-The api_gateway service manages user authentication, JWT-based authorization, and secure access to platform endpoints. It represents the main entry point for all client requests.
-</p>
+<h3>nextflow_worker</h3>
+<p>Executes the radiomics pipeline.</p>
+
+<h3>inference_engine</h3>
+<p>Performs classification and UMAP projection.</p>
+
+<h3>model_service</h3>
+<p>Manages MLflow models.</p>
+
+<h3>llm_service</h3>
+<p>Provides AI-based explainability.</p>
+
+<h3>frontend</h3>
+<p>React-based dashboard.</p>
+
+</div>
+
+<div class="section">
+<h2>4. Communication</h2>
 
 <ul>
-<li>user registration</li>
-<li>authenticated login</li>
-<li>JWT token generation and validation</li>
-<li>routing to backend microservices</li>
-</ul>
-
-</div>
-
-
-<div class="service-box">
-
-<h2>orchestrator</h2>
-
-<p>
-The orchestrator microservice coordinates asynchronous execution of MRI analyses by managing task creation and invoking the Nextflow pipeline within the nextflow_worker service.
-</p>
-
-<ul>
-<li>MRI analysis task creation</li>
-<li>pipeline status monitoring</li>
-<li>asynchronous workflow management</li>
-<li>error propagation between services</li>
-</ul>
-
-</div>
-
-
-<div class="service-box">
-
-<h2>nextflow_worker</h2>
-
-<p>
-The nextflow_worker service executes the structural MRI pipeline using Nextflow and dedicated containers for anatomical segmentation and radiomic feature extraction.
-</p>
-
-<ul>
-<li>volumetric MRI preprocessing</li>
-<li>FreeSurfer or FastSurfer segmentation</li>
-<li>brain region (ROI) extraction</li>
-<li>PyRadiomics feature computation</li>
-</ul>
-
-</div>
-
-
-<div class="service-box">
-
-<h2>model_service</h2>
-
-<p>
-The model_service manages access to the MLflow Model Registry hosted on DagsHub and prepares the diagnostic model used during inference.
-</p>
-
-<ul>
-<li>champion model download</li>
-<li>model versioning</li>
-<li>MLflow integration</li>
-<li>inference input preparation</li>
-</ul>
-
-</div>
-
-
-<div class="service-box">
-
-<h2>inference_engine</h2>
-
-<p>
-Implemented in R using Plumber, the inference_engine service performs KNN classification on radiomic features and computes the patient's position in the three-dimensional UMAP latent space.
-</p>
-
-<ul>
-<li>diagnostic class estimation</li>
-<li>clinical similarity computation</li>
-<li>3D UMAP embedding</li>
-<li>nearest neighbors identification</li>
-</ul>
-
-</div>
-
-
-<div class="service-box">
-
-<h2>llm_service</h2>
-
-<p>
-The llm_service provides assisted clinical interpretation through a Spatial-RAG approach, integrating radiomic features, UMAP coordinates, and conversational context.
-</p>
-
-<ul>
-<li>radiomic feature interpretation</li>
-<li>UMAP diagnostic cluster analysis</li>
-<li>model explainability support</li>
-<li>Groq API integration</li>
-</ul>
-
-</div>
-
-
-<div class="service-box">
-
-<h2>frontend</h2>
-
-<p>
-The React dashboard represents the platform’s clinical interface and allows management of MRI analyses and interactive exploration of diagnostic results.
-</p>
-
-<ul>
-<li>MRI upload</li>
-<li>NiiVue multiplanar viewer</li>
-<li>UMAP latent space visualization</li>
-<li>analysis history</li>
-<li>integrated AI assistant</li>
+<li>REST APIs</li>
+<li>Docker shared volumes</li>
 </ul>
 
 </div>
@@ -224,5 +161,4 @@ The React dashboard represents the platform’s clinical interface and allows ma
 </div>
 
 </body>
-
 </html>
