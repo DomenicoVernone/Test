@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html lang="it">
+<html lang="en">
+
 <head>
 <meta charset="UTF-8">
-<title>MLOps – Components & Project Structure</title>
+<title>MLOps – System Architecture</title>
 
 <style>
 body {
@@ -45,7 +46,7 @@ ul {
     margin-left: 20px;
 }
 
-/* ===== TABLE STYLE UNIFICATO ===== */
+/* ===== UNIFIED TABLE STYLE ===== */
 
 table {
     border-collapse: collapse;
@@ -87,100 +88,153 @@ tr:hover {
 
 <div class="box">
 
-<h1>System Components & Project Structure</h1>
+<h1>System Architecture</h1>
 
 <div class="section">
-<h2>1. Introduction</h2>
+<h2>1. Overview</h2>
 
 <p>
-The MLOps platform is organized as a distributed system composed of
-independent microservices, each responsible for a specific stage of the
-radiomics workflow.
+The MLOps platform is designed as a distributed system based on
+containerized microservices orchestrated through Docker Compose.
+The architecture clearly separates responsibilities between data
+preprocessing, workflow orchestration, statistical inference,
+and clinical visualization.
 </p>
 
 <p>
-The project structure reflects this architectural design, enabling
-modularity, scalability, and clear separation of responsibilities
-between components.
+This architectural approach enables:
 </p>
+
+<ul>
+<li>independent component scalability</li>
+<li>software dependency isolation</li>
+<li>fault isolation between services</li>
+<li>reproducibility of radiomics analyses</li>
+<li>ease of extension and maintenance</li>
+</ul>
 
 </div>
 
 <div class="section">
-<h2>2. Repository Structure</h2>
+<h2>2. Distributed Architecture</h2>
 
 <p>
-The repository is organized into multiple directories, each corresponding
-to a microservice or core system component:
+The system is composed of independent containerized services
+communicating through REST APIs and shared Docker volumes.
+Each microservice implements a specific responsibility
+within the MLOps workflow.
 </p>
 
 <pre>
-Tesi-FTD/
-├── api_gateway/
-├── orchestrator/
-├── model_service/
-├── llm_service/
-├── inference_engine/
-├── nextflow_worker/
-└── frontend/
+Frontend
+  ↓
+API Gateway
+  ↓
+Orchestrator
+  ↓
+Nextflow Worker
+  ↓
+Inference Engine
+  ↓
+LLM Service
+  ↓
+Frontend
 </pre>
 
 <p>
-Each directory contains the source code, configuration files, and Docker
-setup required for the execution of the corresponding service.
+The separation of components allows services to be updated,
+deployed, and scaled independently without impacting
+the entire platform.
 </p>
 
 </div>
 
 <div class="section">
-<h2>3. Microservices Overview</h2>
+<h2>3. End-to-End Data Flow</h2>
+
+<p>
+The platform implements a sequential workflow for
+radiomics analysis of MRI images.
+</p>
+
+<pre>
+MRI Upload
+   ↓
+JWT Authentication
+   ↓
+Task Creation
+   ↓
+Nextflow Pipeline
+   ↓
+Radiomics Feature Extraction
+   ↓
+Diagnostic Inference
+   ↓
+UMAP Embedding
+   ↓
+AI Explainability
+   ↓
+Clinical Visualization
+</pre>
+
+<p>
+Each phase generates structured outputs that are consumed
+by the following service, ensuring modularity and traceability
+throughout the workflow.
+</p>
+
+</div>
+
+<div class="section">
+<h2>4. Microservices Architecture</h2>
 
 <table>
+
 <tr>
 <th>Service</th>
-<th>Role</th>
+<th>Architectural Responsibility</th>
 <th>Technology</th>
 </tr>
 
 <tr>
 <td>api_gateway</td>
-<td>Authentication, authorization, and request routing</td>
+<td>Security layer and centralized routing</td>
 <td>FastAPI, JWT</td>
 </tr>
 
 <tr>
 <td>orchestrator</td>
-<td>Workflow management and pipeline coordination</td>
+<td>Workflow coordination and task management</td>
 <td>FastAPI</td>
 </tr>
 
 <tr>
 <td>nextflow_worker</td>
-<td>Execution of MRI preprocessing and radiomics pipeline</td>
+<td>Distributed radiomics pipeline execution</td>
 <td>Nextflow, Docker</td>
 </tr>
 
 <tr>
 <td>inference_engine</td>
-<td>Diagnostic inference and UMAP embedding</td>
+<td>Machine learning inference and latent space embedding</td>
 <td>R, Plumber</td>
 </tr>
 
 <tr>
 <td>model_service</td>
-<td>Model registry and versioning</td>
+<td>Model registry and version management</td>
 <td>FastAPI, MLflow</td>
 </tr>
 
 <tr>
 <td>llm_service</td>
-<td>AI-based explainability and clinical interpretation</td>
+<td>AI explainability and clinical interpretation</td>
 <td>FastAPI, LLM API</td>
 </tr>
 
 <tr>
 <td>frontend</td>
-<td>User interface and clinical visualization</td>
+<td>Clinical interface and visualization</td>
 <td>React</td>
 </tr>
 
@@ -189,121 +243,92 @@ setup required for the execution of the corresponding service.
 </div>
 
 <div class="section">
-<h2>4. Service Description</h2>
-
-<h3>api_gateway</h3>
-<p>
-Acts as the entry point of the platform. It handles authentication using JWT
-tokens and routes incoming requests to the appropriate internal services.
-</p>
-
-<h3>orchestrator</h3>
-<p>
-Coordinates the execution of MRI analyses. It manages task states
-(pending, running, completed, failed) and triggers the radiomics pipeline.
-</p>
-
-<h3>nextflow_worker</h3>
-<p>
-Executes the neuroimaging pipeline using Nextflow. It processes MRI data,
-performs segmentation, extracts radiomic features, and generates structured outputs.
-</p>
-
-<h3>inference_engine</h3>
-<p>
-Performs diagnostic inference using machine learning models.
-It applies KNN classification and projects data into a latent space using UMAP.
-</p>
-
-<h3>model_service</h3>
-<p>
-Handles model lifecycle management through MLflow, including model retrieval,
-versioning, and integration with external registries such as DagsHub.
-</p>
-
-<h3>llm_service</h3>
-<p>
-Provides explainability through AI models. It generates contextual clinical
-interpretations based on radiomic features and inference results.
-</p>
-
-<h3>frontend</h3>
-<p>
-Implements the user interface using React. It allows MRI upload,
-pipeline monitoring, and visualization of diagnostic results.
-</p>
-
-</div>
-
-<div class="section">
-<h2>5. Service Communication</h2>
+<h2>5. Inter-Service Communication</h2>
 
 <p>
-Microservices communicate through a hybrid approach:
+The platform adopts a hybrid communication approach:
 </p>
 
 <ul>
-<li>REST APIs (HTTP/JSON) for control and orchestration</li>
-<li>shared Docker volumes for MRI data and pipeline outputs</li>
+<li>REST APIs (HTTP/JSON) for orchestration and control</li>
+<li>shared Docker volumes for MRI files and pipeline outputs</li>
 </ul>
 
 <p>
-This design enables efficient handling of large imaging files while
-maintaining interoperability between heterogeneous services.
+This model reduces the overhead associated with transferring
+large imaging files and improves interoperability between
+heterogeneous services.
 </p>
 
 </div>
 
 <div class="section">
-<h2>6. End-to-End Flow</h2>
+<h2>6. State Management</h2>
 
 <p>
-The interaction between components follows a structured workflow:
+The orchestrator maintains the task lifecycle using
+a centralized state management approach.
 </p>
 
 <pre>
-Frontend
-   ↓
-API Gateway
-   ↓
-Orchestrator
-   ↓
-Nextflow Worker
-   ↓
-Radiomics Features (CSV)
-   ↓
-Inference Engine
-   ↓
-LLM Service
-   ↓
-Frontend
+pending → running → completed / failed
 </pre>
 
 <p>
-Each component operates independently while contributing to a
-cohesive and reproducible analysis pipeline.
+This mechanism enables monitoring, asynchronous execution,
+and fault recovery during MRI pipeline processing.
 </p>
 
 </div>
 
 <div class="section">
-<h2>7. Design Considerations</h2>
+<h2>7. Architectural Principles</h2>
 
 <ul>
-<li>Microservices → modularity and independent scaling</li>
-<li>Docker → reproducibility and dependency isolation</li>
-<li>Nextflow → deterministic scientific workflows</li>
-<li>Separation of concerns → clear system boundaries</li>
+<li>microservices → modularity and isolation</li>
+<li>Docker → portability and environment consistency</li>
+<li>Nextflow → scientific reproducibility</li>
+<li>MLflow → model traceability</li>
+<li>REST APIs → interoperability between services</li>
+<li>model/inference separation → architectural flexibility</li>
 </ul>
 
+</div>
+
+<div class="section">
+<h2>8. Scalability and Deployment</h2>
+
 <p>
-These design choices ensure that the system remains maintainable,
-extensible, and suitable for both research and production environments.
+The architecture is designed to support both research
+environments and production-grade deployments.
 </p>
+
+<ul>
+<li>independent microservice scaling</li>
+<li>parallel execution of Nextflow pipelines</li>
+<li>support for HPC environments</li>
+<li>full containerization of all components</li>
+<li>distributed deployment through Docker Compose</li>
+</ul>
+
+</div>
+
+<div class="section">
+<h2>9. Architectural Benefits</h2>
+
+<ul>
+<li>high system modularity</li>
+<li>improved maintainability</li>
+<li>simplified service testing</li>
+<li>reduced coupling between components</li>
+<li>reproducibility of clinical analyses</li>
+<li>easy integration of new AI models</li>
+</ul>
 
 </div>
 
 </div>
 
 </body>
+
 </html>

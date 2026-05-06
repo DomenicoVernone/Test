@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
 <html lang="it">
+
 <head>
 <meta charset="UTF-8">
-<title>MLOps – Componenti e Struttura del Progetto</title>
+<title>MLOps – Componenti del Sistema e Struttura del Progetto</title>
 
 <style>
 body {
@@ -93,16 +94,22 @@ tr:hover {
 <h2>1. Introduzione</h2>
 
 <p>
-La piattaforma MLOps è organizzata come un sistema distribuito composto da
-microservizi indipendenti, ciascuno responsabile di una specifica fase
-del workflow radiomico.
+La piattaforma MLOps è organizzata come un sistema distribuito composto
+da microservizi indipendenti, ciascuno responsabile di una specifica
+fase del workflow radiomico.
 </p>
 
 <p>
-La struttura del progetto riflette questa architettura, consentendo
-modularità, scalabilità e una chiara separazione delle responsabilità
-tra i diversi componenti.
+La struttura del progetto riflette questa architettura, consentendo:
 </p>
+
+<ul>
+<li>modularità dei componenti</li>
+<li>separazione delle responsabilità</li>
+<li>manutenibilità del codice</li>
+<li>scalabilità indipendente dei servizi</li>
+<li>facilità di estensione della piattaforma</li>
+</ul>
 
 </div>
 
@@ -110,8 +117,8 @@ tra i diversi componenti.
 <h2>2. Struttura del repository</h2>
 
 <p>
-Il repository è organizzato in diverse directory, ciascuna associata
-a un microservizio o a un componente principale del sistema:
+Il repository è organizzato in directory separate, ciascuna associata
+a un microservizio o a un componente principale della piattaforma.
 </p>
 
 <pre>
@@ -127,7 +134,8 @@ Tesi-FTD/
 
 <p>
 Ogni directory contiene il codice sorgente, i file di configurazione
-e le definizioni Docker necessarie per l’esecuzione del servizio corrispondente.
+e le definizioni Docker necessarie per l’esecuzione del servizio
+corrispondente.
 </p>
 
 </div>
@@ -136,6 +144,7 @@ e le definizioni Docker necessarie per l’esecuzione del servizio corrispondent
 <h2>3. Panoramica dei microservizi</h2>
 
 <table>
+
 <tr>
 <th>Servizio</th>
 <th>Ruolo</th>
@@ -156,7 +165,7 @@ e le definizioni Docker necessarie per l’esecuzione del servizio corrispondent
 
 <tr>
 <td>nextflow_worker</td>
-<td>Esecuzione della pipeline MRI e radiomica</td>
+<td>Esecuzione pipeline MRI e radiomica</td>
 <td>Nextflow, Docker</td>
 </tr>
 
@@ -193,20 +202,23 @@ e le definizioni Docker necessarie per l’esecuzione del servizio corrispondent
 
 <h3>api_gateway</h3>
 <p>
-Rappresenta il punto di ingresso della piattaforma. Gestisce
-l’autenticazione tramite JWT e instrada le richieste verso i servizi interni.
+Rappresenta il punto di ingresso della piattaforma.
+Gestisce l’autenticazione tramite JWT e instrada le richieste
+verso i servizi interni.
 </p>
 
 <h3>orchestrator</h3>
 <p>
-Coordina l’esecuzione delle analisi MRI. Gestisce lo stato dei task
-(pending, running, completed, failed) e attiva la pipeline radiomica.
+Coordina l’esecuzione delle analisi MRI e gestisce il workflow
+della pipeline radiomica. Mantiene lo stato dei task e supervisiona
+la comunicazione tra i servizi.
 </p>
 
 <h3>nextflow_worker</h3>
 <p>
-Esegue la pipeline di neuroimaging tramite Nextflow. Processa i dati MRI,
-esegue segmentazione, estrae feature radiomiche e genera output strutturati.
+Esegue la pipeline di neuroimaging tramite Nextflow.
+Processa i dati MRI, esegue segmentazione, estrae feature
+radiomiche e genera output strutturati.
 </p>
 
 <h3>inference_engine</h3>
@@ -217,21 +229,23 @@ Applica classificazione KNN e proiezione nello spazio latente tramite UMAP.
 
 <h3>model_service</h3>
 <p>
-Gestisce il ciclo di vita dei modelli tramite MLflow, inclusi recupero,
-versioning e integrazione con registry esterni come DagsHub.
+Gestisce il ciclo di vita dei modelli tramite MLflow,
+inclusi recupero, versioning e integrazione con registry esterni
+come DagsHub.
 </p>
 
 <h3>llm_service</h3>
 <p>
 Fornisce explainability tramite modelli AI, generando interpretazioni
-cliniche contestualizzate basate sulle feature radiomiche e sui risultati
-di inferenza.
+cliniche contestualizzate basate sulle feature radiomiche
+e sui risultati di inferenza.
 </p>
 
 <h3>frontend</h3>
 <p>
-Implementa l’interfaccia utente in React, permettendo l’upload delle MRI,
-il monitoraggio della pipeline e la visualizzazione dei risultati diagnostici.
+Implementa l’interfaccia utente in React, permettendo l’upload
+delle MRI, il monitoraggio della pipeline e la visualizzazione
+dei risultati diagnostici.
 </p>
 
 </div>
@@ -249,18 +263,14 @@ I microservizi comunicano tramite un approccio ibrido:
 </ul>
 
 <p>
-Questa architettura consente di gestire efficientemente file voluminosi
-e garantisce interoperabilità tra servizi eterogenei.
+Questa architettura consente di gestire efficientemente file
+voluminosi e garantisce interoperabilità tra servizi eterogenei.
 </p>
 
 </div>
 
 <div class="section">
-<h2>6. Flusso end-to-end</h2>
-
-<p>
-L’interazione tra i componenti segue un workflow strutturato:
-</p>
+<h2>6. Flusso operativo</h2>
 
 <pre>
 Frontend
@@ -281,8 +291,8 @@ Frontend
 </pre>
 
 <p>
-Ogni componente opera in modo indipendente contribuendo a una pipeline
-di analisi coerente e riproducibile.
+Ogni componente opera in modo indipendente contribuendo a una
+pipeline di analisi coerente, modulare e riproducibile.
 </p>
 
 </div>
@@ -291,15 +301,17 @@ di analisi coerente e riproducibile.
 <h2>7. Scelte progettuali</h2>
 
 <ul>
-<li>Microservizi → modularità e scalabilità indipendente</li>
+<li>microservizi → modularità e scalabilità indipendente</li>
 <li>Docker → isolamento e riproducibilità</li>
 <li>Nextflow → workflow scientifici deterministici</li>
-<li>Separazione delle responsabilità → maggiore manutenibilità</li>
+<li>separazione delle responsabilità → maggiore manutenibilità</li>
+<li>servizi indipendenti → fault isolation</li>
 </ul>
 
 <p>
-Queste scelte progettuali garantiscono che il sistema sia estendibile,
-robusto e adatto sia a contesti di ricerca che a scenari di produzione.
+Queste scelte progettuali garantiscono che il sistema sia
+estensibile, robusto e adatto sia a contesti di ricerca
+che a scenari di produzione.
 </p>
 
 </div>
@@ -307,4 +319,5 @@ robusto e adatto sia a contesti di ricerca che a scenari di produzione.
 </div>
 
 </body>
+
 </html>
