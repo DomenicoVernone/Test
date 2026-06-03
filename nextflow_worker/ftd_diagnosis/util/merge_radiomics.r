@@ -7,13 +7,13 @@ args_parser <- function(x) {
 
 get_all_feat <- function(groups_list, class, demograph) {
     all_feat <- data.frame()
-    roi <- read.table(file.path(labels), header = FALSE, sep = "")
+    roi <- read.table(file.path(labels), header = TRUE, sep = "\t")
 
     for (group in groups_list) {
-        
-        subset <- data.frame(TargetClass = class)
+
+        subset <- NULL
         for (j in c(1:78)) {
-            feat_roi <- read.csv(file.path(path_features, paste(roi$V3[j],'_feat.csv',sep='')))
+            feat_roi <- read.csv(file.path(path_features, paste(roi$Label[j],'_feat.csv',sep='')))
             if (is.null(demograph)) {
                 subset_roi <- feat_roi[grepl(group, feat_roi$Image), ]
             } else {
@@ -25,8 +25,13 @@ get_all_feat <- function(groups_list, class, demograph) {
                 })
                 subset_roi <- filter[to_keep, ]
             }
-            matrix <- subset_roi[,39:126]
-            subset <- cbind(subset, matrix)
+            matrix <- subset_roi[, 39:126, drop = FALSE]
+            if (is.null(subset)) {
+                subset <- data.frame(TargetClass = rep(class, nrow(matrix)))
+                subset <- cbind(subset, matrix)
+            } else {
+                subset <- cbind(subset, matrix)
+            }
         }
 
         all_feat <- rbind(all_feat, subset)

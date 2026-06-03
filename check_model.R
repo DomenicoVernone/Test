@@ -1,0 +1,5 @@
+m <- readRDS("/app/model.rds")
+cat("class:", paste(class(m), collapse=", "), "\n")
+cat("trainingData rows:", nrow(m$trainingData), "\n")
+cat(".outcome levels:", paste(levels(m$trainingData$.outcome), collapse=", "), "\n")
+cat("features:", length(colnames(m$trainingData)[colnames(m$trainingData) != ".outcome"]), "\n")

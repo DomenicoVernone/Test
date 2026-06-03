@@ -1,0 +1,2165 @@
+
+<!doctype html>
+<html lang="it" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../REPORT_FINALE_COMPLETO/">
+      
+      
+      
+        
+          <link rel="alternate" href="../../CHANGES_AND_PERFORMANCE/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="it">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Changelog & Performance - Clinical Twin — FTD Radiomics Platform</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog-e-analisi-performance" class="md-skip">
+          Vai al contenuto
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Intestazione">
+    <a href="../" title="Clinical Twin — FTD Radiomics Platform" class="md-header__button md-logo" aria-label="Clinical Twin — FTD Radiomics Platform" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Clinical Twin — FTD Radiomics Platform
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changelog & Performance
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Seleziona la lingua">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../CHANGES_AND_PERFORMANCE/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="it" class="md-select__link">
+              Italiano
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Cerca" placeholder="Cerca" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Cerca">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Cancella" aria-label="Cancella" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inizializza la ricerca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../SYSTEM_ARCHITECTURE/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Installazione/" class="md-tabs__link">
+          
+  
+  
+  Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Pipeline_doc/" class="md-tabs__link">
+          
+  
+  
+  Pipeline
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Guida_Rapida/" class="md-tabs__link">
+          
+  
+  
+  Usage
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api/" class="md-tabs__link">
+          
+  
+  
+  API
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Deployment/" class="md-tabs__link">
+          
+  
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../testing/" class="md-tabs__link">
+          
+  
+  
+  Testing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../REPORT_FINALE_COMPLETO/" class="md-tabs__link">
+          
+  
+  
+  Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigazione" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../" title="Clinical Twin — FTD Radiomics Platform" class="md-nav__button md-logo" aria-label="Clinical Twin — FTD Radiomics Platform" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Clinical Twin — FTD Radiomics Platform
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SYSTEM_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../COMPONENTS_%26_STRUCTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components & Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Setup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Installazione/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Configurazione/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipeline
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Pipeline
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Pipeline_doc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Radiomics Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Guida_Rapida/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Testing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test Plan & Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REPORT_FINALE_COMPLETO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Technical Report (Session)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog & Performance
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog & Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#parte-1-diff-completo-head1-head" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PARTE 1 — DIFF COMPLETO (HEAD~1 → HEAD)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PARTE 1 — DIFF COMPLETO (HEAD~1 → HEAD)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-modificati" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FILE MODIFICATI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-creati-ex-novo-untracked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FILE CREATI EX-NOVO (untracked)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dettaglio-modifiche-significative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DETTAGLIO MODIFICHE SIGNIFICATIVE
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DETTAGLIO MODIFICHE SIGNIFICATIVE">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-preprocessingnf-processo-mock_freesurfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. preprocessing.nf — Processo mock_freesurfer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-trainingnf-default-parameters-e-fix-demograph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. training.nf — Default parameters e fix demograph
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-nextflowconfig-fix-path-licenza-in-dood" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. nextflow.config — Fix path licenza in DooD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-inference_logicr-supporto-extended-model-xgboost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. inference_logic.R — Supporto extended model XGBoost
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-model_serviceservicesinferencepy-fallback-mlflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. model_service/services/inference.py — Fallback MLflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-xgboostr-extended-model-serializzato" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. XGBoost.r — Extended model serializzato
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-merge_radiomicsr-fix-tsv-header-e-init-subset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. merge_radiomics.r — Fix TSV header e init subset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-docker-composeyml-fix-rete-e-variabili" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. docker-compose.yml — Fix rete e variabili
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-nextflow_workerdocker-composeyml-rename-immagini" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. nextflow_worker/docker-compose.yml — Rename immagini
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-taskhistoryjsx-fix-parsing-filename" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. TaskHistory.jsx — Fix parsing filename
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-rotte-health-e-unificate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Rotte /health e / unificate
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parte-2-perche-prima-3h-ora-15-minuti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PARTE 2 — PERCHÉ PRIMA ~3H, ORA ~15 MINUTI
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PARTE 2 — PERCHÉ PRIMA ~3H, ORA ~15 MINUTI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analisi-del-flusso-pipeline-preprocessing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analisi del flusso pipeline preprocessing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tabella-tempi-per-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tabella tempi per step
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spiegazione-dettagliata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spiegazione dettagliata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parte-3-con-dati-reali-cosa-cambia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PARTE 3 — CON DATI REALI COSA CAMBIA
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PARTE 3 — CON DATI REALI COSA CAMBIA">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-produzione-test_mode-false-dati-reali" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In produzione (test_mode = false, dati reali)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raccomandazioni-per-ridurre-i-tempi-in-produzione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Raccomandazioni per ridurre i tempi in produzione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#impatto-del-mock-sui-tempi-di-sviluppo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Impatto del mock sui tempi di sviluppo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#parte-1-diff-completo-head1-head" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PARTE 1 — DIFF COMPLETO (HEAD~1 → HEAD)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PARTE 1 — DIFF COMPLETO (HEAD~1 → HEAD)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-modificati" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FILE MODIFICATI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-creati-ex-novo-untracked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FILE CREATI EX-NOVO (untracked)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dettaglio-modifiche-significative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DETTAGLIO MODIFICHE SIGNIFICATIVE
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DETTAGLIO MODIFICHE SIGNIFICATIVE">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-preprocessingnf-processo-mock_freesurfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. preprocessing.nf — Processo mock_freesurfer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-trainingnf-default-parameters-e-fix-demograph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. training.nf — Default parameters e fix demograph
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-nextflowconfig-fix-path-licenza-in-dood" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. nextflow.config — Fix path licenza in DooD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-inference_logicr-supporto-extended-model-xgboost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. inference_logic.R — Supporto extended model XGBoost
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-model_serviceservicesinferencepy-fallback-mlflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. model_service/services/inference.py — Fallback MLflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-xgboostr-extended-model-serializzato" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. XGBoost.r — Extended model serializzato
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-merge_radiomicsr-fix-tsv-header-e-init-subset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. merge_radiomics.r — Fix TSV header e init subset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-docker-composeyml-fix-rete-e-variabili" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. docker-compose.yml — Fix rete e variabili
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-nextflow_workerdocker-composeyml-rename-immagini" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. nextflow_worker/docker-compose.yml — Rename immagini
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-taskhistoryjsx-fix-parsing-filename" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. TaskHistory.jsx — Fix parsing filename
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-rotte-health-e-unificate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Rotte /health e / unificate
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parte-2-perche-prima-3h-ora-15-minuti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PARTE 2 — PERCHÉ PRIMA ~3H, ORA ~15 MINUTI
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PARTE 2 — PERCHÉ PRIMA ~3H, ORA ~15 MINUTI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analisi-del-flusso-pipeline-preprocessing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analisi del flusso pipeline preprocessing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tabella-tempi-per-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tabella tempi per step
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spiegazione-dettagliata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spiegazione dettagliata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parte-3-con-dati-reali-cosa-cambia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PARTE 3 — CON DATI REALI COSA CAMBIA
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PARTE 3 — CON DATI REALI COSA CAMBIA">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-produzione-test_mode-false-dati-reali" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In produzione (test_mode = false, dati reali)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raccomandazioni-per-ridurre-i-tempi-in-produzione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Raccomandazioni per ridurre i tempi in produzione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#impatto-del-mock-sui-tempi-di-sviluppo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Impatto del mock sui tempi di sviluppo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="changelog-e-analisi-performance">Changelog e Analisi Performance<a class="headerlink" href="#changelog-e-analisi-performance" title="Permanent link">&para;</a></h1>
+<p><strong>Data:</strong> 2026-06-02<br />
+<strong>Branch:</strong> main<br />
+<strong>Commit corrente:</strong> b08aab0<br />
+<strong>Commit precedente:</strong> af12851  </p>
+<hr />
+<h2 id="parte-1-diff-completo-head1-head">PARTE 1 — DIFF COMPLETO (HEAD~1 → HEAD)<a class="headerlink" href="#parte-1-diff-completo-head1-head" title="Permanent link">&para;</a></h2>
+<h3 id="file-modificati">FILE MODIFICATI<a class="headerlink" href="#file-modificati" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌──────────────────────────────────────────────────────────┬───────────┬────────────────────────────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│ File                                                     │ Righe +/- │ Tipo modifica                      │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├──────────────────────────────────────────────────────────┼───────────┼────────────────────────────────────┤
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│ nextflow_worker/nextflow/preprocessing.nf                │ +75 -5    │ Nuovo processo mock_freesurfer     │
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│ nextflow_worker/nextflow/training.nf                     │ +40 -1    │ Parametri default, fix demograph   │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│ nextflow_worker/nextflow/nextflow.config                 │ +4 -4     │ Fix path licenza DooD              │
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│ inference_engine/R/inference_logic.R                     │ +60 -33   │ Fix XGBoost extended model + conf. │
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│ model_service/services/inference.py                      │ +31 -10   │ Fallback MLflow → model.rds locale │
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│ nextflow_worker/main.py                                  │ +23 -7    │ test_mode API, fix licenza path    │
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│ nextflow_worker/ftd_diagnosis/parallel/models/XGBoost.r  │ +22 -1    │ Extended model con trainingData    │
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│ nextflow_worker/ftd_diagnosis/util/merge_radiomics.r     │ +17 -12   │ Fix header TSV + init subset NULL  │
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│ orchestrator/services/nextflow_runner.py                 │ +8 -6     │ Propagazione test_mode all&#39;API     │
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│ orchestrator/core/config.py                              │ +2 -0     │ Aggiunta variabile TEST_MODE       │
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│ orchestrator/main.py                                     │ +4 -0     │ Aggiunta rotta GET /               │
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│ orchestrator/services/pipeline.py                        │ +3 -2     │ Passa test_mode al Nextflow runner │
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│ docker-compose.yml                                       │ +6 -1     │ Porta API, VITE_AUTH_URL, NF_SET.. │
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│ nextflow_worker/docker-compose.yml                       │ +3 -3     │ Rename immagini → clinical-*       │
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│ frontend/src/components/clinical/TaskHistory.jsx         │ +3 -2     │ Fix parsing filename MD5 prefix    │
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│ inference_engine/api.R                                   │ +3 -0     │ Aggiunta rotta GET /health         │
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>│ llm_service/main.py                                      │ +4 -0     │ Aggiunta rotta GET / separata      │
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>│ model_service/main.py                                    │ +4 -0     │ Aggiunta rotta GET / separata      │
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>└──────────────────────────────────────────────────────────┴───────────┴────────────────────────────────────┘
+</code></pre></div>
+<p>Totale: <strong>22 file modificati — 741 righe aggiunte, 313 rimosse</strong></p>
+<hr />
+<h3 id="file-creati-ex-novo-untracked">FILE CREATI EX-NOVO (untracked)<a class="headerlink" href="#file-creati-ex-novo-untracked" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>nextflow_worker/nextflow/main.nf</code> — entrypoint unificato Nextflow (preprocessing + training in sequenza)</li>
+<li><code>nextflow_worker/nextflow/configs/hyperparameters_small.yaml</code> — configurazione ridotta per test veloci</li>
+<li><code>nextflow_worker/nextflow/configs/training.config</code> — override parametri training per Nextflow</li>
+<li><code>check_model.R</code>, <code>debug_feat.R</code>, <code>list_pkgs.R</code> — script di debug/diagnosi R (non in produzione)</li>
+<li><code>train_rf_direct.R</code>, <code>train_xgb_direct.R</code>, <code>train_xgb_final.R</code> — script di training diretto (debug)</li>
+<li><code>docs/TECHNICAL_REPORT.md</code> — report tecnico della tesi</li>
+</ul>
+<hr />
+<h3 id="dettaglio-modifiche-significative">DETTAGLIO MODIFICHE SIGNIFICATIVE<a class="headerlink" href="#dettaglio-modifiche-significative" title="Permanent link">&para;</a></h3>
+<h4 id="1-preprocessingnf-processo-mock_freesurfer">1. <code>preprocessing.nf</code> — Processo <code>mock_freesurfer</code><a class="headerlink" href="#1-preprocessingnf-processo-mock_freesurfer" title="Permanent link">&para;</a></h4>
+<p><strong>Prima:</strong> Il workflow chiamava direttamente <code>freesurfer()</code> o <code>fastsurfer()</code>. Non esisteva alcun bypass.</p>
+<p><strong>Dopo:</strong> Aggiunto parametro <code>params.test_mode = false</code>. Se <code>true</code>, il workflow chiama <code>mock_freesurfer()</code> invece di <code>freesurfer()</code>.</p>
+<p>Il processo mock:
+- Usa <code>mri_convert</code> per convertire il NIfTI input in <code>nu.mgz</code> (ms, non ore)
+- Genera <code>aparc+aseg.mgz</code> con uno script Python inline: crea 78 label concentriche sferiche senza eseguire <code>recon-all</code>
+- Produce output strutturalmente identico al FreeSurfer reale, compatibile con tutti i processi downstream (<code>nifti_converter</code>, <code>roi_creator</code>, <code>feature_extraction</code>)</p>
+<p>Aggiunto anche fallback per <code>subject_id</code>: se il filename non matcha il pattern NIFD, usa il nome file senza estensione invece di restituire <code>null</code>.</p>
+<p><strong>Perché:</strong> Permette di testare l'intera pipeline (radiomics → inference → UMAP) senza aspettare 2-8h di segmentazione corticale.</p>
+<hr />
+<h4 id="2-trainingnf-default-parameters-e-fix-demograph">2. <code>training.nf</code> — Default parameters e fix demograph<a class="headerlink" href="#2-trainingnf-default-parameters-e-fix-demograph" title="Permanent link">&para;</a></h4>
+<p><strong>Prima:</strong> Nessun default nei parametri; il canale <code>demographic_ch</code> usava <code>fromPath("NULL")</code>, che Nextflow interpreta come path e fallisce se il file non esiste.</p>
+<p><strong>Dopo:</strong> 
+- Aggiunti 20+ parametri default (brain_segmenter, experiment_name, scripts R, paths, ecc.) — il file è ora auto-documentante e usabile senza config esterna
+- <code>demographic_ch</code> ora usa <code>channel.value("NULL")</code> quando <code>params.demographic_data</code> è null, evitando il fallimento su path inesistente
+- Il processo <code>aggregate_features</code> ora dichiara <code>demograph</code> come <code>val</code> invece di <code>path</code> (coerente con il valore sentinella)
+- Rimosso <code>containerOptions "--env-file ${env}"</code> da <code>parallel_training</code> (il file .env viene ora passato come <code>path</code>)</p>
+<hr />
+<h4 id="3-nextflowconfig-fix-path-licenza-in-dood">3. <code>nextflow.config</code> — Fix path licenza in DooD<a class="headerlink" href="#3-nextflowconfig-fix-path-licenza-in-dood" title="Permanent link">&para;</a></h4>
+<p><strong>Prima:</strong> <code>runOptions = "-v ${baseDir}/license.txt:/app/license.txt"</code> — monta la licenza dal path del container Nextflow.</p>
+<p><strong>Dopo:</strong> <code>runOptions = "-v /tmp/nextflow_work/license.txt:/app/license.txt"</code> — usa il path host <code>/tmp/nextflow_work/license.txt</code>, che è un bind-mount esplicito host↔container (dichiarato in docker-compose). In architettura DooD (Docker-out-of-Docker) il daemon Docker dell'host interpreta i path del <code>runOptions</code> come path host, non container.</p>
+<p><strong>Perché:</strong> Il vecchio path <code>${baseDir}</code> era valido solo dentro il container Nextflow, non nel daemon host che avvia i container figli.</p>
+<hr />
+<h4 id="4-inference_logicr-supporto-extended-model-xgboost">4. <code>inference_logic.R</code> — Supporto extended model XGBoost<a class="headerlink" href="#4-inference_logicr-supporto-extended-model-xgboost" title="Permanent link">&para;</a></h4>
+<p><strong>Prima:</strong> L'inferenza gestiva solo <code>xgb.Booster</code> diretto o modelli caret standard. Il fallback era un singolo <code>tryCatch</code> non annidato. Le etichette di output erano <code>"Malato"/"Sano"</code> (hardcoded). La risposta non includeva la confidenza.</p>
+<p><strong>Dopo:</strong>
+- <strong>Caso 1:</strong> Extended model (oggetto lista con <code>$booster</code> + <code>$mlr_model</code> + <code>$trainingData</code> + <code>$y</code>) — prodotto dalla nuova versione di XGBoost.r
+- <strong>Caso 2:</strong> <code>xgb.Booster</code> diretto (retrocompatibilità)
+- <strong>Caso 3:</strong> Modelli caret standard (RF, SVM, kNN)
+- Fix etichette: <code>"bvFTD"/"HC"</code> invece di <code>"Malato"/"Sano"</code>
+- Aggiunto campo <code>confidenza</code> nella risposta (probabilità della classe predetta)
+- Fix <code>roi_labels</code>: <code>read.table(..., header=TRUE, sep="\t")</code> e colonna <code>$Label</code> invece di <code>header=FALSE</code> e <code>$V3</code>
+- <code>tryCatch</code> annidato nel fallback per loggare errori invece di crashare silenziosamente</p>
+<hr />
+<h4 id="5-model_serviceservicesinferencepy-fallback-mlflow">5. <code>model_service/services/inference.py</code> — Fallback MLflow<a class="headerlink" href="#5-model_serviceservicesinferencepy-fallback-mlflow" title="Permanent link">&para;</a></h4>
+<p><strong>Prima:</strong> Se MLflow non era raggiungibile, l'eccezione propagava e il task falliva.</p>
+<p><strong>Dopo:</strong> Se <code>get_champion_uri()</code> lancia un'eccezione, viene cercato <code>model.rds</code> in tre path locali:
+1. <code>SHARED_VOLUME_DIR/models/{model_name}/model.rds</code>
+2. <code>/app/model.rds</code>
+3. <code>SHARED_VOLUME_DIR/models/model.rds</code></p>
+<p>Se nessuno esiste, l'errore è esplicito con i path cercati.</p>
+<hr />
+<h4 id="6-xgboostr-extended-model-serializzato">6. <code>XGBoost.r</code> — Extended model serializzato<a class="headerlink" href="#6-xgboostr-extended-model-serializzato" title="Permanent link">&para;</a></h4>
+<p><strong>Prima:</strong> <code>saveRDS(xgb_model, "xgb.rds")</code> — salva solo il <code>WrappedModel</code> mlr. <code>inference_logic.R</code> non poteva accedere al <code>xgb.Booster</code> raw né ai dati di training per il UMAP.</p>
+<p><strong>Dopo:</strong> Salva un oggetto lista esteso:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">extended_model</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="n">trainingData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">training_with_outcome</span><span class="p">,</span><span class="w">  </span><span class="c1"># dati training per UMAP storico</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="n">x</span><span class="w">            </span><span class="o">=</span><span class="w"> </span><span class="nf">as.matrix</span><span class="p">(</span><span class="n">best_train_x</span><span class="p">),</span><span class="w"> </span><span class="c1"># matrice feature</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="n">y</span><span class="w">            </span><span class="o">=</span><span class="w"> </span><span class="n">training_with_outcome</span><span class="o">$</span><span class="n">.outcome</span><span class="p">,</span><span class="w"> </span><span class="c1"># factor &quot;HC&quot;/&quot;bvFTD&quot;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="n">mlr_model</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">xgb_model</span><span class="p">,</span><span class="w">              </span><span class="c1"># WrappedModel mlr</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="n">booster</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">xgb_model</span><span class="o">$</span><span class="n">learner.model</span><span class="w"> </span><span class="c1"># xgb.Booster raw per predizione diretta</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">)</span>
+</code></pre></div></p>
+<p>Il modello viene salvato sempre come <code>xgb.rds</code> (non rinominato) e loggato su MLflow.</p>
+<hr />
+<h4 id="7-merge_radiomicsr-fix-tsv-header-e-init-subset">7. <code>merge_radiomics.r</code> — Fix TSV header e init subset<a class="headerlink" href="#7-merge_radiomicsr-fix-tsv-header-e-init-subset" title="Permanent link">&para;</a></h4>
+<p><strong>Prima:</strong> <code>read.table(..., header=FALSE, sep="")</code> → colonna <code>$V3</code>. <code>subset</code> inizializzato con <code>data.frame(TargetClass=class)</code> prima del loop, causando dimensione errata se la prima ROI aveva 0 righe.</p>
+<p><strong>Dopo:</strong> <code>read.table(..., header=TRUE, sep="\t")</code> → colonna <code>$Label</code>. <code>subset</code> inizializzato a <code>NULL</code> e creato solo alla prima ROI valida (con righe), evitando l'errore di dimensione.</p>
+<hr />
+<h4 id="8-docker-composeyml-fix-rete-e-variabili">8. <code>docker-compose.yml</code> — Fix rete e variabili<a class="headerlink" href="#8-docker-composeyml-fix-rete-e-variabili" title="Permanent link">&para;</a></h4>
+<p><strong>Prima:</strong> <code>api_gateway</code> esposta su <code>0.0.0.0:8000</code>. Frontend senza <code>VITE_AUTH_URL</code>. Nessuna dipendenza <code>nextflow_worker</code> → <code>api_gateway</code>.</p>
+<p><strong>Dopo:</strong>
+- Porta <code>api_gateway</code>: <code>127.0.0.1:8006:8000</code> (loopback, riduzione superficie di attacco)
+- <code>VITE_AUTH_URL=http://localhost:8006</code> nel frontend (allineato alla nuova porta)
+- <code>NF_SETTINGS</code> aggiunto alle env vars di <code>nextflow_worker</code>
+- <code>nextflow_worker</code> ora dipende da <code>api_gateway</code> (ordine di avvio corretto)</p>
+<hr />
+<h4 id="9-nextflow_workerdocker-composeyml-rename-immagini">9. <code>nextflow_worker/docker-compose.yml</code> — Rename immagini<a class="headerlink" href="#9-nextflow_workerdocker-composeyml-rename-immagini" title="Permanent link">&para;</a></h4>
+<p><strong>Prima:</strong> <code>freesurfer</code>, <code>fsl</code>, <code>pyradiomics</code></p>
+<p><strong>Dopo:</strong> <code>clinical-freesurfer</code>, <code>clinical-fsl</code>, <code>clinical-pyradiomics</code></p>
+<p>Allineamento con i nomi referenziati in <code>preprocessing.nf</code> (<code>container 'clinical-freesurfer'</code> ecc.).</p>
+<hr />
+<h4 id="10-taskhistoryjsx-fix-parsing-filename">10. <code>TaskHistory.jsx</code> — Fix parsing filename<a class="headerlink" href="#10-taskhistoryjsx-fix-parsing-filename" title="Permanent link">&para;</a></h4>
+<p><strong>Prima:</strong> <code>firstUnderscoreIndex === 36</code> — cercava il prefisso UUID a 36 caratteri.</p>
+<p><strong>Dopo:</strong> <code>firstUnderscoreIndex === 8</code> — il prefisso è ora un MD5 troncato a 8 caratteri (come prodotto da <code>orchestrator/routers/analyze.py</code>).</p>
+<hr />
+<h4 id="11-rotte-health-e-unificate">11. Rotte <code>/health</code> e <code>/</code> unificate<a class="headerlink" href="#11-rotte-health-e-unificate" title="Permanent link">&para;</a></h4>
+<p>Tutti i servizi Python (<code>orchestrator</code>, <code>llm_service</code>, <code>model_service</code>, <code>nextflow_worker</code>) e il servizio R (<code>inference_engine</code>) ora espongono sia <code>GET /</code> che <code>GET /health</code> con <code>{"status": "ok", "service": "..."}</code>. Prima alcuni avevano solo <code>/</code>, altri nessuna delle due.</p>
+<hr />
+<h2 id="parte-2-perche-prima-3h-ora-15-minuti">PARTE 2 — PERCHÉ PRIMA ~3H, ORA ~15 MINUTI<a class="headerlink" href="#parte-2-perche-prima-3h-ora-15-minuti" title="Permanent link">&para;</a></h2>
+<h3 id="analisi-del-flusso-pipeline-preprocessing">Analisi del flusso pipeline preprocessing<a class="headerlink" href="#analisi-del-flusso-pipeline-preprocessing" title="Permanent link">&para;</a></h3>
+<p>Il flusso in <code>preprocessing.nf</code> è sequenziale per soggetto:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Input NIfTI
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    │
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    ▼
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>[1] mock_freesurfer / freesurfer / fastsurfer   ← COLLO DI BOTTIGLIA
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    │
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    ▼
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>[2] nifti_converter         (mri_convert ×2, ~5s)
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    │
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    ▼
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>[3] roi_creator              (fslmaths ×78 ROI, ~30-60s)
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    │
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    ▼
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>[4] csv_collector            (loop bash, ~5s)
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    │
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    ▼
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>[5] feature_extraction       (pyradiomics ×78 ROI, --jobs 4, ~5-10min)
+</code></pre></div>
+<h3 id="tabella-tempi-per-step">Tabella tempi per step<a class="headerlink" href="#tabella-tempi-per-step" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>┌──────────────────────────┬──────────────┬──────────────┬──────────────────────────────────────────┐
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>│ Step                     │ Prima        │ Ora          │ Motivo differenza                        │
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├──────────────────────────┼──────────────┼──────────────┼──────────────────────────────────────────┤
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>│ FreeSurfer recon-all     │ 2–8 ore      │ 0            │ Sostituito da mock_freesurfer             │
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>│ mock_freesurfer          │ (non esist.) │ ~30–60s      │ mri_convert + script Python sferiche     │
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>│ nifti_converter          │ ~5s          │ ~5s          │ Invariato (mri_convert ×2)               │
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>│ roi_creator              │ ~30–60s      │ ~30–60s      │ Invariato (fslmaths ×78)                 │
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>│ csv_collector            │ ~5s          │ ~5s          │ Invariato                                │
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>│ feature_extraction       │ ~5–10min     │ ~5–10min     │ Invariato (pyradiomics --jobs 4)         │
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>│ Inference R (inference_  │ ~1–2min      │ ~1–2min      │ Invariato                               │
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>│ engine)                  │              │              │                                          │
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>│ UMAP 3D                  │ ~30s         │ ~30s         │ Invariato                               │
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>│ TOTALE                   │ ~2.5–9.5h    │ ~8–15min     │ Eliminazione recon-all                   │
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>└──────────────────────────┴──────────────┴──────────────┴──────────────────────────────────────────┘
+</code></pre></div>
+<h3 id="spiegazione-dettagliata">Spiegazione dettagliata<a class="headerlink" href="#spiegazione-dettagliata" title="Permanent link">&para;</a></h3>
+<p><strong>Bottleneck eliminato: <code>recon-all</code> di FreeSurfer</strong></p>
+<p><code>recon-all</code> è un'analisi strutturale MRI completa che include:
+- Normalizzazione intensità, skull-stripping, segmentazione della sostanza bianca/grigia
+- Ricostruzione della superficie corticale (pial surface, white surface)
+- Parcellazione in ~35 regioni per emisfero con l'atlante Desikan-Killiany
+- Pipeline a ~30 stadi sequenziali, non parallelizzabili internamente</p>
+<p>Su hardware tipico (16 thread, <code>-openmp 16</code>):
+- MRI 1mm isotropica 256³: <strong>2–4 ore</strong>
+- MRI 3T con <code>-cw256</code>: fino a <strong>6–8 ore</strong></p>
+<p>Il mock elimina tutti questi stadi. Produce <code>nu.mgz</code> con una semplice conversione formato (1-2 secondi) e <code>aparc+aseg.mgz</code> con uno script Python che assegna 78 label via distanza euclidea dal centro (5-10 secondi per un volume 256³).</p>
+<p><strong>Ottimizzazioni aggiuntive rispetto al mock</strong></p>
+<ol>
+<li>
+<p><strong>Fallback subject_id</strong>: Prima, un NIfTI con nome non-NIFD poteva produrre <code>subject_id = null</code>, causando un crash Nextflow prima ancora di avviare FreeSurfer. Il fix <code>?: filename.replaceAll(...)</code> evita il fallimento precoce.</p>
+</li>
+<li>
+<p><strong><code>publishDir</code> con closure <code>{}</code></strong>: Le espressioni <code>publishDir "${var}"</code> vengono valutate staticamente da Nextflow; con variabili di processo come <code>FTD_group</code> e <code>subject</code> è richiesta una closure. Il fix evita path di output errati che potevano portare a riavvii del processo.</p>
+</li>
+<li>
+<p><strong><code>demographic_ch</code> con <code>channel.value("NULL")</code></strong>: Prima <code>fromPath("NULL")</code> causava un errore nel workflow se il file non esisteva, bloccando il processo <code>aggregate_features</code>. Ora il workflow parte sempre.</p>
+</li>
+<li>
+<p><strong><code>merge_radiomics.r</code> fix header</strong>: Prima <code>header=FALSE, sep=""</code> leggeva il TSV malformato (tab-separated letto come whitespace-separated), causando errori di colonna in R durante il merge. Il task di training falliva ripetutamente, richiedendo rilanci manuali.</p>
+</li>
+<li>
+<p><strong>Flag <code>-resume</code> di Nextflow</strong>: Il comando <code>nextflow run ... -resume</code> (già presente in <code>nextflow_runner.py</code>) riutilizza la cache dei processi completati. Con il mock abilitato, se il soggetto è già stato processato (hash NIfTI identico), <code>mock_freesurfer</code>, <code>nifti_converter</code>, <code>roi_creator</code> vengono saltati. Solo <code>feature_extraction</code> viene rieseguito se il codice è cambiato. In pratica, la seconda esecuzione sullo stesso file può completare in <strong>&lt; 1 minuto</strong>.</p>
+</li>
+</ol>
+<p><strong>Step in parallelo</strong></p>
+<ul>
+<li><code>feature_extraction</code> usa <code>--jobs 4</code> (pyradiomics): le 78 ROI vengono processate con 4 worker Python in parallelo. Questo era già presente.</li>
+<li>I processi Nextflow per soggetti diversi (<code>params.maxforks = 1</code> per default) sono sequenziali. Con <code>maxforks &gt; 1</code> si potrebbero parallelizzare soggetti multipli, ma introduce contesa sulla GPU/CPU.</li>
+</ul>
+<hr />
+<h2 id="parte-3-con-dati-reali-cosa-cambia">PARTE 3 — CON DATI REALI COSA CAMBIA<a class="headerlink" href="#parte-3-con-dati-reali-cosa-cambia" title="Permanent link">&para;</a></h2>
+<h3 id="in-produzione-test_mode-false-dati-reali">In produzione (test_mode = false, dati reali)<a class="headerlink" href="#in-produzione-test_mode-false-dati-reali" title="Permanent link">&para;</a></h3>
+<p>Con dati reali il bottleneck torna ad essere FreeSurfer/FastSurfer:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>┌──────────────────────────┬──────────────────┬──────────────────────────────────────────────────────┐
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>│ Configurazione           │ Tempo stimato    │ Note                                                 │
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>├──────────────────────────┼──────────────────┼──────────────────────────────────────────────────────┤
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>│ FreeSurfer recon-all     │ 2–8h/soggetto    │ Dipende da RAM, CPU, risoluzione MRI                 │
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>│ FastSurfer (CPU)         │ 45–90min/sogg.   │ ~4× più veloce di FreeSurfer su CPU                  │
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>│ FastSurfer (GPU CUDA)    │ 5–15min/sogg.    │ Richiede GPU ≥ 8GB VRAM; usa MIG se disponibile      │
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>│ mock_freesurfer          │ ~1min/sogg.      │ Solo per CI/test — output sintetico non diagnostico  │
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>└──────────────────────────┴──────────────────┴──────────────────────────────────────────────────────┘
+</code></pre></div>
+<h3 id="raccomandazioni-per-ridurre-i-tempi-in-produzione">Raccomandazioni per ridurre i tempi in produzione<a class="headerlink" href="#raccomandazioni-per-ridurre-i-tempi-in-produzione" title="Permanent link">&para;</a></h3>
+<ol>
+<li>
+<p><strong>FastSurfer GPU</strong> (<code>brain_segmenter=fastsurfer</code>, <code>fastsurfer_device=cuda</code>): da 2-8h a 5-15min/soggetto. È il percorso clinico raccomandato per throughput elevato.</p>
+</li>
+<li>
+<p><strong><code>-resume</code> Nextflow</strong> (già attivo): se un soggetto è già stato segmentato in un run precedente, i processi FreeSurfer/FastSurfer vengono saltati. Solo i processi modificati vengono rieseguiti.</p>
+</li>
+<li>
+<p><strong><code>maxforks &gt; 1</code></strong>: per dataset multi-soggetto, aumentare <code>params.maxforks</code> permette di segmentare N soggetti in parallelo (CPU-bound). Attenzione: con FastSurfer GPU serve <code>maxforks=1</code> per non saturare la VRAM.</p>
+</li>
+<li>
+<p><strong>Cache features</strong>: <code>radiomics_features.csv</code> è salvato in <code>publishDir "${params.outdir}"</code>. Se il file esiste già e il soggetto non è cambiato, il <code>-resume</code> lo salta automaticamente.</p>
+</li>
+</ol>
+<h3 id="impatto-del-mock-sui-tempi-di-sviluppo">Impatto del mock sui tempi di sviluppo<a class="headerlink" href="#impatto-del-mock-sui-tempi-di-sviluppo" title="Permanent link">&para;</a></h3>
+<p>Con <code>TEST_MODE=true</code> nell'environment dell'orchestrator, l'intera pipeline end-to-end (NIfTI → diagnosi + UMAP) completa in <strong>~10–15 minuti</strong> invece di <strong>~3–9 ore</strong>, permettendo:
+- Iterazioni rapide su <code>inference_logic.R</code>, <code>XGBoost.r</code>, <code>merge_radiomics.r</code>
+- Test CI automatizzati senza infrastruttura GPU
+- Debug della pipeline senza attendere segmentazione reale</p>
+<p>Il flag è passato end-to-end: <code>orchestrator.settings.TEST_MODE</code> → <code>pipeline.py</code> → <code>nextflow_runner.py</code> → <code>nextflow_worker/main.py</code> → <code>--test_mode true</code> al processo Nextflow.</p>
+<hr />
+<p><em>Report generato automaticamente il 2026-06-02</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Torna su
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiato", "clipboard.copy": "Copia", "search.result.more.one": "1 altro in questa pagina", "search.result.more.other": "# altri in questa pagina", "search.result.none": "Nessun documento trovato", "search.result.one": "1 documento trovato", "search.result.other": "# documenti trovati", "search.result.placeholder": "Scrivi per iniziare a cercare", "search.result.term.missing": "Non presente", "select.version": "Seleziona la versione"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

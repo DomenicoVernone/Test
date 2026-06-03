@@ -123,11 +123,32 @@ class InferenceOrchestrator:
                 )
                 logger.info(f"Task {task_id}: skip_mlflow=True, uso cache locale.")
             else:
-                model_uri = self.get_champion_uri(model_name)
-                logger.info(f"Task {task_id}: modello champion -> {model_uri}")
-                exact_rds_path = await asyncio.to_thread(
-                    self._sync_download_and_find_rds, model_uri, model_name
-                )
+                try:
+                    model_uri = self.get_champion_uri(model_name)
+                    logger.info(f"Task {task_id}: modello champion -> {model_uri}")
+                    exact_rds_path = await asyncio.to_thread(
+                        self._sync_download_and_find_rds, model_uri, model_name
+                    )
+                except Exception as mlflow_error:
+                    # Fallback: cerca model.rds nella directory locale dell'app
+                    logger.warning(
+                        f"Task {task_id}: MLflow non disponibile ({mlflow_error}). "
+                        f"Tentativo fallback a model.rds locale..."
+                    )
+                    local_candidates = [
+                        os.path.join(settings.SHARED_VOLUME_DIR, "models", model_name, "model.rds"),
+                        "/app/model.rds",
+                        os.path.join(settings.SHARED_VOLUME_DIR, "models", "model.rds"),
+                    ]
+                    exact_rds_path = next(
+                        (p for p in local_candidates if os.path.exists(p)), None
+                    )
+                    if exact_rds_path is None:
+                        raise RuntimeError(
+                            f"MLflow non raggiungibile e nessun model.rds locale trovato. "
+                            f"Percorsi cercati: {local_candidates}"
+                        )
+                    logger.info(f"Task {task_id}: fallback modello locale -> {exact_rds_path}")
 
             logger.info(f"Task {task_id}: file modello R -> {exact_rds_path}")
 

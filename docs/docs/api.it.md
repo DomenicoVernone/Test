@@ -1,483 +1,329 @@
-<!DOCTYPE html>
+# API Reference — Clinical Twin
 
-<html lang="it">
+La piattaforma Clinical Twin espone API REST su 5 microservizi.
+Tutti i servizi comunicano sulla rete Docker `clinical_twin_net`.
+L'accesso esterno è vincolato a `127.0.0.1` (solo loopback).
 
-<head>
+---
 
-<meta charset="UTF-8">
-<title>MLOps – API Reference</title>
+## Porte dei servizi
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 40px;
-    background-color: #f9f9f9;
-    color: #333;
-}
+| Servizio | Porta container | Porta host (esterna) | Swagger UI |
+|----------|----------------|----------------------|------------|
+| api_gateway | 8000 | `127.0.0.1:8006` | http://localhost:8006/docs |
+| orchestrator | 8000 | `127.0.0.1:8001` | http://localhost:8001/docs |
+| model_service | 8000 | `127.0.0.1:8003` | http://localhost:8003/docs |
+| llm_service | 8000 | `127.0.0.1:8002` | http://localhost:8002/docs |
+| inference_engine (R/Plumber) | 8000 | `127.0.0.1:8004` | — |
+| nextflow_worker | 8000 | `127.0.0.1:8005` | http://localhost:8005/docs |
 
-h1, h2, h3 {
-    color: #2c3e50;
-}
+---
 
-h1 {
-    border-bottom: 2px solid #ccc;
-    padding-bottom: 10px;
-}
+## Autenticazione
 
-pre {
-    background-color: #eee;
-    padding: 15px;
-    border-radius: 5px;
-    overflow-x: auto;
-}
+Tutti gli endpoint (eccetto `/signup`, `/login`, `/health`) richiedono un JWT Bearer token.
 
-.section {
-    margin-bottom: 40px;
-}
+### Ottenere un token
 
-.box {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
+```bash
+curl -s -X POST http://localhost:8006/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"tuapassword"}'
+```
 
-ul {
-    margin-left: 20px;
-}
-
-/* ===== TABLE STYLE UNIFICATO ===== */
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 15px;
-    font-size: 14px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-th {
-    background-color: #2c3e50;
-    color: white;
-    text-align: left;
-    padding: 12px;
-    font-weight: 600;
-}
-
-td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    vertical-align: top;
-}
-
-tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
-
-tr:hover {
-    background-color: #eef2f5;
-}
-</style>
-
-</head>
-
-<body>
-
-<div class="box">
-
-<h1>API REST – Sistema MLOps</h1>
-
-<div class="section">
-<h2>1. Introduzione</h2>
-
-<p>
-Il sistema MLOps espone un insieme di API REST che consentono la comunicazione
-tra microservizi e l’interazione con il frontend clinico.
-</p>
-
-<p>
-Le API rappresentano il livello di integrazione dell’intera piattaforma e
-definiscono il contratto tra:
-</p>
-
-<ul>
-<li>utente e sistema (frontend → backend)</li>
-<li>microservizi interni</li>
-<li>pipeline e motore di inferenza</li>
-</ul>
-
-<p>
-Gli endpoint sono implementati principalmente tramite FastAPI (Python)
-e Plumber (R) e utilizzano JSON come formato standard per richieste e risposte.
-</p>
-
-</div>
-
-<div class="section">
-<h2>2. Architettura delle API</h2>
-
-<p>
-Le API seguono un modello distribuito in cui ogni microservizio espone
-endpoint specifici per il proprio dominio funzionale.
-</p>
-
-<pre>
-Frontend
-   ↓
-API Gateway (autenticazione)
-   ↓
-Orchestrator (task pipeline)
-   ↓
-Nextflow Worker (pipeline)
-   ↓
-Inference Engine (KNN + UMAP)
-   ↓
-LLM Service (explainability)
-</pre>
-
-<p>
-L’API Gateway rappresenta il punto di ingresso principale e gestisce
-l’autenticazione tramite token JWT.
-</p>
-
-</div>
-
-<div class="section">
-<h2>3. Autenticazione e sicurezza</h2>
-
-<p>
-Il sistema utilizza autenticazione basata su JSON Web Token (JWT)
-per proteggere gli endpoint.
-</p>
-
-<p>
-Flusso di autenticazione:
-</p>
-
-<pre>
-1. Utente effettua login
-2. Server genera JWT
-3. Token incluso nelle richieste successive
-4. Servizi validano il token
-</pre>
-
-<p>
-Header richiesto:
-</p>
-
-<pre>
-Authorization: Bearer &lt;token&gt;
-</pre>
-
-</div>
-
-<div class="section">
-<h2>4. API api_gateway</h2>
-
-<h3>4.1 Registrazione utente</h3>
-
-<pre>
-POST /signup
-</pre>
-
-<p>Request:</p>
-
-<pre>
+Risposta:
+```json
 {
-  "username": "user",
-  "password": "password"
-}
-</pre>
-
-<p>Response:</p>
-
-<pre>
-{
-  "message": "User created successfully"
-}
-</pre>
-
-<h3>4.2 Login</h3>
-
-<pre>
-POST /login
-</pre>
-
-<p>Response:</p>
-
-<pre>
-{
-  "access_token": "jwt_token",
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "bearer"
 }
-</pre>
+```
 
-<h3>4.3 Informazioni utente</h3>
+Usa il token nelle richieste successive:
+```
+Authorization: Bearer <access_token>
+```
 
-<pre>
-GET /me
-</pre>
+I token JWT sono firmati con `HS256` usando la `SECRET_KEY` condivisa tra
+`api_gateway` e `orchestrator`. Scadenza predefinita: 30 minuti.
 
-<p>Response:</p>
+---
 
-<pre>
+## 1. API Gateway — porta 8006
+
+### POST /signup
+Registra un nuovo utente.
+
+```bash
+curl -X POST http://localhost:8006/signup \
+  -H "Content-Type: application/json" \
+  -d '{"username":"doctor01","password":"securepass"}'
+```
+
+Risposta `200`:
+```json
+{"message": "User created successfully"}
+```
+
+### POST /login
+Autentica e riceve un token JWT.
+
+```bash
+curl -X POST http://localhost:8006/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"doctor01","password":"securepass"}'
+```
+
+Risposta `200`:
+```json
 {
-  "username": "user"
+  "access_token": "eyJ...",
+  "token_type": "bearer"
 }
-</pre>
+```
 
-</div>
+### GET /me
+Restituisce le informazioni dell'utente autenticato.
 
-<div class="section">
-<h2>5. API orchestrator</h2>
+```bash
+curl http://localhost:8006/me \
+  -H "Authorization: Bearer <token>"
+```
 
-<h3>5.1 Avvio analisi MRI</h3>
+Risposta `200`:
+```json
+{"username": "doctor01"}
+```
 
-<pre>
-POST /analyze
-</pre>
+### GET /health
+```json
+{"status": "ok", "service": "api_gateway"}
+```
 
-<p>Request:</p>
+---
 
-<pre>
+## 2. Orchestrator — porta 8001
+
+### POST /analyze/upload
+Carica un file NIfTI e avvia la pipeline diagnostica completa.
+
+```bash
+curl -X POST http://localhost:8001/analyze/upload \
+  -H "Authorization: Bearer <token>" \
+  -F "file=@/path/to/scan.nii.gz" \
+  -F "model_name=HC_vs_bvFTD"
+```
+
+Risposta `202`:
+```json
 {
-  "filename": "subject01.nii.gz"
+  "task_id": 17,
+  "status": "PENDING",
+  "filename": "a3f8b21c_scan.nii.gz",
+  "model_name": "HC_vs_bvFTD"
 }
-</pre>
+```
 
-<p>Response:</p>
+> **Nota:** Il filename è prefissato con un hash MD5 di 8 caratteri per evitare collisioni.
 
-<pre>
+### GET /analyze/status/{task_id}
+Verifica lo stato e recupera i risultati quando completato.
+
+```bash
+curl http://localhost:8001/analyze/status/17 \
+  -H "Authorization: Bearer <token>"
+```
+
+Risposta in esecuzione:
+```json
 {
-  "task_id": "12345",
-  "status": "pending"
+  "task_id": 17,
+  "status": "PROCESSING",
+  "progress": 10.0,
+  "filename": "a3f8b21c_scan.nii.gz"
 }
-</pre>
+```
 
-<h3>5.2 Stato task</h3>
-
-<pre>
-GET /task/{task_id}
-</pre>
-
-<p>Response:</p>
-
-<pre>
+Risposta completato (`status = "COMPLETED"`):
+```json
 {
-  "task_id": "12345",
-  "status": "running",
-  "created_at": "timestamp"
+  "task_id": 17,
+  "status": "COMPLETED",
+  "progress": 100.0,
+  "diagnosi_predetta": "HC",
+  "confidenza": 0.7957,
+  "plot_data": {
+    "storico": [
+      {"x": -1.23, "y": 0.45, "z": 2.11, "label": "HC", "subject_id": "Paziente_Storico_1"}
+    ],
+    "nuovo_paziente": {"x": -0.91, "y": 0.38, "z": 1.74}
+  }
 }
-</pre>
+```
 
-<h3>5.3 Lista task</h3>
+**Valori di stato del task:**
 
-<pre>
-GET /tasks
-</pre>
+| Stato | Significato |
+|-------|------------|
+| `PENDING` | Task creato, pipeline non ancora avviata |
+| `PROCESSING` | Pipeline Nextflow in esecuzione (estrazione feature) |
+| `ANALYZING_R` | Motore di inferenza R in esecuzione |
+| `COMPLETED` | Diagnosi disponibile |
+| `ERROR` | Pipeline fallita |
 
-<p>
-Restituisce tutte le analisi associate all’utente autenticato.
-</p>
+### GET /analyze/tasks
+Lista tutti i task dell'utente autenticato.
 
-</div>
+### GET /analyze/nifti/{task_id}/volume.nii.gz
+Scarica il file NIfTI associato a un task (usato dal viewer 3D).
 
-<div class="section">
-<h2>6. API inference_engine</h2>
+### GET /health
+```json
+{"status": "ok", "service": "orchestrator"}
+```
 
-<h3>6.1 Classificazione KNN</h3>
+---
 
-<pre>
-POST /knn
-</pre>
+## 3. Model Service — porta 8003
 
-<p>Response:</p>
+### POST /infer
+Scarica il modello champion da MLflow e avvia l'inferenza R.
 
-<pre>
+```bash
+curl -X POST http://localhost:8003/infer \
+  -H "Content-Type: application/json" \
+  -d '{"task_id": 17, "model_name": "HC_vs_bvFTD"}'
+```
+
+Risposta `200`:
+```json
 {
-  "prediction": "bvFTD",
-  "confidence": 0.81
+  "status": "ok",
+  "result": {
+    "status": "success",
+    "task_id": "17",
+    "diagnosi_predetta": "HC",
+    "confidenza": 0.7957,
+    "plot_data": { "storico": [...], "nuovo_paziente": {...} }
+  }
 }
-</pre>
+```
 
-<h3>6.2 Proiezione UMAP</h3>
+Catena di fallback MLflow (in ordine se MLflow/DagsHub non disponibile):
+1. `/shared_data/models/{model_name}/model.rds`
+2. `/app/model.rds`
+3. `/shared_data/models/model.rds`
 
-<pre>
-POST /umap
-</pre>
+### GET /model_info/{model_name}
+Recupera i metadati del modello champion (chiamato dall'orchestratore prima
+del preprocessing per determinare quale segmentatore cerebrale è stato usato
+durante il training).
 
-<p>Response:</p>
+```bash
+curl http://localhost:8003/model_info/HC_vs_bvFTD
+```
 
-<pre>
+Risposta `200`:
+```json
 {
-  "x": 1.23,
-  "y": -0.45,
-  "z": 2.11
+  "model_name": "HC_vs_bvFTD",
+  "brain_segmenter": "freesurfer",
+  "run_id": "abc123def456",
+  "tags": {"model": "XGBoost", "brain_segmenter": "freesurfer"}
 }
-</pre>
+```
 
-</div>
+### GET /health
+```json
+{"status": "ok", "service": "model_service"}
+```
 
-<div class="section">
-<h2>7. API model_service</h2>
+---
 
-<h3>7.1 Caricamento modello</h3>
+## 4. Inference Engine (R/Plumber) — porta 8004
 
-<pre>
-POST /load-model
-</pre>
+Il motore di inferenza è un server R Plumber. È chiamato **solo da model_service**,
+mai direttamente dall'utente.
 
-<p>
-Scarica il modello dal Model Registry MLflow e lo rende disponibile
-per l’inference_engine.
-</p>
+### GET /health
+```json
+{"status": "ok"}
+```
 
-<h3>7.2 Predizione (opzionale)</h3>
+### POST /infer
+Esegue l'inferenza clinica e calcola l'embedding UMAP 3D.
 
-<pre>
-POST /predict
-</pre>
+Parametri (body JSON): `task_id`, `model_name`, `model_dir` (path assoluto del file `.rds`)
 
-<p>
-Endpoint opzionale per inferenza diretta (non utilizzato nel flusso principale).
-</p>
-
-</div>
-
-<div class="section">
-<h2>8. API llm_service</h2>
-
-<h3>8.1 Chat AI</h3>
-
-<pre>
-POST /chat
-</pre>
-
-<p>Request:</p>
-
-<pre>
+Risposta:
+```json
 {
-  "message": "Explain this patient's diagnosis"
+  "status": "success",
+  "task_id": "17",
+  "diagnosi_predetta": "HC",
+  "confidenza": 0.7957,
+  "plot_data": {
+    "storico": [{"x": -1.23, "y": 0.45, "z": 2.11, "label": "HC", "subject_id": "..."}],
+    "nuovo_paziente": {"x": -0.91, "y": 0.38, "z": 1.74}
+  }
 }
-</pre>
+```
 
-<p>Response:</p>
+---
 
-<pre>
-{
-  "response": "The patient is located near..."
-}
-</pre>
+## 5. Nextflow Worker — porta 8005
 
-<p>
-Questo endpoint utilizza feature radiomiche e coordinate UMAP
-per generare spiegazioni cliniche contestualizzate.
-</p>
+Questo servizio è chiamato **solo dall'orchestratore**, non direttamente dall'utente.
 
-</div>
+### POST /start_preprocessing
+Avvia la pipeline Nextflow di preprocessing per un file NIfTI.
 
-<div class="section">
-<h2>9. Contratto dati tra servizi</h2>
+`test_mode: true` attiva `mock_freesurfer` (bypassa FreeSurfer recon-all,
+completa in ~30 secondi invece di 6–8 ore).
 
-<p>
-Le API definiscono un contratto dati chiaro tra i componenti del sistema.
-</p>
+### GET /status/{task_id}
+Verifica lo stato della pipeline Nextflow: `RUNNING`, `SUCCESS`, `FAILED`.
 
-<p>
-Elemento centrale:
-</p>
+### GET /health
+```json
+{"status": "ok", "service": "nextflow_worker"}
+```
 
-<pre>
-radiomics_features.csv
-</pre>
+---
 
-<p>
-Questo file rappresenta l’input standard per l’inference_engine
-e garantisce coerenza tra pipeline e inferenza.
-</p>
+## 6. LLM Service — porta 8002
 
-<p>
-Output inferenza:
-</p>
+### POST /chat
+Chiede all'assistente AI un'interpretazione clinica.
 
-<pre>
-{
-  "prediction": "...",
-  "confidence": 0.XX,
-  "umap_coordinates": [x, y, z]
-}
-</pre>
+### GET /health
+```json
+{"status": "ok", "service": "llm_service"}
+```
 
-</div>
+---
 
-<div class="section">
-<h2>10. Swagger e testing</h2>
+## Gestione degli errori
 
-<p>
-Ogni microservizio FastAPI espone una documentazione interattiva
-tramite Swagger UI:
-</p>
+Tutti i servizi restituiscono codici HTTP standard:
 
-<pre>
-http://localhost:8000/docs
-http://localhost:8001/docs
-http://localhost:8002/docs
-</pre>
+| Codice | Significato |
+|--------|------------|
+| `200` | Successo |
+| `202` | Accettato (task asincrono avviato) |
+| `401` | Non autorizzato (JWT mancante o non valido) |
+| `404` | Risorsa non trovata |
+| `422` | Errore di validazione (corpo della richiesta non valido) |
+| `500` | Errore interno del server |
 
-<p>
-Swagger consente:
-</p>
+---
 
-<ul>
-<li>test degli endpoint</li>
-<li>validazione JSON</li>
-<li>debug rapido</li>
-</ul>
+## Contratto dati: radiomics_features.csv
 
-</div>
+L'artefatto dati centrale scambiato tra `nextflow_worker` e `inference_engine`:
 
-<div class="section">
-<h2>11. Gestione errori</h2>
-
-<p>
-Le API seguono convenzioni standard HTTP:
-</p>
-
-<ul>
-<li>200 → successo</li>
-<li>401 → non autorizzato</li>
-<li>404 → risorsa non trovata</li>
-<li>500 → errore interno</li>
-</ul>
-
-<p>
-Gli errori vengono propagati tra servizi per garantire consistenza
-nel workflow.
-</p>
-
-</div>
-
-<div class="section">
-<h2>12. Conclusioni</h2>
-
-<p>
-Le API costituiscono il backbone di comunicazione del sistema MLOps,
-garantendo interoperabilità tra microservizi e integrazione con il frontend.
-</p>
-
-<p>
-La definizione chiara dei contratti dati e degli endpoint consente
-un’evoluzione modulare del sistema e facilita lo sviluppo di nuove
-funzionalità.
-</p>
-
-</div>
-
-</div>
-
-</body>
-</html>
+- Generato da: processo `feature_extraction` in `preprocessing.nf`
+- Posizione: `/shared_data/features/features_{task_id}.csv`
+- Formato: CSV con una riga per soggetto, ~6.864 colonne
+- Nomi colonne: `{nome_ROI}_{feature_pyradiomics}` (es. `Hippocampus_original_shape_Volume`)
+- Nomi ROI da: `ROI_labels.tsv` (78 regioni cerebrali)

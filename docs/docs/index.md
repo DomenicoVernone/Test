@@ -1,234 +1,108 @@
-<!DOCTYPE html>
+# Clinical Twin — FTD Radiomics Platform
 
-<html lang="it">
+**Clinical Twin** is an MLOps platform for the differential diagnosis of
+Frontotemporal Dementia (FTD) variants through automated analysis of T1 MRI.
 
-<head>
-<meta charset="UTF-8">
-<title>MLOps – Introduction</title>
+---
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 40px;
-    background-color: #f9f9f9;
-    color: #333;
-}
+## What it does
 
-h1, h2, h3 {
-    color: #2c3e50;
-}
+The system takes a T1 MRI scan as input and produces:
 
-h1 {
-    border-bottom: 2px solid #ccc;
-    padding-bottom: 10px;
-}
+- **Diagnosis**: `HC` (Healthy Control) or `bvFTD` (behavioral variant FTD)
+- **Confidence score**: 0–100% (XGBoost probability)
+- **3D UMAP visualization**: patient position in the clinical space relative to the training cohort
 
-pre {
-    background-color: #eee;
-    padding: 15px;
-    border-radius: 5px;
-    overflow-x: auto;
-}
+Total analysis time: **~12 minutes** (test mode) or **~4–10 hours** (full FreeSurfer pipeline).
 
-.section {
-    margin-bottom: 40px;
-}
+---
 
-.box {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
+## Architecture
 
-ul {
-    margin-left: 20px;
-}
+7 containerized microservices orchestrated via Docker Compose:
 
-/* ===== TABLE STYLE UNIFICATO ===== */
+| Service | Port | Role |
+|---------|------|------|
+| Frontend (React) | 5173 | Clinical dashboard |
+| API Gateway | 127.0.0.1:8006 | JWT authentication |
+| Orchestrator | 127.0.0.1:8001 | Task management |
+| Model Service | 127.0.0.1:8003 | MLflow + model download |
+| Inference Engine | 127.0.0.1:8004 | R + XGBoost + UMAP |
+| LLM Service | 127.0.0.1:8002 | AI assistant |
+| Nextflow Worker | 127.0.0.1:8005 | Neuroimaging pipeline |
 
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 15px;
-    font-size: 14px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    overflow: hidden;
-}
+See [System Architecture](SYSTEM_ARCHITECTURE.md) for the complete diagram.
 
-th {
-    background-color: #2c3e50;
-    color: white;
-    text-align: left;
-    padding: 12px;
-    font-weight: 600;
-}
+---
 
-td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    vertical-align: top;
-}
+## Pipeline
 
-tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
+```
+T1 MRI (.nii.gz)
+    → FreeSurfer recon-all (or mock_freesurfer for testing)
+    → 78 brain region masks (FSL fslmaths)
+    → PyRadiomics feature extraction (~6,864 features)
+    → XGBoost classification + UMAP 3D embedding
+    → Diagnosis + confidence + visualization
+```
 
-tr:hover {
-    background-color: #eef2f5;
-}
-</style>
+See [Pipeline Documentation](Pipeline_doc.md) for full details.
 
-</head>
+---
 
-<body>
+## Quick Start
 
-<div class="box">
+```bash
+# 1. Clone
+git clone https://github.com/carlosto033/Tesi-FTD.git && cd Tesi-FTD
 
-<h1>Introduction</h1>
+# 2. Configure .env files and add FreeSurfer license
+cp api_gateway/.env.example api_gateway/.env
+cp orchestrator/.env.example orchestrator/.env
+# Set SECRET_KEY to the same value in both files
+cp /path/to/license.txt nextflow_worker/license.txt
 
-<div class="section">
-<h2>1. System Overview</h2>
+# 3. Build pipeline images
+docker compose -f nextflow_worker/docker-compose.yml build
 
-<p>
-MLOps is an advanced clinical decision support platform designed
-for the differential diagnosis of Frontotemporal Dementia (FTD)
-variants through automated analysis of magnetic resonance imaging (MRI).
-</p>
+# 4. Enable test mode for fast runs (~12 min instead of ~8h)
+echo "TEST_MODE=true" >> orchestrator/.env
 
-<p>
-The system integrates a complete pipeline for neuroimaging processing,
-radiomic feature extraction, statistical inference, and AI-assisted
-interpretation, following MLOps principles of reproducibility,
-scalability, and modularity.
-</p>
+# 5. Start
+docker compose up --build -d
 
-<p>
-The objective is to transform complex data into interpretable clinical
-information, supporting the medical decision-making process.
-</p>
+# 6. Open dashboard
+# http://localhost:5173
+```
 
-</div>
+See [Quickstart](Guida_Rapida.md) for the complete walkthrough.
 
-<div class="section">
-<h2>2. Logical Architecture</h2>
+---
 
-<p>
-The platform is built on a containerized microservices architecture,
-where each component implements a specific responsibility within
-the diagnostic workflow.
-</p>
+## Status
 
-<ul>
-<li><b>Neuroimaging pipeline</b> (Nextflow)</li>
-<li><b>Orchestrator</b> (task management)</li>
-<li><b>Model Service</b> (MLflow)</li>
-<li><b>Inference Engine</b> (KNN + UMAP)</li>
-<li><b>LLM Service</b> (Explainability)</li>
-<li><b>React Frontend</b></li>
-</ul>
+| Component | Status |
+|-----------|--------|
+| End-to-end pipeline | ✅ Working (tested 2026-05-28) |
+| TEST_MODE (mock FreeSurfer) | ✅ Working (~12 min) |
+| Full FreeSurfer pipeline | ✅ Working (~4h 21m measured) |
+| XGBoost inference + UMAP 3D | ✅ Working (HC, 79.57% on test scan) |
+| MLflow/DagsHub model registry | ✅ Working (with fallback) |
+| Current model | ⚠️ Trained on 12 synthetic subjects — research only |
+| Clinical validation | ❌ Requires real NIFD dataset |
 
-<p>
-This separation enables scalability and ease of extension.
-</p>
+---
 
-</div>
+## Documentation
 
-<div class="section">
-<h2>3. End-to-End Workflow</h2>
-
-<p>
-The system implements an automated workflow from MRI input to diagnosis.
-</p>
-
-<pre>
-1. MRI Upload
-2. API Gateway (JWT)
-3. Orchestrator
-4. Nextflow Pipeline
-5. Radiomics Features (CSV)
-6. Model Service
-7. Inference Engine
-8. UMAP Projection
-9. LLM Explainability
-10. Visualization
-</pre>
-
-<p>
-The workflow ensures consistency and reproducibility of analyses.
-</p>
-
-</div>
-
-<div class="section">
-<h2>4. Neuroimaging and Radiomics Pipeline</h2>
-
-<p>
-The pipeline executes a deterministic sequence:
-</p>
-
-<ul>
-<li>segmentation (FreeSurfer / FastSurfer)</li>
-<li>ROI extraction</li>
-<li>radiomic feature extraction (PyRadiomics)</li>
-</ul>
-
-<p>
-The output is a feature vector used for inference.
-</p>
-
-</div>
-
-<div class="section">
-<h2>5. Inference and Explainability</h2>
-
-<p>
-The system uses:
-</p>
-
-<ul>
-<li>KNN for classification</li>
-<li>UMAP for 3D embedding</li>
-</ul>
-
-<p>
-The LLM provides interpretations based on features and context.
-</p>
-
-</div>
-
-<div class="section">
-<h2>6. Key Features</h2>
-
-<ul>
-<li>Fully automated MRI pipeline</li>
-<li>Microservices architecture</li>
-<li>Reproducibility with Nextflow</li>
-<li>MLflow integration</li>
-<li>AI-based explainability</li>
-</ul>
-
-</div>
-
-<div class="section">
-<h2>7. Application Context</h2>
-
-<p>
-The platform is developed in an academic context for research
-in neuroimaging and decision support systems.
-</p>
-
-<p>
-It is not intended for direct clinical use without regulatory validation.
-</p>
-
-</div>
-
-</div>
-
-</body>
-
-</html>
+- [System Architecture](SYSTEM_ARCHITECTURE.md) — service diagram, DooD, shared volume
+- [Components & Structure](COMPONENTS_&_STRUCTURE.md) — directory structure, file roles
+- [Installation](Installazione.md) — prerequisites, setup steps
+- [Configuration](Configurazione.md) — .env variables, TEST_MODE, GPU config
+- [Pipeline](Pipeline_doc.md) — Nextflow processes, mock_freesurfer, training
+- [Quickstart](Guida_Rapida.md) — run your first analysis
+- [API Reference](api.md) — all endpoints with curl examples
+- [Deployment](Deployment.md) — Docker commands, DooD, troubleshooting
+- [Testing](testing.md) — test results, bug fixes, known limitations
+- [Technical Report](REPORT_FINALE_COMPLETO.md) — complete session report
+- [Changelog](CHANGES_AND_PERFORMANCE.md) — diff and performance data

@@ -28,20 +28,22 @@ class NextflowRunner:
         task_id: int,
         nifti_filename: str,
         model_name: str = None,
-        brain_segmenter: str = "freesurfer"
+        brain_segmenter: str = "freesurfer",
+        test_mode: bool = False
     ) -> str:
 
         input_path = os.path.join(settings.NIFTI_DIR, nifti_filename)
         temp_outdir = os.path.join(settings.SHARED_VOLUME_DIR, f"temp_nf_{task_id}")
         os.makedirs(temp_outdir, exist_ok=True)
 
-        logger.info(f"[INFO] Invio richiesta al Nextflow Worker per Task {task_id} (segmentatore: {brain_segmenter})")
+        logger.info(f"[INFO] Invio richiesta al Nextflow Worker per Task {task_id} (segmentatore: {brain_segmenter}, test_mode: {test_mode})")
 
         payload = {
             "task_id": str(task_id),
             "input_path": input_path,
             "outdir": temp_outdir,
-            "brain_segmenter": brain_segmenter
+            "brain_segmenter": brain_segmenter,
+            "test_mode": test_mode
         }
 
         elapsed = 0

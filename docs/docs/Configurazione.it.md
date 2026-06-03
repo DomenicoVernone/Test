@@ -1,351 +1,142 @@
-<!DOCTYPE html>
-
-<html lang="it">
-
-<head>
-
-<meta charset="UTF-8">
-<title>MLOps – Configuration</title>
-
-<style>
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 40px;
-    background-color: #f9f9f9;
-    color: #333;
-}
-
-h1, h2, h3 {
-    color: #2c3e50;
-}
-
-h1 {
-    border-bottom: 2px solid #ccc;
-    padding-bottom: 10px;
-}
-
-pre {
-    background-color: #eee;
-    padding: 15px;
-    border-radius: 5px;
-    overflow-x: auto;
-}
-
-.section {
-    margin-bottom: 40px;
-}
-
-.box {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-ul {
-    margin-left: 20px;
-}
-
-/* ===== TABLE STYLE UNIFICATO ===== */
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 15px;
-    font-size: 14px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-th {
-    background-color: #2c3e50;
-    color: white;
-    text-align: left;
-    padding: 12px;
-    font-weight: 600;
-}
-
-td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    vertical-align: top;
-}
-
-tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
-
-tr:hover {
-    background-color: #eef2f5;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="box">
-
-<h1>Configurazione della piattaforma MLOps</h1>
-
-<div class="section">
-<h2>1. Introduzione</h2>
-
-<p>
-La configurazione della piattaforma MLOps è basata su variabili
-di ambiente distribuite tra i microservizi.
-</p>
-
-<p>
-Questo approccio consente di separare la logica applicativa
-dai parametri operativi, facilitando il deployment in ambienti
-diversi (development, staging, production).
-</p>
-
-</div>
-
-<div class="section">
-<h2>2. File di configurazione</h2>
-
-<p>
-Ogni microservizio utilizza un file <code>.env</code> dedicato
-per la gestione delle variabili di ambiente.
-</p>
-
-<pre>
-.env
-api_gateway/.env
-orchestrator/.env
-model_service/.env
-llm_service/.env
-frontend/.env
-</pre>
-
-<p>
-Questi file devono essere configurati prima dell’avvio del sistema.
-</p>
-
-</div>
-
-<div class="section">
-<h2>3. Variabili principali</h2>
-
-<p>
-Le seguenti variabili rappresentano i parametri fondamentali per
-l’autenticazione tra microservizi, l’accesso ai modelli e
-l’integrazione con servizi AI.
-</p>
-
-<table>
-
-<tr>
-<th>Variabile</th>
-<th>Servizio</th>
-<th>Descrizione</th>
-</tr>
-
-<tr>
-<td>SECRET_KEY</td>
-<td>api_gateway, orchestrator, llm_service</td>
-<td>Chiave condivisa per la generazione e validazione dei token JWT tra i microservizi</td>
-</tr>
-
-<tr>
-<td>GROQ_API_KEY</td>
-<td>llm_service</td>
-<td>Chiave di accesso al servizio LLM utilizzato dall’assistente AI context-aware</td>
-</tr>
-
-<tr>
-<td>MLFLOW_TRACKING_URI</td>
-<td>model_service</td>
-<td>Endpoint del server MLflow per il recupero dei modelli registrati</td>
-</tr>
-
-<tr>
-<td>DAGSHUB_TOKEN</td>
-<td>model_service</td>
-<td>Token di autenticazione per l’accesso al Model Registry ospitato su DagsHub</td>
-</tr>
-
-</table>
-
-</div>
-
-<div class="section">
-<h2>4. Configurazione MLflow / Model Registry</h2>
-
-<p>
-Il servizio <b>model_service</b> utilizza MLflow per la gestione
-dei modelli di machine learning.
-</p>
-
-<p>
-Le variabili configurate consentono:
-</p>
-
-<ul>
-<li>connessione al tracking server</li>
-<li>download del modello champion</li>
-<li>versionamento dei modelli</li>
-</ul>
-
-<p>
-Questa integrazione permette di separare il ciclo di vita dei modelli
-dalla logica di inferenza.
-</p>
+# Configurazione — Clinical Twin
+
+La piattaforma è configurata tramite file `.env`, uno per servizio.
+Questi file devono essere configurati prima di avviare il sistema.
 
-</div>
-
-<div class="section">
-<h2>5. Configurazione assistente AI</h2>
-
-<p>
-Il servizio <b>llm_service</b> utilizza un modello linguistico esterno
-per generare interpretazioni cliniche.
-</p>
-
-<p>
-La variabile <code>GROQ_API_KEY</code> consente l’autenticazione al servizio
-LLM e deve essere configurata correttamente per abilitare l’assistente AI.
-</p>
-
-</div>
-
-<div class="section">
-<h2>6. Configurazione GPU (opzionale)</h2>
-
-<p>
-Se disponibile una GPU NVIDIA, è possibile accelerare la pipeline
-di segmentazione utilizzando FastSurfer in modalità CUDA.
-</p>
-
-<pre>
-params.fastsurfer_device=cuda
-</pre>
-
-<p>
-Su sistemi CPU-only questo parametro deve essere impostato su:
-</p>
-
-<pre>
-params.fastsurfer_device=cpu
-</pre>
-
-</div>
-
-<div class="section">
-<h2>7. Configurazione GPU MIG</h2>
-
-<p>
-Su sistemi HPC multi-utente è possibile utilizzare GPU partizionate
-tramite tecnologia Multi-Instance GPU (MIG).
-</p>
-
-<p>
-Questa configurazione consente di assegnare una specifica istanza GPU
-a ciascun job della pipeline.
-</p>
+---
+
+## File di configurazione
+
+```
+Tesi-FTD/
+├── api_gateway/.env
+├── orchestrator/.env
+├── model_service/.env
+├── llm_service/.env
+└── nextflow_worker/.env  (opzionale — variabili iniettate via docker-compose.yml)
+```
+
+Copia i file di esempio per iniziare:
+```bash
+cp api_gateway/.env.example    api_gateway/.env
+cp orchestrator/.env.example   orchestrator/.env
+cp model_service/.env.example  model_service/.env
+cp llm_service/.env.example    llm_service/.env
+```
+
+---
+
+## 1. api_gateway/.env
+
+```env
+SECRET_KEY=cambia-questa-con-una-stringa-casuale-lunga
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
 
-<pre>
-MIG_DEVICE=MIG-xxxxxxxxxxxxxxxx
-</pre>
+| Variabile | Obbligatoria | Descrizione |
+|-----------|-------------|-------------|
+| `SECRET_KEY` | **Sì** | Chiave condivisa per firma JWT — deve corrispondere a `orchestrator/.env` |
+| `ALGORITHM` | No | Algoritmo JWT (default: `HS256`) |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | No | TTL token in minuti (default: 30) |
 
-<p>
-Se non si utilizza MIG, la variabile può essere lasciata vuota.
-</p>
+---
 
-</div>
+## 2. orchestrator/.env
 
-<div class="section">
-<h2>8. Configurazione volumi condivisi</h2>
+```env
+SECRET_KEY=cambia-questa-con-una-stringa-casuale-lunga
+DATABASE_URL=sqlite:////shared_db/clinical_twin.db
+MODEL_SERVICE_URL=http://model_service:8000
+NEXTFLOW_WORKER_URL=http://nextflow_worker:8000
+SHARED_VOLUME_DIR=/shared_data
+USE_MOCK=false
+TEST_MODE=false
+```
 
-<p>
-Il sistema utilizza una directory condivisa per lo scambio
-di dati tra microservizi.
-</p>
+| Variabile | Obbligatoria | Descrizione |
+|-----------|-------------|-------------|
+| `SECRET_KEY` | **Sì** | Deve corrispondere a `api_gateway/.env` |
+| `USE_MOCK` | No | `true` = usa MockRunner (nessun Nextflow, CSV sintetico) |
+| `TEST_MODE` | No | `true` = attiva `mock_freesurfer` in Nextflow (30s invece di 6–8h) |
 
-<pre>
-HOST_SHARED_VOLUME_DIR=/mnt/shared_volume
-</pre>
+### USE_MOCK vs TEST_MODE
 
-<p>
-Questa directory contiene:
-</p>
+| Flag | Cosa fa | Quando usarlo |
+|------|--------|--------------|
+| `USE_MOCK=true` | Salta completamente Nextflow, genera CSV sintetico | Test unitari logica orchestratore |
+| `TEST_MODE=true` | Esegue Nextflow reale ma rimpiazza FreeSurfer con mock sintetico | Test integrazione pipeline veloce |
+| Entrambi `false` | Pipeline completa con FreeSurfer | Uso in produzione |
 
-<ul>
-<li>dataset MRI</li>
-<li>output radiomici</li>
-<li>file intermedi</li>
-</ul>
+---
 
-</div>
+## 3. model_service/.env
 
-<div class="section">
-<h2>9. Configurazione pipeline Nextflow</h2>
+```env
+MLFLOW_TRACKING_URI=https://dagshub.com/tuo-username/Tesi-FTD.mlflow
+MLFLOW_TRACKING_USERNAME=tuo-username-dagshub
+MLFLOW_TRACKING_PASSWORD=tuo-token-dagshub
+R_ENGINE_URL=http://inference_engine:8000/infer
+SHARED_VOLUME_DIR=/shared_data
+```
 
-<p>
-I parametri della pipeline sono definiti nel file:
-</p>
+**Catena di fallback modello** (quando MLflow non è disponibile):
+1. `/shared_data/models/{model_name}/model.rds`
+2. `/app/model.rds` (bind-mount da `model_service/model.rds`)
+3. `/shared_data/models/model.rds`
 
-<pre>
-nextflow_worker/nextflow/configs/nextflow.config
-</pre>
+---
 
-<table>
+## 4. llm_service/.env
 
-<tr>
-<th>Parametro</th>
-<th>Descrizione</th>
-</tr>
+```env
+SECRET_KEY=cambia-questa-con-una-stringa-casuale-lunga
+GROQ_API_KEY=gsk_...
+```
 
-<tr>
-<td>maxforks</td>
-<td>Numero massimo di processi paralleli</td>
-</tr>
+---
 
-<tr>
-<td>pyradiomics_jobs</td>
-<td>Numero di job radiomici simultanei</td>
-</tr>
+## 5. Variabili pipeline Nextflow (docker-compose.yml)
 
-<tr>
-<td>fastsurfer_threads</td>
-<td>Numero di thread CPU utilizzati</td>
-</tr>
+Queste variabili sono iniettate nel container `nextflow_worker`:
 
-<tr>
-<td>brain_segmenter</td>
-<td>Selezione segmentatore (freesurfer / fastsurfer)</td>
-</tr>
+| Variabile | Descrizione |
+|-----------|-------------|
+| `SHARED_VOLUME_DIR` | Path volume condiviso dentro il container |
+| `HOST_SHARED_VOLUME_DIR` | Path volume condiviso sull'**host** (DooD) |
+| `NF_OUTDIR` | Directory output pipeline Nextflow |
+| `NF_LABELS` | Path a `ROI_labels.tsv` (78 etichette regioni cerebrali) |
+| `NF_SETTINGS` | Path a `pyradiomics.yaml` (parametri estrazione radiomica) |
+| `MIG_DEVICE` | UUID istanza NVIDIA MIG per FastSurfer GPU. Lascia `all` per GPU standard |
 
-</table>
+---
 
-</div>
+## 6. Configurazione GPU
 
-<div class="section">
-<h2>10. Conclusioni</h2>
+### GPU NVIDIA standard
+Nessuna configurazione extra. FastSurfer usa tutte le GPU disponibili (`MIG_DEVICE=all`).
 
-<p>
-La configurazione della piattaforma MLOps consente un’elevata
-flessibilità operativa, permettendo di adattare il sistema
-a diversi ambienti e requisiti hardware.
-</p>
+### NVIDIA MIG (Multi-Instance GPU)
+Per sistemi HPC con GPU partitioning:
+```bash
+nvidia-smi -L  # trova l'UUID dell'istanza MIG
+# Imposta in docker-compose.yml: MIG_DEVICE=MIG-GPU-xxxxxxxx-...
+```
 
-<p>
-La separazione tra configurazione e logica applicativa facilita
-il deployment e garantisce una gestione più sicura e scalabile
-dell’infrastruttura.
-</p>
+### Modalità CPU-only
+Usa `brain_segmenter=freesurfer` (basato su CPU, nessuna GPU richiesta).
 
-</div>
+---
 
-</div>
+## 7. Licenza FreeSurfer
 
-</body>
+Il file licenza FreeSurfer deve essere presente in:
+```
+nextflow_worker/license.txt
+```
 
-</html>
+Registrazione gratuita: https://surfer.nmr.mgh.harvard.edu/registration.html
+
+Il file viene copiato automaticamente in `/tmp/nextflow_work/license.txt`
+all'avvio del `nextflow_worker` (hook lifespan in `main.py`), che è il path
+referenziato da `nextflow.config` per i bind-mount DooD.

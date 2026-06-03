@@ -1,516 +1,206 @@
-<!DOCTYPE html>
+# Radiomics Pipeline — Clinical Twin
 
-<html lang="it">
+## Overview
 
-<head>
+The neuroimaging pipeline is implemented in Nextflow (DSL2) and runs via the
+**Docker-out-of-Docker (DooD)** pattern inside the `nextflow_worker` container.
+It transforms a raw T1 MRI into a structured radiomic feature matrix
+used for XGBoost-based diagnosis.
 
-<meta charset="UTF-8">
+---
 
-<title>Radiomics MLOps Pipeline</title>
+## Pipeline Files
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 40px;
-    background-color: #f9f9f9;
-    color: #333;
+| File | Purpose |
+|------|---------|
+| `nextflow_worker/nextflow/preprocessing.nf` | Main preprocessing workflow (production) |
+| `nextflow_worker/nextflow/main.nf` | Canonical DSL2 entry point (manual/CI runs) |
+| `nextflow_worker/nextflow/training.nf` | Training workflow (offline, research) |
+| `nextflow_worker/nextflow/nextflow.config` | Global configuration (Docker, params) |
+| `nextflow_worker/nextflow/configs/training.config` | Training-specific parameter overrides |
+| `nextflow_worker/nextflow/configs/pyradiomics.yaml` | PyRadiomics extraction settings |
+| `nextflow_worker/nextflow/configs/hyperparameters.yaml` | Nested CV hyperparameters |
+
+---
+
+## Preprocessing Pipeline
+
+### Full Flow
+
+```
+Input: scan.nii.gz (T1 MRI)
+    │
+    ▼ [1] freesurfer / fastsurfer / mock_freesurfer
+        Container: clinical-freesurfer (or deepmi/fastsurfer:cuda-v2.4.2)
+        Input:  scan.nii.gz
+        Output: {subject}/mri/nu.mgz        (intensity normalized brain)
+                {subject}/mri/aparc+aseg.mgz (anatomical parcellation, 78 labels)
+        Time:   6–8h (CPU FreeSurfer) | 20–30m (GPU FastSurfer) | 30s (mock)
+    │
+    ▼ [2] nifti_converter
+        Container: clinical-freesurfer (mri_convert)
+        Input:  nu.mgz + aparc+aseg.mgz
+        Output: nu.nii + aparc+aseg.nii
+        Time:   < 1 minute
+    │
+    ▼ [3] roi_creator
+        Container: clinical-fsl (fslmaths)
+        Input:  aparc+aseg.nii + ROI_labels.tsv (78 ROI definitions)
+        Output: ROI/{roi_name}.nii.gz  × 78 binary masks
+        Time:   2–5 minutes
+    │
+    ▼ [4] csv_collector
+        Container: clinical-pyradiomics
+        Input:  nu.nii + ROI/*.nii.gz + ROI_labels.tsv
+        Output: {roi_name}.csv × 78 (image/mask path pairs)
+        Time:   < 1 minute
+    │
+    ▼ [5] feature_extraction
+        Container: clinical-pyradiomics (pyradiomics)
+        Input:  {roi_name}.csv × 78
+        Output: {roi_name}_feat.csv × 78 + radiomics_features.csv (aggregated)
+        Time:   30–60 minutes (4 parallel workers)
+    │
+    ▼
+Output: /shared_data/features/features_{task_id}.csv
+        ~6,864 columns: {ROI_name}_{pyradiomics_feature}
+        (78 ROIs × ~88 features: shape, first-order, GLCM, GLRLM, GLSZM, NGTDM)
+```
+
+### Feature Naming Convention
+
+Column names in `radiomics_features.csv` follow the pattern:
+```
+{ROI_name}_{feature_category}_{feature_name}
+```
+
+Examples:
+- `Hippocampus_original_shape_Volume`
+- `Amygdala_original_firstorder_Mean`
+- `FrontalLobe_original_glcm_Contrast`
+
+ROI names are sourced from `ROI_labels.tsv` (78 brain regions).
+
+---
+
+## Process Detail
+
+### [1] Brain Segmentation
+
+Three options:
+
+**FreeSurfer** (`brain_segmenter=freesurfer`):
+```bash
+recon-all -subject {subject} -i {nifti} -all -notal-check -cw256 -openmp 16
+```
+Produces `aparc+aseg.mgz` with 78 anatomical labels matching `ROI_labels.tsv`.
+
+**FastSurfer** (`brain_segmenter=fastsurfer`):
+```bash
+run_fastsurfer.sh --t1 {nifti} --sid {subject} --fsaparc --device cuda
+```
+GPU-accelerated deep learning segmentation, ~10× faster than FreeSurfer.
+
+**mock_freesurfer** (`test_mode=true`):
+Generates synthetic anatomy via Python/numpy (concentric spheres, labels 1–78).
+Used for CI testing and pipeline development. Completes in ~30 seconds.
+Activate via `TEST_MODE=true` in `orchestrator/.env`.
+
+### [3] ROI Creation
+
+For each of the 78 ROIs in `ROI_labels.tsv`:
+```bash
+fslmaths aparc+aseg.nii -thr {label_id} -uthr {label_id} -bin ROI/{roi_name}.nii.gz
+```
+
+The `ROI_labels.tsv` format (tab-separated, with header):
+```
+Index	Label
+1	Left-Cerebral-White-Matter
+2	Left-Cerebral-Cortex
+...
+78	Right-Cerebral-Cortex
+```
+
+### [5] Feature Extraction
+
+PyRadiomics extracts ~88 features per ROI using the settings in `pyradiomics.yaml`.
+The `aggregate.py` script inside the `feature_extraction` process combines all
+78 `{roi_name}_feat.csv` files into a single `radiomics_features.csv`.
+
+---
+
+## mock_freesurfer (Test Mode)
+
+The `mock_freesurfer` process was added to enable rapid pipeline testing
+without waiting 6–8 hours for real FreeSurfer segmentation.
+
+```groovy
+// Activation: params.test_mode = true
+process mock_freesurfer {
+    container 'clinical-freesurfer'
+    // Converts input NIfTI to nu.mgz
+    // Generates aparc+aseg.mgz with 78 concentric sphere labels via Python/numpy
+    // Completes in ~30 seconds
 }
+```
 
-h1, h2, h3 {
-    color: #2c3e50;
-}
+**Propagation chain:**
+`orchestrator/.env (TEST_MODE=true)` → `pipeline.py` → `NextflowRunner` →
+`nextflow_worker/main.py` → `nextflow run --test_mode true` → `mock_freesurfer`
 
-h1 {
-    border-bottom: 2px solid #ccc;
-    padding-bottom: 10px;
-}
+**Important:** Groovy interprets the string `"false"` as truthy.
+The flag is only passed when `test_mode=True` in Python to avoid this.
 
-pre {
-    background-color: #eee;
-    padding: 15px;
-    border-radius: 5px;
-    overflow-x: auto;
-}
+---
 
-.section {
-    margin-bottom: 40px;
-}
+## Training Pipeline
 
-.box {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
+The training pipeline (`training.nf`) is run **offline** to produce the `.rds` model
+that gets deployed to `inference_engine`.
 
-ul {
-    margin-left: 20px;
-}
+```bash
+# Build training image
+docker compose -f nextflow_worker/docker-compose.yml build ftd_training
 
-/* ===== TABLE STYLE UNIFICATO ===== */
+# Run training (requires preprocessed feature CSVs)
+nextflow run training.nf -c configs/training.config \
+  --feat_output /shared_data/nf_output/features \
+  --config configs/hyperparameters.yaml
+```
 
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 15px;
-    font-size: 14px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    overflow: hidden;
-}
+Training steps:
+1. `aggregate_features` → `feat_all.csv` (merge_radiomics.r)
+2. `select_features` → LASSO/RFE feature selection (features_selection.r)
+3. `parallel_training` → SVM, RF, kNN, XGBoost in parallel
+4. `frequency_stability` → feature importance stability analysis
+5. `aggregate_metrics` → cross-validation metrics summary
 
-th {
-    background-color: #2c3e50;
-    color: white;
-    text-align: left;
-    padding: 12px;
-    font-weight: 600;
-}
+The XGBoost model is saved as an **extended model** containing:
+- `$booster` — raw xgb.Booster (no mlr dependency)
+- `$trainingData` — training set for UMAP historical space
+- `$x`, `$y` — feature matrix and labels
 
-td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    vertical-align: top;
-}
+---
 
-tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
+## ROI Labels File
 
-tr:hover {
-    background-color: #eef2f5;
-}
+`nextflow_worker/data/external/ROI_labels.tsv` — 78 brain regions.
 
-</style>
+Critical: both `merge_radiomics.r` and `inference_logic.R` must parse this file
+with `header=TRUE, sep="\t"` (a historical bug where `header=FALSE, sep=""` caused
+all ROI mappings to be wrong was fixed in session 2026-05-27).
 
-</head>
+---
 
-<body>
+## Measured Performance (sub-01_ses-test_T1w.nii)
 
-<div class="box">
-
-<h1>MLOps Pipeline for Radiomic Feature Extraction</h1>
-
-<div class="section">
-
-<h2>1. Introduction</h2>
-
-<p>
-
-Within the MLOps system, an automated pipeline has been designed and implemented for processing brain MRI images and extracting quantitative biomarkers.
-
-The pipeline is implemented using Nextflow and is integrated into a distributed microservices architecture, with the goal of ensuring reproducibility, modularity, and scalability according to MLOps principles.
-
-</p>
-
-<p>
-
-The entire workflow enables the transformation of T1-weighted MRI images into a structured set of radiomic features, which can be used as input for clinical inference models.
-
-</p>
-
-</div>
-
-<div class="section">
-
-<h2>2. Pipeline General Architecture</h2>
-
-<p>
-
-The pipeline implements a deterministic sequence of operations, each encapsulated in an isolated and containerized process.
-
-</p>
-
-<h3>Logical Flow:</h3>
-
-<pre>
-
-MRI (.nii)
-
-  ↓
-
-Brain segmentation (FreeSurfer / FastSurfer)
-
-  ↓
-
-Conversion to NIfTI format
-
-  ↓
-
-ROI extraction (Region of Interest)
-
-  ↓
-
-Mapping construction for PyRadiomics
-
-  ↓
-
-Radiomic feature extraction
-
-  ↓
-
-Final aggregation
-
-  ↓
-
-radiomics_features.csv
-
-</pre>
-
-<p>
-
-The final result is a structured file containing quantitative features for each brain region.
-
-</p>
-
-</div>
-
-<div class="section">
-
-<h2>3. Process Description</h2>
-
-<h3>3.1 Brain Segmentation</h3>
-
-<p>
-
-The first step uses <b>FreeSurfer</b> or <b>FastSurfer</b> to perform anatomical brain segmentation.
-
-</p>
-
-<p>
-
-This process produces a volumetric parcellation where each voxel is associated with a specific brain region (e.g., hippocampus, amygdala, frontal cortex).
-
-The main output is the aparc+aseg.mgz file.
-
-</p>
-
-<h3>3.2 Data Conversion</h3>
-
-<p>
-
-Files generated by FreeSurfer are in .mgz format, which is not compatible with radiomics tools.
-
-The <b>nifti_converter</b> process converts these files into .nii format, making them usable for subsequent steps.
-
-</p>
-
-<h3>3.3 ROI Extraction</h3>
-
-<p>
-
-The <b>roi_creator</b> process, based on FSL, generates binary masks for each brain region.
-
-</p>
-
-<pre>
-
-ROI/
-
-├── hippocampus.nii.gz
-
-├── amygdala.nii.gz
-
-├── thalamus.nii.gz
-
-</pre>
-
-<p>
-
-This step is essential to isolate individual anatomical structures on which features will be computed.
-
-</p>
-
-<h3>3.4 Data Preparation for PyRadiomics</h3>
-
-<p>
-
-The <b>csv_collector</b> process builds mapping CSV files in the format required by PyRadiomics:
-
-</p>
-
-<pre>
-
-Image,Mask
-
-nu.nii,ROI/hippocampus.nii.gz
-
-</pre>
-
-<p>
-
-Each CSV file represents a specific region of interest.
-
-</p>
-
-<h3>3.5 Radiomic Feature Extraction</h3>
-
-<p>
-
-The <b>feature_extraction</b> process uses PyRadiomics to compute quantitative features for each ROI.
-
-</p>
-
-<p>Features include:</p>
-
-<ul>
-
-<li>first-order statistics (mean, variance, skewness)</li>
-
-<li>shape features (volume, surface)</li>
-
-<li>texture features (GLCM, GLRLM, GLSZM)</li>
-
-</ul>
-
-<h3>3.6 Final Aggregation</h3>
-
-<p>
-
-The features generated for each ROI are aggregated into a single file:
-
-</p>
-
-<pre>radiomics_features.csv</pre>
-
-<p>
-
-This file represents a matrix where:
-
-</p>
-
-<ul>
-
-<li>each row corresponds to a subject</li>
-
-<li>each column represents a specific radiomic feature</li>
-
-</ul>
-
-</div>
-
-<div class="section">
-
-<h2>4. Design Choices</h2>
-
-<p>
-
-The pipeline has been designed according to MLOps principles to ensure robustness and reliability.
-
-</p>
-
-<h3>4.1 Error Handling</h3>
-
-<p>
-
-A fail-fast approach has been adopted, setting:
-
-</p>
-
-<pre>errorStrategy = 'terminate'</pre>
-
-<p>
-
-This ensures that the pipeline stops immediately in case of an error, preventing inconsistent outputs.
-
-</p>
-
-<h3>4.2 Channel Management</h3>
-
-<p>
-
-Static files (such as ROI_labels.tsv) are managed using:
-
-</p>
-
-<pre>Channel.value()</pre>
-
-<p>
-
-This avoids duplication and ensures deterministic data distribution across processes.
-
-</p>
-
-<h3>4.3 Data Consistency</h3>
-
-<p>
-
-After channel join operations, tuple normalization is performed to ensure proper alignment between:
-
-</p>
-
-<ul>
-
-<li>images</li>
-
-<li>ROIs</li>
-
-<li>metadata</li>
-
-</ul>
-
-<h3>4.4 Validation Checks</h3>
-
-<p>
-
-Explicit checks have been introduced to verify:
-
-</p>
-
-<ul>
-
-<li>correct ROI generation</li>
-
-<li>successful radiomic feature extraction</li>
-
-</ul>
-
-<p>
-
-Otherwise, the pipeline terminates with an error.
-
-</p>
-
-<h3>4.5 Containerization</h3>
-
-<p>
-
-Each process runs in a dedicated Docker container, ensuring:
-
-</p>
-
-<ul>
-
-<li>dependency isolation</li>
-
-<li>portability</li>
-
-<li>reproducibility</li>
-
-</ul>
-
-</div>
-
-<div class="section">
-
-<h2>5. Pipeline Output</h2>
-
-<p>
-
-The main output is the file:
-
-</p>
-
-<pre>radiomics_features.csv</pre>
-
-<p>
-
-This file contains structured radiomic features and represents the input for the clinical inference system.
-
-</p>
-
-</div>
-
-<div class="section">
-
-<h2>6. Integration into the MLOps System</h2>
-
-<pre>
-
-Nextflow pipeline
-
-  ↓
-
-radiomics_features.csv
-
-  ↓
-
-model_service (MLflow / DagsHub)
-
-  ↓
-
-inference_engine (R)
-
-  ↓
-
-Prediction + UMAP
-
-  ↓
-
-Frontend (clinical visualization)
-
-</pre>
-
-<p>
-
-In particular, the inference engine uses the features for:
-
-</p>
-
-<ul>
-
-<li>diagnostic classification</li>
-
-<li>projection into the latent space using 3D UMAP</li>
-
-</ul>
-
-</div>
-
-<div class="section">
-
-<h2>7. Improvements Introduced</h2>
-
-<p>
-
-Compared to the initial version, several improvements have been introduced:
-
-</p>
-
-<ul>
-
-<li>replacement of errorStrategy = ignore with terminate</li>
-
-<li>improved channel management to avoid inconsistencies</li>
-
-<li>introduction of explicit checks on generated ROIs</li>
-
-<li>elimination of silent errors in the feature extraction phase</li>
-
-<li>greater robustness in file and path handling</li>
-
-</ul>
-
-<p>
-
-These improvements transformed the pipeline from an experimental prototype into a reliable component within an MLOps system.
-
-</p>
-
-</div>
-
-<div class="section">
-
-<h2>8. Conclusions</h2>
-
-<p>
-
-The developed pipeline represents a central component of the MLOps system, enabling the automated transformation of complex imaging data into structured and interpretable features.
-
-</p>
-
-<p>
-
-The adoption of Nextflow and a containerized architecture ensures high levels of reproducibility and scalability, making the solution suitable for advanced research and clinical contexts.
-
-</p>
-
-</div>
-
-</div>
-
-</body>
-
-</html>
+| Step | Mode | Duration |
+|------|------|---------|
+| mock_freesurfer | test_mode=true | ~30 seconds |
+| nifti_converter | — | ~10 seconds |
+| roi_creator (78 ROIs) | FSL | ~3 minutes |
+| feature_extraction | 4 workers | ~8 minutes |
+| R inference + UMAP | — | ~45 seconds |
+| **Total (test mode)** | — | **~12 minutes** |
+| **Total (FreeSurfer CPU)** | recon-all | **~4–10 hours** |

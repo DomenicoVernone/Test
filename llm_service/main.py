@@ -46,5 +46,9 @@ app.include_router(chat.router)
 
 
 @app.get("/", tags=["Health"])
+def root():
+    return {"status": "ok", "service": "llm_service"}
+
+@app.get("/health", tags=["Health"])
 def health():
     return {"status": "ok", "service": "llm_service"}

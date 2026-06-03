@@ -1,4 +1,4 @@
-site_name: MLOps – FTD Radiomics Pipeline Documentation
+site_name: Clinical Twin — FTD Radiomics Platform
 
 theme:
   name: material
@@ -8,12 +8,14 @@ theme:
     accent: indigo
   features:
     - navigation.tabs
+    - navigation.sections
+    - navigation.top
     - content.code.copy
+    - content.code.annotate
 
 plugins:
   - search
   - i18n:
-      default_language: en
       languages:
         - locale: en
           name: English
@@ -22,8 +24,16 @@ plugins:
         - locale: it
           name: Italiano
           build: true
-      add_selector: true
-      fallback_to_default: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - tables
+  - toc:
+      permalink: true
 
 nav:
   - Introduction: index.md
@@ -49,4 +59,8 @@ nav:
       - Deployment Guide: Deployment.md
 
   - Testing:
-      - Test Plan: testing.md
+      - Test Plan & Results: testing.md
+
+  - Reports:
+      - Technical Report (Session): REPORT_FINALE_COMPLETO.md
+      - Changelog & Performance: CHANGES_AND_PERFORMANCE.md

@@ -1,4 +1,30 @@
-// Composed parameters
+// ── Default parameters (override via CLI o configs/training.config) ───────────
+params.brain_segmenter    = "fastsurfer"
+params.experiment_name    = "hc_vs_bvFTD"
+params.selection_method   = "lasso"          // "lasso" o "rfe"
+params.sperimental        = "bvFTD"
+params.control            = "HC"
+params.parallel_training  = true
+
+params.merge_script    = "${projectDir}/../ftd_diagnosis/util/merge_radiomics.r"
+params.rfe_script      = "${projectDir}/../ftd_diagnosis/sequential/RFE.r"
+params.lasso_script    = "${projectDir}/../ftd_diagnosis/sequential/lasso.r"
+params.selection       = "${projectDir}/../ftd_diagnosis/parallel/features_selection.r"
+params.metrics_script  = "${projectDir}/../ftd_diagnosis/util/process_metrics.r"
+params.stability_script = "${projectDir}/../ftd_diagnosis/util/stability.r"
+
+params.svm = "${projectDir}/../ftd_diagnosis/parallel/models/svm.r"
+params.rf  = "${projectDir}/../ftd_diagnosis/parallel/models/random_forest.r"
+params.knn = "${projectDir}/../ftd_diagnosis/parallel/models/kNN.r"
+params.xgb = "${projectDir}/../ftd_diagnosis/parallel/models/XGBoost.r"
+
+params.feat_output       = "/shared_data/nf_output/features"
+params.labels            = "/app/data/external/ROI_labels.tsv"
+params.demographic_data  = null
+params.config            = "${projectDir}/configs/hyperparameters.yaml"
+params.env               = "${projectDir}/../.env.example"
+
+// ── Composed parameters ───────────────────────────────────────────────────────
 params.experiment_path = "${params.brain_segmenter}/${params.experiment_name}/${params.selection_method}"
 params.training_args = "${params.brain_segmenter} ${params.selection_method} ${params.experiment_name}"
 
@@ -15,8 +41,11 @@ workflow {
     labels_file_ch = channel
         .fromPath(params.labels)
     
-    demographic_ch = channel
-        .fromPath(params.demographic_data ?: "NULL")
+    // Dati demografici opzionali: se non forniti, viene passato un valore sentinella
+    // che merge_radiomics.r interpreta come assenza di covariate demografiche.
+    demographic_ch = params.demographic_data
+        ? channel.fromPath(params.demographic_data)
+        : channel.value("NULL")
 
     csv_dir = channel
         .fromPath(
@@ -108,7 +137,7 @@ process aggregate_features {
     path script
     path csv_dir
     path labels
-    path demograph
+    val  demograph   // "NULL" quando non fornito, path stringa altrimenti
 
     output:
     path csv_dir
@@ -164,12 +193,11 @@ process select_features {
 
 process parallel_training {
     container 'ftd-training'
-    containerOptions "--env-file ${env}"
     publishDir "data/experiments-selected-mwmote/${params.experiment_path}", mode: 'copy'
     debug true
 
     input:
-    tuple path(feat_dir), path(data_dir), path(script), val(env)
+    tuple path(feat_dir), path(data_dir), path(script), path(env)
 
     output:
     path ("*.csv")

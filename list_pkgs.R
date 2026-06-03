@@ -1,0 +1,1 @@
+cat(paste(installed.packages()[,1], collapse="\n"))

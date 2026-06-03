@@ -81,8 +81,8 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
   if (nchar(roi_labels_path) == 0) {
     stop("Variabile NF_LABELS non definita. Il file ROI labels deve essere fornito dalla pipeline Nextflow.")
   }  
-  roi_labels <- read.table(roi_labels_path, header = FALSE, sep = "")
-  roi_names <- roi_labels$V3 # 78 ROI in ordine
+  roi_labels <- read.table(roi_labels_path, header = TRUE, sep = "\t")
+  roi_names <- roi_labels$Label # 78 ROI in ordine
 
   build_roi_mapping <- function(feature_req, roi_names) {
     mapping <- character(length(feature_req))
@@ -124,33 +124,60 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
   nomi_esatti_per_python <- csv_column_names
 
   # Predizione: il comportamento dipende dal tipo di modello.
-  # XGBoost restituisce probabilita' continue; gli altri modelli caret
-  # supportano type="class". Il fallback intercetta modelli non standard.
+  # L'extended model da XGBoost.r contiene $booster (raw xgb.Booster) e
+  # $mlr_model (WrappedModel mlr). XGBoost restituisce probabilita' continue;
+  # gli altri modelli caret supportano type="class".
   message("[INFERENCE] Esecuzione predizione clinica...")
   predizione <- "Sconosciuto"
+  confidenza <- NA_real_
 
   tryCatch(
     {
-      if (inherits(modello, "xgb.Booster")) {
+      # Caso 1: extended model da XGBoost.r con $booster embedded
+      if (!is.null(modello$booster) && inherits(modello$booster, "xgb.Booster")) {
+        mat <- as.matrix(dati_nuovo)
+        pred_prob <- predict(modello$booster, mat)
+        if (pred_prob > 0.5) {
+          predizione <- levels(modello$y)[2]
+          confidenza <- round(pred_prob, 4)
+        } else {
+          predizione <- levels(modello$y)[1]
+          confidenza <- round(1 - pred_prob, 4)
+        }
+      # Caso 2: raw xgb.Booster (modello diretto, non wrapped)
+      } else if (inherits(modello, "xgb.Booster")) {
         mat <- as.matrix(dati_nuovo)
         pred_prob <- predict(modello, mat)
-        predizione <- ifelse(pred_prob > 0.5, "Malato", "Sano")
+        predizione <- ifelse(pred_prob > 0.5, "bvFTD", "HC")
+        confidenza <- round(max(pred_prob, 1 - pred_prob), 4)
+      # Caso 3: modello caret standard (RF, SVM, kNN, ecc.)
       } else {
         pred_raw <- predict(modello, newdata = dati_nuovo, type = "class")
         predizione <- as.character(pred_raw)
+        tryCatch({
+          prob_df <- predict(modello, newdata = dati_nuovo, type = "prob")
+          confidenza <- round(max(prob_df[1, ]), 4)
+        }, error = function(e2) { })
       }
     },
     error = function(e) {
       message("[INFERENCE] Predizione con type='class' fallita, tento predizione standard.")
-      pred_raw <- predict(modello, newdata = dati_nuovo)
-      if (is.list(pred_raw) && !is.null(pred_raw$data$response)) {
-        predizione <<- as.character(pred_raw$data$response)
-      } else {
-        predizione <<- as.character(pred_raw)
-      }
+      tryCatch(
+        {
+          pred_raw <- predict(modello, newdata = dati_nuovo)
+          if (is.list(pred_raw) && !is.null(pred_raw$data$response)) {
+            predizione <<- as.character(pred_raw$data$response)
+          } else {
+            predizione <<- as.character(pred_raw)
+          }
+        },
+        error = function(e2) {
+          message(paste("[INFERENCE] Predizione standard fallita:", e2$message, "— uso 'Sconosciuto'"))
+        }
+      )
     }
   )
-  message(paste("[INFERENCE] Diagnosi calcolata:", predizione))
+  message(paste("[INFERENCE] Diagnosi calcolata:", predizione, "| Confidenza:", confidenza))
 
   # UMAP 3D: fit sullo storico, transform sul nuovo paziente.
   # ret_model=TRUE e' necessario per poter chiamare umap_transform successivamente.
@@ -224,9 +251,10 @@ run_clinical_inference <- function(task_id, model_dir, csv_file) {
   }
 
   list(
-    status = "success",
-    task_id = task_id,
-    diagnosi_predetta = predizione,
-    plot_data = plot_data_list
+    status             = "success",
+    task_id            = task_id,
+    diagnosi_predetta  = predizione,
+    confidenza         = confidenza,
+    plot_data          = plot_data_list
   )
 }

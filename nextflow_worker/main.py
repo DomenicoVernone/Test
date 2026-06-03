@@ -47,9 +47,10 @@ async def lifespan(app: FastAPI):
     # che nel volume condiviso (per inference_engine, che lo legge tramite NF_LABELS).
     # pyradiomics.yaml viene copiato in /tmp come fallback per NF_SETTINGS.
     try:
+        os.makedirs("/tmp/nextflow_work", exist_ok=True)
         shutil.copy2("/app/data/external/ROI_labels.tsv", "/tmp/ROI_labels.tsv")
         shutil.copy2("/app/data/external/ROI_labels.tsv", "/shared_data/ROI_labels.tsv")
-        shutil.copy2("/app/license.txt", "/tmp/freesurfer_license.txt")
+        shutil.copy2("/app/license.txt", "/tmp/nextflow_work/license.txt")
         shutil.copy2("/app/nextflow/configs/pyradiomics.yaml", "/tmp/pyradiomics.yaml")
         logger.info("File statici copiati in /tmp e nel volume condiviso.")
     except OSError as e:
@@ -71,6 +72,7 @@ class NextflowTask(BaseModel):
     input_path: str
     outdir: str
     brain_segmenter: Optional[str] = "freesurfer"
+    test_mode: bool = False
 
 
 def get_nifti_hash(nifti_path: str) -> str:
@@ -81,7 +83,7 @@ def get_nifti_hash(nifti_path: str) -> str:
     return hashlib.md5(os.path.basename(nifti_path).encode()).hexdigest()[:12]
 
 
-def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segmenter: str):
+def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segmenter: str, test_mode: bool = False):
     host_outdir = outdir.replace(CONTAINER_BASE, HOST_BASE)
     os.makedirs(host_outdir, exist_ok=True)
 
@@ -97,9 +99,7 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
     if not os.path.exists(tmp_nifti):
         shutil.copy2(input_path, tmp_nifti)
 
-    # La licenza FreeSurfer viene copiata in /tmp/freesurfer_license.txt
-    # perche' nextflow.config la monta li' nel container via runOptions.
-    shutil.copy2("/app/license.txt", "/tmp/freesurfer_license.txt")
+    shutil.copy2("/app/license.txt", "/tmp/nextflow_work/license.txt")
 
     cmd = [
         "nextflow", "run", "/app/nextflow/preprocessing.nf",
@@ -112,6 +112,11 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
         "--fastsurfer_threads", "8",
         "-w", work_dir,
     ]
+    # Groovy interpreta la stringa "false" come truthy: passare il flag
+    # solo quando è true, lasciando il default booleano false di preprocessing.nf
+    # quando test_mode è disabilitato.
+    if test_mode:
+        cmd.extend(["--test_mode", "true"])
 
     logger.info(f"Task {task_id}: avvio Nextflow — segmentatore={brain_segmenter}, input={tmp_nifti}")
 
@@ -124,7 +129,7 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
         TASKS_STATUS[task_id] = "FAILED"
 
 
-async def run_pipeline_with_gpu_lock(task_id: str, input_path: str, outdir: str, brain_segmenter: str):
+async def run_pipeline_with_gpu_lock(task_id: str, input_path: str, outdir: str, brain_segmenter: str, test_mode: bool = False):
     """
     Wrapper asincrono per la pipeline Nextflow.
     I task FastSurfer acquisiscono il GPU lock prima di partire: la MIG instance
@@ -136,13 +141,18 @@ async def run_pipeline_with_gpu_lock(task_id: str, input_path: str, outdir: str,
         async with gpu_lock:
             logger.info(f"Task {task_id}: GPU lock acquisito.")
             await asyncio.to_thread(
-                run_nextflow_pipeline, task_id, input_path, outdir, brain_segmenter
+                run_nextflow_pipeline, task_id, input_path, outdir, brain_segmenter, test_mode
             )
             logger.info(f"Task {task_id}: GPU lock rilasciato.")
     else:
         await asyncio.to_thread(
-            run_nextflow_pipeline, task_id, input_path, outdir, brain_segmenter
+            run_nextflow_pipeline, task_id, input_path, outdir, brain_segmenter, test_mode
         )
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "nextflow_worker"}
 
 
 @app.post("/start_preprocessing")
@@ -154,6 +164,7 @@ async def start_preprocessing(task: NextflowTask, background_tasks: BackgroundTa
         task.input_path,
         task.outdir,
         task.brain_segmenter,
+        task.test_mode,
     )
     return {"status": "accepted", "message": f"Nextflow avviato per il task {task.task_id}"}
 

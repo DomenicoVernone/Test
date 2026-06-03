@@ -157,6 +157,14 @@ XGBoost_trainer <- function() {
         xgb_model <- fold_model[[max_pos]]
         tuned_params <- fold_info[[max_pos]]
 
+        # Recover training data for the best fold so inference_logic.R
+        # can build the UMAP historical space.
+        best_outer <- ceiling(max_pos / j)
+        best_inner <- ((max_pos - 1) %% j) + 1
+        best_train <- readRDS(file.path(data_path, sprintf("train_out%d_in%d.rds", best_outer, best_inner)))
+        best_train_x <- best_train[, !names(best_train) %in% "TargetClass", drop = FALSE]
+        best_train_y <- factor(best_train$TargetClass, levels = c(0, 1))
+
         best_params <- tuned_params$x
         for (param_name in names(best_params)) {
             mlflow_log_param(paste0("best_", param_name), best_params[[param_name]])
@@ -191,7 +199,19 @@ XGBoost_trainer <- function() {
         mlflow_log_metric("auc", auc)
         mlflow_log_metric("sd_auc", sd_auc)
         
-        saveRDS(xgb_model, "xgb.rds")
+        training_with_outcome <- best_train_x
+        training_with_outcome$.outcome <- factor(
+            ifelse(as.character(best_train_y) == "1", "bvFTD", "HC"),
+            levels = c("HC", "bvFTD")
+        )
+        extended_model <- list(
+            trainingData = training_with_outcome,
+            x            = as.matrix(best_train_x),
+            y            = training_with_outcome$.outcome,
+            mlr_model    = xgb_model,
+            booster      = xgb_model$learner.model
+        )
+        saveRDS(extended_model, "xgb.rds")
         mlflow_log_artifact("xgb.rds", "model")
         mlflow_log_artifact("xgb.csv", "folds_eval")
 

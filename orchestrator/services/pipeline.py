@@ -67,7 +67,8 @@ async def run_full_pipeline(task_id: int, model_name: str):
             task_id=task_id,
             nifti_filename=task.filename,
             model_name=model_name,
-            brain_segmenter=brain_segmenter
+            brain_segmenter=brain_segmenter,
+            test_mode=settings.TEST_MODE
         )
 
         # FASE 2: INFERENZA

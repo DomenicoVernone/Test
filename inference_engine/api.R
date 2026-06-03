@@ -21,6 +21,9 @@ function(req) {
   plumber::forward()
 }
 
+#* @get /health
+function() list(status = "ok")
+
 #* Esegue inferenza clinica e calcolo UMAP 3D
 #* @param task_id ID del task
 #* @param model_name Nome del modello

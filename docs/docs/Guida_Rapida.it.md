@@ -1,295 +1,153 @@
-<!DOCTYPE html>
-
-<html lang="it">
-
-<head>
-
-<meta charset="UTF-8">
-<title>MLOps – Quickstart</title>
-
-<style>
-
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 40px;
-    background-color: #f9f9f9;
-    color: #333;
-}
-
-h1, h2, h3 {
-    color: #2c3e50;
-}
-
-h1 {
-    border-bottom: 2px solid #ccc;
-    padding-bottom: 10px;
-}
-
-pre {
-    background-color: #eee;
-    padding: 15px;
-    border-radius: 5px;
-    overflow-x: auto;
-}
-
-.section {
-    margin-bottom: 40px;
-}
-
-.box {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-ul {
-    margin-left: 20px;
-}
-
-/* ===== TABLE STYLE UNIFICATO ===== */
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 15px;
-    font-size: 14px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-th {
-    background-color: #2c3e50;
-    color: white;
-    text-align: left;
-    padding: 12px;
-    font-weight: 600;
-}
+# Guida Rapida — Clinical Twin
 
-td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    vertical-align: top;
-}
+Questa guida descrive il percorso più veloce per eseguire la prima analisi MRI.
 
-tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
+---
 
-tr:hover {
-    background-color: #eef2f5;
-}
-</style>
-
-</head>
+## Tempi stimati
 
-<body>
-
-<div class="box">
+| Modalità | Tempo totale | Caso d'uso |
+|----------|-------------|-----------|
+| **TEST_MODE=true** (mock FreeSurfer) | ~5–15 minuti | Sviluppo, test pipeline |
+| **FreeSurfer CPU** (segmentazione reale) | ~4–10 ore | Produzione, ricerca |
+| **FastSurfer GPU** (CUDA) | ~30–60 minuti | Produzione con GPU NVIDIA |
 
-<h1>Quickstart – Avvio rapido della piattaforma MLOps</h1>
-
-<div class="section">
-<h2>1. Introduzione</h2>
+---
 
-<p>
-Questa guida descrive i passaggi essenziali per eseguire la prima analisi MRI
-utilizzando la piattaforma MLOps.
-</p>
+## Prerequisiti
+
+1. Docker Desktop in esecuzione
+2. Tutti i file `.env` configurati (vedi [Configurazione](Configurazione.it.md))
+3. Licenza FreeSurfer in `nextflow_worker/license.txt`
+4. Immagini Docker pipeline costruite: `docker compose -f nextflow_worker/docker-compose.yml build`
+
+---
+
+## Quickstart: Modalità Test (raccomandato per il primo avvio)
+
+### Step 1 — Imposta TEST_MODE
+
+Modifica `orchestrator/.env`:
+```env
+TEST_MODE=true
+USE_MOCK=false
+```
+
+Questo attiva `mock_freesurfer`: invece di eseguire FreeSurfer `recon-all` (6–8 ore),
+la pipeline genera maschere cerebrali sintetiche in ~30 secondi.
+
+### Step 2 — Avvia il sistema
+
+```bash
+docker compose up --build -d
+```
+
+Attendi ~30 secondi che tutti i servizi siano pronti.
+
+### Step 3 — Registra e accedi
 
-<p>
-Il flusso comprende l’avvio dei microservizi, la configurazione iniziale
-e l’esecuzione completa della pipeline radiomica fino alla visualizzazione
-dei risultati diagnostici.
-</p>
-
-</div>
-
-<div class="section">
-<h2>2. Avvio dello stack</h2>
-
-<p>
-Dopo aver completato installazione e configurazione, avviare
-l’intero sistema tramite Docker Compose:
-</p>
-
-<pre>
-docker compose up -d --build
-</pre>
-
-<p>
-Attendere che tutti i container risultino attivi.
-</p>
-
-</div>
-
-<div class="section">
-<h2>3. Accesso alla piattaforma</h2>
-
-<p>
-Una volta avviato lo stack, la dashboard è disponibile al seguente indirizzo:
-</p>
-
-<pre>
-http://localhost:5173
-</pre>
-
-<p>
-Le API sono accessibili tramite Swagger UI:
-</p>
-
-<pre>
-http://localhost:8000/docs
-</pre>
-
-</div>
-
-<div class="section">
-<h2>4. Creazione del primo utente</h2>
-
-<p>
-Al primo avvio è necessario registrare un utente tramite API Gateway.
-</p>
-
-<pre>
-POST /signup
-</pre>
-
-<p>
-Dopo la registrazione è possibile effettuare il login e accedere
-alle funzionalità della piattaforma.
-</p>
-
-</div>
-
-<div class="section">
-<h2>5. Upload della MRI</h2>
-
-<p>
-Dopo il login, è possibile caricare una risonanza magnetica
-in formato:
-</p>
-
-<ul>
-<li>.nii</li>
-<li>.nii.gz</li>
-</ul>
-
-<p>
-Il file viene salvato nel volume condiviso e registrato
-come task asincrono.
-</p>
-
-</div>
-
-<div class="section">
-<h2>6. Esecuzione della pipeline</h2>
-
-<p>
-Dopo l’upload, la pipeline viene avviata automaticamente
-dal servizio orchestrator.
-</p>
-
-<p>Fasi principali:</p>
-
-<ul>
-<li>segmentazione anatomica</li>
-<li>estrazione ROI</li>
-<li>estrazione feature radiomiche</li>
-<li>inferenza diagnostica</li>
-<li>proiezione UMAP</li>
-</ul>
-
-<p>
-Lo stato della pipeline può essere monitorato tramite dashboard.
-</p>
-
-</div>
-
-<div class="section">
-<h2>7. Visualizzazione risultati</h2>
-
-<p>
-Al termine dell’elaborazione, i risultati sono disponibili nella dashboard.
-</p>
-
-<ul>
-<li>segmentazione MRI (viewer multiplanare)</li>
-<li>classe diagnostica</li>
-<li>confidence score</li>
-<li>posizione nello spazio UMAP</li>
-<li>nearest neighbors</li>
-</ul>
-
-</div>
-
-<div class="section">
-<h2>8. Interazione con assistente AI</h2>
-
-<p>
-L’assistente AI consente di ottenere spiegazioni cliniche
-sui risultati ottenuti.
-</p>
-
-<p>
-È possibile:
-</p>
-
-<ul>
-<li>interpretare le feature radiomiche</li>
-<li>analizzare la posizione nel cluster diagnostico</li>
-<li>richiedere spiegazioni contestualizzate</li>
-</ul>
-
-</div>
-
-<div class="section">
-<h2>9. Flusso completo</h2>
-
-<pre>
-Login
-   ↓
-Upload MRI
-   ↓
-Pipeline radiomica
-   ↓
-Inferenza KNN
-   ↓
-Embedding UMAP
-   ↓
-Visualizzazione dashboard
-   ↓
-Explainability AI
-</pre>
-
-<p>
-Questo flusso rappresenta il ciclo completo di analisi
-supportato dalla piattaforma.
-</p>
-
-</div>
-
-<div class="section">
-<h2>10. Conclusioni</h2>
-
-<p>
-Il Quickstart consente di eseguire rapidamente una pipeline
-radiomica completa senza configurazioni avanzate.
-</p>
-
-<p>
-Per utilizzi più avanzati (scalabilità, GPU, configurazioni
-multi-ambiente), fare riferimento alle sezioni dedicate
-di Deployment e Configuration.
-</p>
-
-</div>
-
-</div>
-
-</body>
-
-</html>
+Tramite browser: apri **http://localhost:5173** e accedi direttamente.
+
+Tramite curl:
+```bash
+# Registra
+curl -X POST http://localhost:8006/signup \
+  -H "Content-Type: application/json" \
+  -d '{"username":"doctor01","password":"test123"}'
+
+# Accedi
+curl -X POST http://localhost:8006/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"doctor01","password":"test123"}'
+```
+
+### Step 4 — Carica una MRI
+
+Tramite browser (raccomandato):
+1. Apri http://localhost:5173
+2. Clicca **"Carica MRI"** o **"Nuova Analisi"**
+3. Seleziona un file `.nii` o `.nii.gz`
+4. Scegli il modello `HC_vs_bvFTD`
+5. Clicca **"Analizza"**
+
+### Step 5 — Attendi i risultati
+
+Il frontend **esegue polling automaticamente** ogni 3 secondi.
+Vedrai la card del task passare da **IN ELABORAZIONE** → **COMPLETATO**.
+
+Tempo totale con `TEST_MODE=true`: circa **5–15 minuti**.
+
+### Step 6 — Visualizza i risultati
+
+Quando completato, clicca la card del task nella barra laterale per vedere:
+- **Diagnosi**: `HC` (Controllo Sano) o `bvFTD`
+- **Confidenza**: es. 79.57%
+- **UMAP 3D**: visualizzazione interattiva della posizione del paziente rispetto alla coorte di training
+
+---
+
+## Diagramma flusso completo
+
+```
+[Docker Desktop in esecuzione]
+        │
+        ▼
+docker compose up --build -d
+        │
+        ▼
+http://localhost:5173  ──► Login
+        │
+        ▼
+Carica scan.nii.gz  ──► Seleziona modello: HC_vs_bvFTD
+        │
+        ▼
+Orchestratore crea task (PENDING)
+        │
+        ▼
+Fase 0: model_service → brain_segmenter = "freesurfer"
+        │
+        ▼
+Fase 1: Pipeline Nextflow
+  ├─ TEST_MODE=true  → mock_freesurfer (30s) → ROI → radiomica → CSV
+  └─ TEST_MODE=false → FreeSurfer recon-all (6–8h) → ROI → radiomica → CSV
+        │
+        ▼
+Fase 2: model_service → inference_engine (R)
+  ├─ Predizione XGBoost: HC o bvFTD
+  ├─ Confidenza: 0.00–1.00
+  └─ UMAP 3D: spazio storico + nuovo paziente
+        │
+        ▼
+Task → COMPLETATO (100%)
+        │
+        ▼
+Frontend mostra: diagnosi + confidenza + visualizzazione 3D
+```
+
+---
+
+## Modalità Produzione (FreeSurfer reale)
+
+Per analizzare dati MRI reali:
+
+1. Imposta `TEST_MODE=false` in `orchestrator/.env`
+2. Carica una MRI T1 reale (`.nii` o `.nii.gz`)
+3. La pipeline eseguirà FreeSurfer `recon-all` completo (~4–10 ore su CPU)
+4. La card del task mostra un timer live durante l'elaborazione
+5. I risultati appaiono automaticamente al completamento
+
+> **Suggerimento:** Usa FastSurfer con una GPU per ridurre il tempo di segmentazione
+> da ~8h a ~30 minuti. Imposta `MIG_DEVICE=all` e il sistema userà automaticamente
+> FastSurfer se il modello deployato è stato addestrato con FastSurfer.
+
+---
+
+## Arresto
+
+```bash
+# Ferma senza perdere dati
+docker compose down
+
+# Ferma ed elimina tutti i volumi (ATTENZIONE: elimina tutto lo storico task)
+docker compose down -v
+```

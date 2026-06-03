@@ -37,5 +37,9 @@ app.add_middleware(
 app.include_router(analyze.router)
 
 @app.get("/", tags=["Health"])
+def root():
+    return {"status": "ok", "service": "orchestrator"}
+
+@app.get("/health", tags=["Health"])
 def health():
     return {"status": "ok", "service": "orchestrator"}

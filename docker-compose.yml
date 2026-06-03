@@ -24,7 +24,7 @@ services:
     networks:
       - clinical_network
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8006:8000"
     volumes:
       - ./api_gateway:/app
       - clinical_db_data:/shared_db
@@ -124,6 +124,7 @@ services:
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - VITE_AUTH_URL=http://localhost:8006
     depends_on:
       - api_gateway
       - orchestrator
@@ -150,4 +151,7 @@ services:
       - HOST_SHARED_VOLUME_DIR=${HOST_SHARED_VOLUME_DIR:-/shared_data}
       - NF_OUTDIR=${NF_OUTDIR:-/shared_data/nf_output}
       - NF_LABELS=${NF_LABELS:-/app/data/external/ROI_labels.tsv}
+      - NF_SETTINGS=${NF_SETTINGS:-/app/nextflow/configs/pyradiomics.yaml}
       - MIG_DEVICE=${MIG_DEVICE:-all}
+    depends_on:
+      - api_gateway

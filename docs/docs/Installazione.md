@@ -1,388 +1,190 @@
-<!DOCTYPE html>
+# Installation — Clinical Twin
 
-<html lang="it">
+---
 
-<head>
+## System Requirements
 
-<meta charset="UTF-8">
-<title>MLOps – Installation</title>
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| OS | Windows 10 (WSL2), macOS 12, Ubuntu 20.04 | Ubuntu 22.04 LTS |
+| CPU | 4 cores | 16+ cores (FreeSurfer is multi-threaded) |
+| RAM | 16 GB | 32+ GB |
+| Disk | 50 GB free | 200+ GB (FreeSurfer: ~5 GB/subject) |
+| Docker | 24.x | Latest |
+| Docker Compose | 2.x | Latest |
+| NVIDIA GPU | — | RTX 3080+ / A100 (for FastSurfer) |
 
-<style>
+---
 
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 40px;
-    background-color: #f9f9f9;
-    color: #333;
-}
+## Step 1 — Install Docker
 
-h1, h2, h3 {
-    color: #2c3e50;
-}
+### Windows
+1. Download Docker Desktop: https://www.docker.com/products/docker-desktop/
+2. Enable WSL2 integration during setup
+3. Allocate at least 16 GB RAM in Docker Desktop → Settings → Resources
 
-h1 {
-    border-bottom: 2px solid #ccc;
-    padding-bottom: 10px;
-}
+### macOS
+```bash
+brew install --cask docker
+```
 
-pre {
-    background-color: #eee;
-    padding: 15px;
-    border-radius: 5px;
-    overflow-x: auto;
-}
+### Linux (Ubuntu/Debian)
+```bash
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+newgrp docker
+```
 
-.section {
-    margin-bottom: 40px;
-}
+---
 
-.box {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
+## Step 2 — Clone the repository
 
-ul {
-    margin-left: 20px;
-}
-
-/* ===== TABLE STYLE UNIFICATO ===== */
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 15px;
-    font-size: 14px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-th {
-    background-color: #2c3e50;
-    color: white;
-    text-align: left;
-    padding: 12px;
-    font-weight: 600;
-}
-
-td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    vertical-align: top;
-}
-
-tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
-
-tr:hover {
-    background-color: #eef2f5;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="box">
-
-<h1>MLOps Platform Installation</h1>
-
-<div class="section">
-<h2>1. Introduction</h2>
-
-<p>
-This section describes the steps required to configure
-the execution environment of the MLOps platform and start
-the complete microservices stack.
-</p>
-
-<p>
-The installation is designed to be simple and reproducible,
-based on Docker containers and dedicated configuration files
-for each service.
-</p>
-
-</div>
-
-<div class="section">
-<h2>2. Repository</h2>
-
-<p>
-The platform source code is available on GitHub
-and includes all microservices, the Nextflow pipeline,
-and the frontend dashboard.
-</p>
-
-<pre>
+```bash
 git clone https://github.com/carlosto033/Tesi-FTD.git
 cd Tesi-FTD
-</pre>
+```
 
-<p>
-The repository contains:
-</p>
+---
 
-<ul>
-<li>backend microservices</li>
-<li>Nextflow radiomics pipeline</li>
-<li>React frontend</li>
-<li>Docker configuration files</li>
-</ul>
+## Step 3 — Get the FreeSurfer license
 
-</div>
+The FreeSurfer license is **required** for the neuroimaging pipeline to work.
 
-<div class="section">
-<h2>3. Prerequisites</h2>
+1. Register at: https://surfer.nmr.mgh.harvard.edu/registration.html
+2. You will receive a `license.txt` file by email
+3. Copy it to the project:
 
-<p>
-Before installation, the following components are required:
-</p>
-
-<ul>
-<li>Docker</li>
-<li>Docker Compose</li>
-<li>Git</li>
-</ul>
-
-<p>
-Optional components:
-</p>
-
-<ul>
-<li>NVIDIA GPU (for FastSurfer acceleration)</li>
-<li>CUDA + NVIDIA Container Toolkit</li>
-</ul>
-
-<p>
-It is also necessary to download the FreeSurfer license:
-</p>
-
-<pre>
-https://surfer.nmr.mgh.harvard.edu/registration.html
-</pre>
-
-</div>
-
-<div class="section">
-<h2>4. Environment Configuration</h2>
-
-<p>
-The platform uses <code>.env</code> files to configure
-microservice parameters.
-</p>
-
-<p>
-Copy the example files:
-</p>
-
-<pre>
-cp .env.example .env
-cp api_gateway/.env.example api_gateway/.env
-cp orchestrator/.env.example orchestrator/.env
-cp model_service/.env.example model_service/.env
-cp llm_service/.env.example llm_service/.env
-cp frontend/.env.example frontend/.env
-</pre>
-
-<p>
-Then configure the main environment variables used
-for communication between microservices and integration with external services:
-</p>
-
-<table>
-
-<tr>
-<th>Variable</th>
-<th>Service</th>
-<th>Description</th>
-</tr>
-
-<tr>
-<td>SECRET_KEY</td>
-<td>api_gateway, orchestrator, llm_service</td>
-<td>Shared key for generating and validating JWT tokens across microservices</td>
-</tr>
-
-<tr>
-<td>GROQ_API_KEY</td>
-<td>llm_service</td>
-<td>Access key for the LLM service used by the context-aware AI assistant</td>
-</tr>
-
-<tr>
-<td>MLFLOW_TRACKING_URI</td>
-<td>model_service</td>
-<td>MLflow server endpoint for retrieving registered models</td>
-</tr>
-
-<tr>
-<td>DAGSHUB_TOKEN</td>
-<td>model_service</td>
-<td>Authentication token for accessing the Model Registry hosted on DagsHub</td>
-</tr>
-
-</table>
-
-</div>
-
-<div class="section">
-<h2>5. FreeSurfer License</h2>
-
-<p>
-The segmentation pipeline requires a valid FreeSurfer license.
-</p>
-
-<p>
-After downloading the file:
-</p>
-
-<pre>
+```bash
 cp /path/to/license.txt nextflow_worker/license.txt
-</pre>
+```
 
-<p>
-Without this file, the pipeline cannot be executed.
-</p>
+> Without this file, FreeSurfer will crash immediately with `ERROR: License file not found`.
 
-</div>
+---
 
-<div class="section">
-<h2>6. Docker Image Build</h2>
+## Step 4 — Configure environment files
 
-<p>
-It is necessary to build the images used by the radiomics pipeline.
-</p>
+```bash
+# Copy all example files
+for svc in api_gateway orchestrator model_service llm_service; do
+    cp ${svc}/.env.example ${svc}/.env
+done
+```
 
-<pre>
-docker build -t clinical-freesurfer -f nextflow_worker/dockerfiles/freesurfer.dockerfile nextflow_worker/
+Edit each `.env` file:
 
-docker build -t clinical-fsl -f nextflow_worker/dockerfiles/fsl.dockerfile nextflow_worker/
+**Minimum required:** set `SECRET_KEY` to the same value in both `api_gateway/.env` and `orchestrator/.env`:
+```bash
+# Generate a secure key
+python3 -c "import secrets; print(secrets.token_hex(32))"
+# Copy the output into SECRET_KEY in both files
+```
 
-docker build -t clinical-pyradiomics -f nextflow_worker/dockerfiles/pyradiomics.dockerfile nextflow_worker/
-</pre>
+See [Configuration](Configurazione.md) for the full variable reference.
 
-<p>
-These images will be automatically used by Nextflow.
-</p>
+---
 
-</div>
+## Step 5 — Build Nextflow pipeline images
 
-<div class="section">
-<h2>7. Stack Startup</h2>
+```bash
+docker compose -f nextflow_worker/docker-compose.yml build
+```
 
-<p>
-Once the configuration is complete, the entire system can be started.
-</p>
+Expected output (each image ~2–5 GB, total ~15 GB):
+```
+[+] Building clinical-freesurfer ... done
+[+] Building clinical-fsl        ... done
+[+] Building clinical-pyradiomics ... done
+[+] Building ftd-training        ... done
+```
 
-<pre>
-docker compose up -d --build
-</pre>
+> This step may take 20–40 minutes on first build (downloading base images).
 
-<p>
-This command initializes:
-</p>
+---
 
-<ul>
-<li>API Gateway</li>
-<li>Orchestrator</li>
-<li>Nextflow Worker</li>
-<li>Inference Engine</li>
-<li>LLM Service</li>
-<li>Frontend</li>
-</ul>
+## Step 6 — Start the system
 
-</div>
+```bash
+docker compose up --build -d
+```
 
-<div class="section">
-<h2>8. Installation Verification</h2>
+Verify all 7 services are running:
+```bash
+docker compose ps
 
-<p>
-After startup, verify:
-</p>
+# Expected: 7 containers with status "Up"
+# clinical_api_gateway
+# clinical_orchestrator
+# clinical_model_service
+# clinical_llm_service
+# inference_engine
+# clinical_frontend
+# nextflow_worker
+```
 
-<ul>
-<li>running containers (docker ps)</li>
-<li>absence of errors in logs</li>
-<li>frontend accessibility</li>
-</ul>
+---
 
-<p>Service access:</p>
+## Step 7 — Verify installation
 
-<pre>
-Frontend → http://localhost:5173
-Swagger → http://localhost:8000/docs
-</pre>
+```bash
+# Check all health endpoints
+for port in 8006 8001 8003 8005; do
+    echo -n "Port $port: "
+    curl -s http://localhost:$port/health | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('status','?'))"
+done
 
-</div>
+# Open the dashboard
+open http://localhost:5173   # macOS
+# or xdg-open http://localhost:5173  (Linux)
+# or navigate to http://localhost:5173 in your browser (Windows)
+```
 
-<div class="section">
-<h2>9. First User Creation</h2>
+---
 
-<p>
-On first startup, it is necessary to create a user via the API Gateway.
-</p>
+## Step 8 — Register first user and test
 
-<pre>
-POST /signup
-</pre>
+```bash
+# Register
+curl -X POST http://localhost:8006/signup \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"test123"}'
 
-<p>
-After registration, it will be possible to access the platform
-and start MRI analyses.
-</p>
+# For quick pipeline test, set TEST_MODE=true in orchestrator/.env
+# Then restart: docker compose restart orchestrator
+```
 
-</div>
+See [Quickstart](Guida_Rapida.md) for the first analysis walkthrough.
 
-<div class="section">
-<h2>10. First Analysis Execution</h2>
+---
 
-<p>
-Once logged in:
-</p>
+## NVIDIA GPU Setup (optional)
 
-<ul>
-<li>upload an MRI (.nii or .nii.gz)</li>
-<li>start the pipeline</li>
-<li>monitor the status via the dashboard</li>
-</ul>
+For FastSurfer acceleration:
 
-<p>
-The system will automatically perform:
-</p>
+```bash
+# Install NVIDIA Container Toolkit
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list \
+  | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt update && sudo apt install -y nvidia-container-toolkit
+sudo systemctl restart docker
 
-<ul>
-<li>segmentation</li>
-<li>radiomic extraction</li>
-<li>inference</li>
-<li>result visualization</li>
-</ul>
+# Verify
+docker run --gpus all nvidia/cuda:12.0-base nvidia-smi
+```
 
-</div>
+---
 
-<div class="section">
-<h2>11. Conclusions</h2>
+## Uninstall
 
-<p>
-The MLOps platform installation is designed to be
-fast and reproducible thanks to Docker and centralized
-configurations.
-</p>
+```bash
+# Stop and remove all containers and volumes
+docker compose down -v
 
-<p>
-Once completed, the system is ready to execute full
-radiomics pipelines and support clinical analysis workflows.
-</p>
+# Remove pipeline images
+docker rmi clinical-freesurfer clinical-fsl clinical-pyradiomics ftd-training
 
-</div>
-
-</div>
-
-</body>
-
-</html>
+# Remove project
+cd .. && rm -rf Tesi-FTD
+```

@@ -1,0 +1,1934 @@
+
+<!doctype html>
+<html lang="it" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../Deployment/">
+      
+      
+        <link rel="next" href="../REPORT_FINALE_COMPLETO/">
+      
+      
+        
+          <link rel="alternate" href="../../testing/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="it">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Test Plan & Results - Clinical Twin — FTD Radiomics Platform</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#testing-clinical-twin" class="md-skip">
+          Vai al contenuto
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Intestazione">
+    <a href="../" title="Clinical Twin — FTD Radiomics Platform" class="md-header__button md-logo" aria-label="Clinical Twin — FTD Radiomics Platform" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Clinical Twin — FTD Radiomics Platform
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Test Plan & Results
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Seleziona la lingua">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../testing/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="it" class="md-select__link">
+              Italiano
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Cerca" placeholder="Cerca" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Cerca">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Cancella" aria-label="Cancella" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inizializza la ricerca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../SYSTEM_ARCHITECTURE/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Installazione/" class="md-tabs__link">
+          
+  
+  
+  Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Pipeline_doc/" class="md-tabs__link">
+          
+  
+  
+  Pipeline
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Guida_Rapida/" class="md-tabs__link">
+          
+  
+  
+  Usage
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api/" class="md-tabs__link">
+          
+  
+  
+  API
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Deployment/" class="md-tabs__link">
+          
+  
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Testing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../REPORT_FINALE_COMPLETO/" class="md-tabs__link">
+          
+  
+  
+  Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigazione" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../" title="Clinical Twin — FTD Radiomics Platform" class="md-nav__button md-logo" aria-label="Clinical Twin — FTD Radiomics Platform" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Clinical Twin — FTD Radiomics Platform
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SYSTEM_ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../COMPONENTS_%26_STRUCTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components & Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Setup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Installazione/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Configurazione/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipeline
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Pipeline
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Pipeline_doc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Radiomics Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Guida_Rapida/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Testing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test Plan & Results
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test Plan & Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo test
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-1-pipeline-sintetica-test_modetrue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test 1: Pipeline sintetica (TEST_MODE=true)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-2-mri-reale-freesurfer-cpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test 2: MRI reale (FreeSurfer CPU)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bug-fix-applicati-durante-i-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug fix applicati durante i test
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Bug fix applicati durante i test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#categorie-di-causa-radice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Categorie di causa radice
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-critici-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix critici (P1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#come-ripetere-i-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come ripetere i test
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Come ripetere i test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-rapido-test_modetrue-15-min" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test rapido (TEST_MODE=true, ~15 min)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limitazioni-note" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitazioni note
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Limitazioni note">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modello-attuale-dati-di-training-sintetici" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modello attuale (dati di training sintetici)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#infrastruttura" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastruttura
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requisiti-per-la-validazione-clinica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requisiti per la validazione clinica
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REPORT_FINALE_COMPLETO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Technical Report (Session)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGES_AND_PERFORMANCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog & Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo test
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-1-pipeline-sintetica-test_modetrue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test 1: Pipeline sintetica (TEST_MODE=true)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-2-mri-reale-freesurfer-cpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test 2: MRI reale (FreeSurfer CPU)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bug-fix-applicati-durante-i-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug fix applicati durante i test
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Bug fix applicati durante i test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#categorie-di-causa-radice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Categorie di causa radice
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fix-critici-p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix critici (P1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#come-ripetere-i-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come ripetere i test
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Come ripetere i test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-rapido-test_modetrue-15-min" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test rapido (TEST_MODE=true, ~15 min)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limitazioni-note" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitazioni note
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Limitazioni note">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modello-attuale-dati-di-training-sintetici" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modello attuale (dati di training sintetici)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#infrastruttura" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastruttura
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requisiti-per-la-validazione-clinica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requisiti per la validazione clinica
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="testing-clinical-twin">Testing — Clinical Twin<a class="headerlink" href="#testing-clinical-twin" title="Permanent link">&para;</a></h1>
+<hr />
+<h2 id="riepilogo-test">Riepilogo test<a class="headerlink" href="#riepilogo-test" title="Permanent link">&para;</a></h2>
+<p>Tutti i test sono stati eseguiti sul branch <code>main</code> (commit <code>b08aab0</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Modalità</th>
+<th>Stato</th>
+<th>Durata</th>
+<th>Risultato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pipeline (dati sintetici)</td>
+<td>TEST_MODE=true</td>
+<td>✅ PASSED</td>
+<td>~12 min</td>
+<td>HC, 79.57%</td>
+</tr>
+<tr>
+<td>Pipeline completa (MRI reale)</td>
+<td>FreeSurfer CPU</td>
+<td>✅ PASSED</td>
+<td>~4h 21m</td>
+<td>HC, 79.57%</td>
+</tr>
+<tr>
+<td>Fallback MLflow</td>
+<td>No connessione DagsHub</td>
+<td>✅ PASSED</td>
+<td>—</td>
+<td>Modello locale usato</td>
+</tr>
+<tr>
+<td>Mock runner (USE_MOCK)</td>
+<td>USE_MOCK=true</td>
+<td>✅ PASSED</td>
+<td>~2 min</td>
+<td>CSV sintetico</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="test-1-pipeline-sintetica-test_modetrue">Test 1: Pipeline sintetica (TEST_MODE=true)<a class="headerlink" href="#test-1-pipeline-sintetica-test_modetrue" title="Permanent link">&para;</a></h2>
+<p><strong>Scopo:</strong> Verificare la pipeline completa senza attendere FreeSurfer (~8h).</p>
+<p><strong>Input:</strong> <code>sub-01_ses-test_T1w.nii</code> (MRI T1 reale)</p>
+<p><strong>Risultati (Task 17):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;COMPLETED&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;diagnosi_predetta&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HC&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;confidenza&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.7957</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">&quot;plot_data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="nt">&quot;storico&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">12</span><span class="w"> </span><span class="err">pu</span><span class="kc">nt</span><span class="err">i</span><span class="w"> </span><span class="err">—</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="err">HC</span><span class="w"> </span><span class="err">+</span><span class="w"> </span><span class="mi">6</span><span class="w"> </span><span class="err">bvFTD</span><span class="p">],</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="nt">&quot;nuovo_paziente&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="err">...</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="err">...</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;z&quot;</span><span class="p">:</span><span class="w"> </span><span class="err">...</span><span class="p">}</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Tempi:</strong>
+- <code>mock_freesurfer</code>: ~30 secondi
+- <code>nifti_converter</code>: ~10 secondi
+- <code>roi_creator</code> (78 ROI): ~3 minuti
+- <code>feature_extraction</code> (4 worker): ~8 minuti
+- Inferenza R + UMAP 3D: ~45 secondi
+- <strong>Totale: ~12 minuti</strong></p>
+<hr />
+<h2 id="test-2-mri-reale-freesurfer-cpu">Test 2: MRI reale (FreeSurfer CPU)<a class="headerlink" href="#test-2-mri-reale-freesurfer-cpu" title="Permanent link">&para;</a></h2>
+<p><strong>Input:</strong> <code>sub-01_ses-test_T1w.nii</code> (stesso file, TEST_MODE=false)</p>
+<p><strong>Risultati:</strong> Identici al Test 1 (HC, 79.57%).</p>
+<p><strong>Tempi:</strong>
+- FreeSurfer <code>recon-all</code>: 4 ore 21 minuti
+- Step rimanenti: ~12 minuti
+- <strong>Totale: ~4 ore 33 minuti</strong></p>
+<hr />
+<h2 id="bug-fix-applicati-durante-i-test">Bug fix applicati durante i test<a class="headerlink" href="#bug-fix-applicati-durante-i-test" title="Permanent link">&para;</a></h2>
+<p>20 bug identificati e corretti in 2 sessioni di sviluppo.</p>
+<h3 id="categorie-di-causa-radice">Categorie di causa radice<a class="headerlink" href="#categorie-di-causa-radice" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Categoria</th>
+<th>Bug</th>
+<th>Impatto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Parsing ROI_labels.tsv (<code>header=FALSE, sep=""</code>)</td>
+<td>2</td>
+<td>Tutti i mapping ROI sbagliati → feature zero → predizioni prive di significato</td>
+</tr>
+<tr>
+<td>Path DooD disallineati (licenza FreeSurfer)</td>
+<td>3</td>
+<td>FreeSurfer crash all'avvio</td>
+</tr>
+<tr>
+<td>Nomi immagini Docker errati</td>
+<td>1</td>
+<td>Tutti i processi Nextflow impossibili da avviare</td>
+</tr>
+<tr>
+<td>Formato modello XGBoost incompatibile</td>
+<td>1</td>
+<td>Inferenza sempre in crash</td>
+</tr>
+<tr>
+<td><code>cbind</code> righe disallineate (multi-soggetto)</td>
+<td>1</td>
+<td>Training impossibile su dataset reali</td>
+</tr>
+<tr>
+<td>Catena propagazione <code>test_mode</code> spezzata</td>
+<td>3</td>
+<td>Modalità mock mai attivata nonostante <code>TEST_MODE=true</code></td>
+</tr>
+<tr>
+<td>tryCatch annidato mancante</td>
+<td>1</td>
+<td>HTTP 500 invece di fallback "Sconosciuto"</td>
+</tr>
+<tr>
+<td>Label cliniche hardcoded ("Malato"/"Sano")</td>
+<td>1</td>
+<td>Label sbagliate nell'output</td>
+</tr>
+<tr>
+<td>Parsing filename (UUID vs MD5[:8])</td>
+<td>1</td>
+<td>Lista task mostrава filename illeggibili</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fix-critici-p1">Fix critici (P1)<a class="headerlink" href="#fix-critici-p1" title="Permanent link">&para;</a></h3>
+<p><strong>1. Parsing etichette ROI</strong> (<code>merge_radiomics.r</code>, <code>inference_logic.R</code>):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Prima (rotto): header=FALSE, sep=&quot;&quot; → colonna V3 inesistente</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># Dopo (corretto): header=TRUE, sep=&quot;\t&quot; → colonna Label corretta</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">roi</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">read.table</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;\t&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">roi_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">roi</span><span class="o">$</span><span class="n">Label</span>
+</code></pre></div></p>
+<p><strong>2. Path licenza FreeSurfer</strong> (<code>nextflow.config</code>):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="err">#</span><span class="w"> </span><span class="nl">Prima:</span><span class="w"> </span><span class="n">$</span><span class="o">{</span><span class="n">baseDir</span><span class="o">}</span><span class="s">/license.txt (path interno container, non visibile al daemon Docker host)</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="s"># Dopo:  /</span><span class="n">tmp</span><span class="s">/nextflow_work/</span><span class="n">license</span><span class="o">.</span><span class="na">txt</span><span class="w"> </span><span class="o">(</span><span class="n">path</span><span class="w"> </span><span class="n">host</span><span class="w"> </span><span class="n">via</span><span class="w"> </span><span class="n">bind</span><span class="o">-</span><span class="n">mount</span><span class="o">)</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">runOptions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;-v /tmp/nextflow_work/license.txt:/app/license.txt&quot;</span>
+</code></pre></div></p>
+<hr />
+<h2 id="come-ripetere-i-test">Come ripetere i test<a class="headerlink" href="#come-ripetere-i-test" title="Permanent link">&para;</a></h2>
+<h3 id="test-rapido-test_modetrue-15-min">Test rapido (TEST_MODE=true, ~15 min)<a class="headerlink" href="#test-rapido-test_modetrue-15-min" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;TEST_MODE=true&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>orchestrator/.env
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>--build<span class="w"> </span>-d
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>sleep<span class="w"> </span><span class="m">30</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1"># Registra e accedi</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8006/signup<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;username&quot;:&quot;testuser&quot;,&quot;password&quot;:&quot;testpass&quot;}&#39;</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8006/login<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;username&quot;:&quot;testuser&quot;,&quot;password&quot;:&quot;testpass&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import sys,json; print(json.load(sys.stdin)[&#39;access_token&#39;])&quot;</span><span class="k">)</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="c1"># Carica una MRI</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8001/analyze/upload<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;file=@your_scan.nii&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="w">  </span>-F<span class="w"> </span><span class="s2">&quot;model_name=HC_vs_bvFTD&quot;</span>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="c1"># Controlla lo stato</span>
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>curl<span class="w"> </span>http://localhost:8001/analyze/status/1<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span>
+</code></pre></div>
+<hr />
+<h2 id="limitazioni-note">Limitazioni note<a class="headerlink" href="#limitazioni-note" title="Permanent link">&para;</a></h2>
+<h3 id="modello-attuale-dati-di-training-sintetici">Modello attuale (dati di training sintetici)<a class="headerlink" href="#modello-attuale-dati-di-training-sintetici" title="Permanent link">&para;</a></h3>
+<p>Il modello <code>HC_vs_bvFTD</code> deployato è addestrato su <strong>12 soggetti sintetici</strong>
+(6 HC + 6 bvFTD generati da 1 scan reale + rumore gaussiano).</p>
+<table>
+<thead>
+<tr>
+<th>Limitazione</th>
+<th>Impatto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12 soggetti sintetici</td>
+<td>Il modello non generalizza a pazienti reali</td>
+</tr>
+<tr>
+<td>Nessuna selezione feature</td>
+<td>~6.864 feature usate senza selezione LASSO/RFE</td>
+</tr>
+<tr>
+<td>Confidenza non calibrata</td>
+<td>79.57% non è una probabilità clinicamente interpretabile</td>
+</tr>
+<tr>
+<td>Spazio UMAP con 12 punti</td>
+<td>Visualizzazione non significativa clinicamente</td>
+</tr>
+<tr>
+<td>Solo classificazione binaria (HC vs bvFTD)</td>
+<td>Altri varianti FTD non coperti</td>
+</tr>
+</tbody>
+</table>
+<h3 id="infrastruttura">Infrastruttura<a class="headerlink" href="#infrastruttura" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Limitazione</th>
+<th>Stato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stato task in memoria (nextflow_worker)</td>
+<td>Perso al riavvio del container</td>
+</tr>
+<tr>
+<td>Nessun HTTPS</td>
+<td>Solo HTTP (aggiungere nginx/caddy per produzione)</td>
+</tr>
+<tr>
+<td>JWT senza refresh token</td>
+<td>Sessioni da 30 min, richiede re-login</td>
+</tr>
+<tr>
+<td>Nessun monitoring/alerting</td>
+<td>Nessuna integrazione Prometheus/Grafana</td>
+</tr>
+<tr>
+<td>DICOM non supportato</td>
+<td>Solo NIfTI (.nii/.nii.gz)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="requisiti-per-la-validazione-clinica">Requisiti per la validazione clinica<a class="headerlink" href="#requisiti-per-la-validazione-clinica" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Re-training del modello su dataset NIFD reale (≥200 soggetti)</li>
+<li>Applicazione selezione feature LASSO/RFE</li>
+<li>Calibrazione probabilità output (regressione isotonica o Platt scaling)</li>
+<li>Coorte di validazione indipendente</li>
+<li>Report: sensibilità, specificità, VPP, VPN, AUC-ROC</li>
+<li>Revisione clinica da parte di neurologi</li>
+<li>Conformità HIPAA/GDPR (anonimizzazione DICOM, cifratura dati)</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Torna su
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiato", "clipboard.copy": "Copia", "search.result.more.one": "1 altro in questa pagina", "search.result.more.other": "# altri in questa pagina", "search.result.none": "Nessun documento trovato", "search.result.one": "1 documento trovato", "search.result.other": "# documenti trovati", "search.result.placeholder": "Scrivi per iniziare a cercare", "search.result.term.missing": "Non presente", "select.version": "Seleziona la versione"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,423 +1,233 @@
-<!DOCTYPE html>
+# Deployment Guide — Clinical Twin
 
-<html lang="it">
+---
 
-<head>
+## Prerequisites
 
-<meta charset="UTF-8">
-<title>MLOps – Deployment</title>
+| Component | Version | Notes |
+|-----------|---------|-------|
+| Docker Desktop | ≥ 4.x | Enable "Use WSL 2 based engine" on Windows |
+| Docker Compose | ≥ 2.x | Included in Docker Desktop |
+| RAM | ≥ 16 GB | FreeSurfer requires ~8–12 GB per process |
+| Disk | ≥ 100 GB | FreeSurfer output: ~5 GB per subject |
+| NVIDIA GPU | Optional | Required only for FastSurfer (CUDA mode) |
+| NVIDIA Container Toolkit | If GPU | `apt install nvidia-container-toolkit` |
+| FreeSurfer license | **Required** | Register at surfer.nmr.mgh.harvard.edu |
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 40px;
-    background-color: #f9f9f9;
-    color: #333;
-}
+---
 
-h1, h2, h3 {
-    color: #2c3e50;
-}
+## Step 1 — Clone and configure
 
-h1 {
-    border-bottom: 2px solid #ccc;
-    padding-bottom: 10px;
-}
+```bash
+git clone https://github.com/carlosto033/Tesi-FTD.git
+cd Tesi-FTD
 
-pre {
-    background-color: #eee;
-    padding: 15px;
-    border-radius: 5px;
-    overflow-x: auto;
-}
+# Copy environment files
+cp api_gateway/.env.example    api_gateway/.env
+cp orchestrator/.env.example   orchestrator/.env
+cp model_service/.env.example  model_service/.env
+cp llm_service/.env.example    llm_service/.env
 
-.section {
-    margin-bottom: 40px;
-}
+# Set your SECRET_KEY (must be the same in api_gateway and orchestrator)
+# Edit each .env with your values
+```
 
-.box {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
+Place the FreeSurfer license:
+```bash
+cp /path/to/your/license.txt nextflow_worker/license.txt
+```
 
-ul {
-    margin-left: 20px;
-}
+---
 
-/* ===== TABLE STYLE UNIFICATO ===== */
+## Step 2 — Build Nextflow Docker images
 
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 15px;
-    font-size: 14px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    overflow: hidden;
-}
+The neuroimaging pipeline requires 4 specialized Docker images.
+Build them **before** starting the main stack:
 
-th {
-    background-color: #2c3e50;
-    color: white;
-    text-align: left;
-    padding: 12px;
-    font-weight: 600;
-}
+```bash
+# Build all 4 pipeline images at once
+docker compose -f nextflow_worker/docker-compose.yml build
+```
 
-td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    vertical-align: top;
-}
+This builds:
+- `clinical-freesurfer` — FreeSurfer 7.4 + nibabel + Python
+- `clinical-fsl` — FSL (fslmaths for ROI masks)
+- `clinical-pyradiomics` — PyRadiomics + Python
+- `ftd-training` — R + mlr + xgboost + mlflow (for training pipeline)
 
-tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
+> **Important:** image names must match exactly (`clinical-freesurfer`, not `freesurfer`).
+> The `docker-compose.yml` in `nextflow_worker/` uses the correct names.
 
-tr:hover {
-    background-color: #eef2f5;
-}
+---
 
-</style>
+## Step 3 — Start the main stack
 
-</head>
+```bash
+docker compose up --build -d
+```
 
-<body>
+Wait for all services to be healthy:
+```bash
+docker compose ps
 
-<div class="box">
+# Check health endpoints
+curl http://localhost:8006/health  # api_gateway
+curl http://localhost:8001/health  # orchestrator
+curl http://localhost:8003/health  # model_service
+curl http://localhost:8004/health  # inference_engine
+curl http://localhost:8005/health  # nextflow_worker
+```
 
-<h1>MLOps Platform Deployment</h1>
+---
 
-<div class="section">
-<h2>1. Introduction</h2>
+## Step 4 — Register first user
 
-<p>
-This section describes the deployment strategies of the MLOps platform
-across different operational contexts, from local testing to
-dedicated server infrastructures.
-</p>
+```bash
+curl -X POST http://localhost:8006/signup \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"yourpassword"}'
+```
 
-<p>
-The entire system is designed to run using Docker containers,
-ensuring dependency isolation, portability, and reproducibility
-of the execution environment.
-</p>
+---
 
-</div>
+## Service URLs
 
-<div class="section">
-<h2>2. Architectural Context</h2>
+| Service | URL |
+|---------|-----|
+| Frontend dashboard | http://localhost:5173 |
+| API Gateway Swagger | http://localhost:8006/docs |
+| Orchestrator Swagger | http://localhost:8001/docs |
+| Model Service Swagger | http://localhost:8003/docs |
+| Nextflow Worker Swagger | http://localhost:8005/docs |
 
-<p>
-The platform is based on a microservices architecture described
-in detail in the <b>System Architecture</b> section.
-</p>
+---
 
-<p>
-In the deployment context, services are orchestrated using Docker Compose
-and communicate via REST APIs and shared volumes for managing
-MRI data and pipeline outputs.
-</p>
+## DooD (Docker-out-of-Docker) Setup
 
-</div>
+The `nextflow_worker` spawns Nextflow sub-containers by connecting to the
+**host Docker daemon** via socket mount:
 
-<div class="section">
-<h2>3. Local Deployment (Development)</h2>
+```yaml
+# docker-compose.yml (nextflow_worker section)
+volumes:
+  - /var/run/docker.sock:/var/run/docker.sock
+  - /tmp/nextflow_work:/tmp/nextflow_work
+```
 
-<p>
-Local mode is used for development, debugging, and functional testing.
-</p>
+The directory `/tmp/nextflow_work` is a **host↔container bind-mount** used as
+coordination point. It must exist on the host before Docker starts:
 
-<p>Compatibility:</p>
+```bash
+# On Linux/macOS:
+mkdir -p /tmp/nextflow_work
 
-<ul>
-<li>Windows (WSL2)</li>
-<li>macOS</li>
-<li>Linux</li>
-</ul>
+# On Windows (Docker Desktop + WSL2):
+# Docker Desktop creates this automatically via the bind-mount
+```
 
-<p>Stack startup:</p>
+**Why this matters:** In DooD, all `-v` bind-mounts in Nextflow processes are
+interpreted by the HOST Docker daemon. The path `/tmp/nextflow_work/license.txt`
+must exist on the host — not just inside the container.
 
-<pre>
-docker compose up -d --build
-</pre>
+---
 
-<p>
-This command builds the images and starts all microservices.
-</p>
+## GPU Deployment
 
-<p>Access:</p>
-
-<pre>
-Frontend → http://localhost:5173  
-API → http://localhost:8000/docs
-</pre>
-
-</div>
-
-<div class="section">
-<h2>4. Deployment on Linux Server</h2>
-
-<p>
-Recommended configuration for processing large MRI datasets.
-</p>
-
-<p>Prerequisites:</p>
-
-<ul>
-<li>Docker Engine installed</li>
-<li>Docker Compose</li>
-<li>Multicore CPU</li>
-<li>≥16 GB RAM recommended</li>
-</ul>
-
-<p>Shared volume configuration:</p>
-
-<pre>
-HOST_SHARED_VOLUME_DIR=/mnt/shared_volume
-</pre>
-
-<p>
-This directory is used to share data between containers
-during pipeline execution.
-</p>
-
-<p>Service startup:</p>
-
-<pre>
-docker compose up -d
-</pre>
-
-</div>
-
-<div class="section">
-<h2>5. Deployment with NVIDIA GPU</h2>
-
-<p>
-Using NVIDIA GPUs enables acceleration of anatomical segmentation
-through FastSurfer, significantly reducing processing time.
-</p>
-
-<p>Prerequisites:</p>
-
-<ul>
-<li>Updated NVIDIA drivers</li>
-<li>Compatible CUDA version</li>
-<li>NVIDIA Container Toolkit</li>
-</ul>
-
-<p>GPU availability check:</p>
-
-<pre>
+### NVIDIA GPU (standard)
+```bash
+# Verify GPU visibility
 nvidia-smi
-</pre>
 
-<p>Enable GPU in the pipeline:</p>
+# The pipeline will use GPU automatically when brain_segmenter=fastsurfer
+# No extra configuration needed (MIG_DEVICE defaults to "all")
+```
 
-<pre>
-params.fastsurfer_device=cuda
-</pre>
+### NVIDIA MIG (Multi-Instance GPU)
+```bash
+# List MIG instances
+nvidia-smi -L
 
-<p>
-This parameter enables GPU usage for segmentation processes.
-</p>
+# Set in your environment:
+export MIG_DEVICE="MIG-GPU-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+```
 
-</div>
+---
 
-<div class="section">
-<h2>6. Deployment with GPU MIG (Multi-Instance GPU)</h2>
+## Stopping the Stack
 
-<p>
-On multi-user HPC systems, it is possible to use
-Multi-Instance GPU (MIG) technology to partition an NVIDIA GPU
-into multiple isolated instances.
-</p>
+```bash
+# Stop without removing volumes (data preserved)
+docker compose down
 
-<p>
-This approach allows assigning a dedicated portion of GPU
-to each pipeline job, improving resource isolation and
-management of concurrent workloads.
-</p>
+# Stop and remove all data (WARNING: irreversible)
+docker compose down -v
+```
 
-<p>
-Within the radiomics pipeline, MIG can be used to:
-</p>
+---
 
-<ul>
-<li>run multiple segmentations in parallel</li>
-<li>avoid interference between concurrent jobs</li>
-<li>optimize GPU resource utilization</li>
-</ul>
+## Troubleshooting
 
-<p>
-Environment variable configuration:
-</p>
+### Port 8000 already in use
 
-<pre>
-MIG_DEVICE=MIG-xxxxxxxxxxxxxxxx
-</pre>
+If another service occupies port 8000 on your host, the `api_gateway` binding on
+`127.0.0.1:8006` → internal port `8000` should not conflict (the host port is 8006).
+If you see conflicts, check:
+```bash
+netstat -an | grep 8006
+# or on Windows:
+netstat -an | findstr 8006
+```
 
-<p>
-This variable identifies the specific GPU instance assigned to the container.
-</p>
+### Docker images not found: `clinical-freesurfer`
 
-<p>
-On systems without GPU partitioning or in CPU-only mode,
-this variable can be left empty.
-</p>
+The Nextflow pipeline requires images named `clinical-freesurfer`, `clinical-fsl`,
+`clinical-pyradiomics`. If Nextflow reports "image not found":
+```bash
+# Rebuild pipeline images
+docker compose -f nextflow_worker/docker-compose.yml build
 
-</div>
+# Verify images exist
+docker images | grep clinical
+```
 
-<div class="section">
-<h2>7. Multi-Environment Deployment</h2>
+### FreeSurfer license error
 
-<p>
-The system supports multiple environments:
-</p>
+Symptom: `ERROR: License file not found`
 
-<ul>
-<li><b>development</b> → development and debugging</li>
-<li><b>staging</b> → pre-production validation</li>
-<li><b>production</b> → large-scale usage</li>
-</ul>
+1. Verify the license file exists: `ls nextflow_worker/license.txt`
+2. Verify the nextflow_worker container copied it: 
+   ```bash
+   docker exec nextflow_worker ls /tmp/nextflow_work/license.txt
+   ```
+3. If missing, restart the container: `docker compose restart nextflow_worker`
 
-<p>
-The main differences concern:
-</p>
+### Pipeline stuck after FreeSurfer
 
-<ul>
-<li>logging configuration</li>
-<li>credential management</li>
-<li>hardware resource allocation</li>
-</ul>
+If Nextflow completes but no `radiomics_features.csv` appears:
+```bash
+# Check Nextflow logs
+docker exec nextflow_worker cat /tmp/nextflow_work/cache_*/nextflow.log | tail -50
 
-</div>
+# Check if ROI masks were generated
+ls /tmp/nextflow_work/cache_*/work/*/ROI/ | head -20
+```
 
-<div class="section">
-<h2>8. Pipeline Image Build</h2>
+### Inference returns "Sconosciuto" with NA confidence
 
-<p>
-Before executing the pipeline, it is necessary to build
-the Docker images used by Nextflow processes.
-</p>
+The model file is missing or corrupt. Check:
+```bash
+docker exec model_service ls -la /app/model.rds
+# Should be > 1000 bytes. A valid XGBoost extended model is ~50KB+
+```
 
-<pre>
-docker build -t clinical-freesurfer -f nextflow_worker/dockerfiles/freesurfer.dockerfile nextflow_worker/
+---
 
-docker build -t clinical-fsl -f nextflow_worker/dockerfiles/fsl.dockerfile nextflow_worker/
+## Production Hardening Checklist
 
-docker build -t clinical-pyradiomics -f nextflow_worker/dockerfiles/pyradiomics.dockerfile nextflow_worker/
-</pre>
-
-<p>
-These images are dynamically invoked during pipeline execution.
-</p>
-
-</div>
-
-<div class="section">
-<h2>9. Data and Volume Management</h2>
-
-<p>
-MRI data and pipeline outputs are managed through Docker volumes
-shared across services.
-</p>
-
-<ul>
-<li>MRI input uploaded via frontend</li>
-<li>radiomic outputs generated by the pipeline</li>
-<li>intermediate processing files</li>
-</ul>
-
-<p>
-This approach avoids transferring large files via APIs,
-improving overall system performance.
-</p>
-
-</div>
-
-<div class="section">
-<h2>10. Scalability</h2>
-
-<p>
-The architecture allows independent scaling of services:
-</p>
-
-<ul>
-<li>Nextflow pipeline parallelization</li>
-<li>concurrent execution of multiple MRI analyses</li>
-<li>scaling of the inference engine</li>
-</ul>
-
-<p>
-The system can be extended to handle high workloads
-in research or production environments.
-</p>
-
-</div>
-
-<div class="section">
-<h2>11. Logging and Monitoring</h2>
-
-<p>
-The system uses multiple logging layers:
-</p>
-
-<ul>
-<li>Docker logs for microservices</li>
-<li>Nextflow logs for the pipeline</li>
-<li>task state managed by the orchestrator</li>
-</ul>
-
-<p>
-This enables comprehensive monitoring and effective debugging.
-</p>
-
-</div>
-
-<div class="section">
-<h2>12. Security</h2>
-
-<p>
-Sensitive credentials are managed via environment variables:
-</p>
-
-<ul>
-<li>SECRET_KEY</li>
-<li>DAGSHUB_TOKEN</li>
-<li>GROQ_API_KEY</li>
-</ul>
-
-<p>
-Keys must not be included in the source code and should be
-configured via .env files.
-</p>
-
-</div>
-
-<div class="section">
-<h2>13. Conclusions</h2>
-
-<p>
-Container-based deployment allows running the platform
-consistently across different environments, maintaining
-isolation and reproducibility.
-</p>
-
-<p>
-The architecture is designed to support both local usage and
-deployment on dedicated infrastructures, making the system scalable
-and ready for real-world scenarios.
-</p>
-
-</div>
-
-</div>
-
-</body>
-
-</html>
+- [ ] Change all `SECRET_KEY` values to long random strings (`openssl rand -hex 32`)
+- [ ] Configure HTTPS via reverse proxy (nginx/caddy) with valid TLS certificate
+- [ ] Restrict Docker socket access (read-only, dedicated group)
+- [ ] Enable Docker log rotation
+- [ ] Set up backup for `clinical_twin_db` volume (SQLite database)
+- [ ] Configure MLflow with a real model and assign `@champion` alias
+- [ ] Test with `TEST_MODE=true` before running real FreeSurfer jobs

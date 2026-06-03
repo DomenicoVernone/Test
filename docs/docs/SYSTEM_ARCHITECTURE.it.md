@@ -1,334 +1,149 @@
-<!DOCTYPE html>
-
-<html lang="it">
-
-<head>
-<meta charset="UTF-8">
-<title>MLOps – System Architecture</title>
-
-<style>
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 40px;
-    background-color: #f9f9f9;
-    color: #333;
-}
-
-h1, h2, h3 {
-    color: #2c3e50;
-}
-
-h1 {
-    border-bottom: 2px solid #ccc;
-    padding-bottom: 10px;
-}
-
-pre {
-    background-color: #eee;
-    padding: 15px;
-    border-radius: 5px;
-    overflow-x: auto;
-}
-
-.section {
-    margin-bottom: 40px;
-}
-
-.box {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-ul {
-    margin-left: 20px;
-}
-
-/* ===== TABLE STYLE UNIFICATO ===== */
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 15px;
-    font-size: 14px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-th {
-    background-color: #2c3e50;
-    color: white;
-    text-align: left;
-    padding: 12px;
-    font-weight: 600;
-}
-
-td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    vertical-align: top;
-}
-
-tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
-
-tr:hover {
-    background-color: #eef2f5;
-}
-</style>
-
-</head>
-
-<body>
-
-<div class="box">
-
-<h1>System Architecture</h1>
-
-<div class="section">
-<h2>1. Visione generale</h2>
-
-<p>
-La piattaforma MLOps è progettata come un sistema distribuito basato su
-microservizi containerizzati orchestrati tramite Docker Compose.
-L’architettura separa chiaramente le responsabilità tra preprocessing
-dei dati, orchestrazione dei workflow, inferenza statistica e
-visualizzazione clinica.
-</p>
-
-<p>
-Questo approccio architetturale consente:
-</p>
-
-<ul>
-<li>scalabilità indipendente dei componenti</li>
-<li>isolamento delle dipendenze software</li>
-<li>fault isolation tra microservizi</li>
-<li>riproducibilità delle pipeline radiomiche</li>
-<li>facilità di estensione e manutenzione</li>
-</ul>
-
-</div>
-
-<div class="section">
-<h2>2. Architettura distribuita</h2>
-
-<p>
-Il sistema è composto da servizi indipendenti containerizzati che
-collaborano attraverso API REST e volumi condivisi Docker.
-Ogni microservizio implementa una responsabilità specifica
-all’interno del workflow MLOps.
-</p>
-
-<pre>
-Frontend
-  ↓
-API Gateway
-  ↓
-Orchestrator
-  ↓
-Nextflow Worker
-  ↓
-Inference Engine
-  ↓
-LLM Service
-  ↓
-Frontend
-</pre>
-
-<p>
-La separazione dei componenti permette di aggiornare, distribuire
-e scalare i servizi in maniera indipendente senza impattare
-l’intera piattaforma.
-</p>
-
-</div>
-
-<div class="section">
-<h2>3. Flusso dati end-to-end</h2>
-
-<p>
-La piattaforma implementa un workflow sequenziale per l’analisi
-radiomica delle immagini MRI.
-</p>
-
-<pre>
-MRI Upload
-   ↓
-Autenticazione JWT
-   ↓
-Creazione Task
-   ↓
-Pipeline Nextflow
-   ↓
-Estrazione Feature Radiomiche
-   ↓
-Inferenza Diagnostica
-   ↓
-Embedding UMAP
-   ↓
-Explainability AI
-   ↓
-Visualizzazione Clinica
-</pre>
-
-<p>
-Ogni fase produce output strutturati che vengono utilizzati
-dal servizio successivo, garantendo modularità e tracciabilità
-dell’intero workflow.
-</p>
-
-</div>
-
-<div class="section">
-<h2>4. Struttura dei microservizi</h2>
-
-<table>
-
-<tr>
-<th>Servizio</th>
-<th>Responsabilità architetturale</th>
-<th>Tecnologia</th>
-</tr>
-
-<tr>
-<td>api_gateway</td>
-<td>Security layer e routing centralizzato</td>
-<td>FastAPI, JWT</td>
-</tr>
-
-<tr>
-<td>orchestrator</td>
-<td>Workflow coordination e task management</td>
-<td>FastAPI</td>
-</tr>
-
-<tr>
-<td>nextflow_worker</td>
-<td>Pipeline radiomica distribuita</td>
-<td>Nextflow, Docker</td>
-</tr>
-
-<tr>
-<td>inference_engine</td>
-<td>Inferenza ML e spazio latente UMAP</td>
-<td>R, Plumber</td>
-</tr>
-
-<tr>
-<td>model_service</td>
-<td>Model Registry e versioning</td>
-<td>FastAPI, MLflow</td>
-</tr>
-
-<tr>
-<td>llm_service</td>
-<td>Explainability AI e interpretazione clinica</td>
-<td>FastAPI, LLM API</td>
-</tr>
-
-<tr>
-<td>frontend</td>
-<td>Interfaccia clinica e visualizzazione</td>
-<td>React</td>
-</tr>
-
-</table>
-
-</div>
-
-<div class="section">
-<h2>5. Comunicazione tra servizi</h2>
-
-<p>
-La piattaforma adotta un approccio di comunicazione ibrido:
-</p>
-
-<ul>
-<li>API REST (HTTP/JSON) per orchestrazione e controllo</li>
-<li>volumi Docker condivisi per file MRI e output pipeline</li>
-</ul>
-
-<p>
-Questo modello riduce l’overhead di trasferimento dei file voluminosi
-e migliora l’interoperabilità tra componenti sviluppati con
-tecnologie differenti.
-</p>
-
-</div>
-
-<div class="section">
-<h2>6. Gestione dello stato</h2>
-
-<p>
-L’orchestrator mantiene il ciclo di vita dei task tramite
-uno stato centralizzato.
-</p>
-
-<pre>
-pending → running → completed / failed
-</pre>
-
-<p>
-Questo approccio consente monitoraggio, fault recovery
-e gestione asincrona delle pipeline MRI.
-</p>
-
-</div>
-
-<div class="section">
-<h2>7. Principi architetturali</h2>
-
-<ul>
-<li>microservizi → modularità e isolamento</li>
-<li>Docker → portabilità e consistenza ambientale</li>
-<li>Nextflow → riproducibilità scientifica</li>
-<li>MLflow → tracciabilità dei modelli</li>
-<li>REST APIs → interoperabilità tra servizi</li>
-<li>separazione model/inference → flessibilità architetturale</li>
-</ul>
-
-</div>
-
-<div class="section">
-<h2>8. Scalabilità e deployment</h2>
-
-<p>
-L’architettura è progettata per supportare sia ambienti di ricerca
-che deployment production-grade.
-</p>
-
-<ul>
-<li>scaling indipendente dei microservizi</li>
-<li>parallelizzazione delle pipeline Nextflow</li>
-<li>supporto per ambienti HPC</li>
-<li>containerizzazione completa dei componenti</li>
-<li>deployment distribuito tramite Docker Compose</li>
-</ul>
-
-</div>
-
-<div class="section">
-<h2>9. Benefici architetturali</h2>
-
-<ul>
-<li>alta modularità del sistema</li>
-<li>maggiore manutenibilità</li>
-<li>facilità di testing dei servizi</li>
-<li>riduzione dell’accoppiamento tra componenti</li>
-<li>riproducibilità delle analisi cliniche</li>
-<li>facilità di integrazione di nuovi modelli AI</li>
-</ul>
-
-</div>
-
-</div>
-
-</body>
-
-</html>
+# Architettura del Sistema — Clinical Twin
+
+## Panoramica
+
+Clinical Twin è una piattaforma distribuita per la diagnosi differenziale della
+Demenza Frontotemporale (FTD) basata su radiomica di MRI T1.
+Il sistema segue un'architettura a microservizi con 7 servizi containerizzati
+orchestrati tramite Docker Compose.
+
+---
+
+## Mappa dei servizi
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    clinical_twin_net (bridge)                    │
+│                                                                  │
+│  ┌──────────────┐    ┌──────────────────┐    ┌───────────────┐  │
+│  │   frontend   │    │   api_gateway    │    │  llm_service  │  │
+│  │  React/Vite  │    │  FastAPI + JWT   │    │ FastAPI + LLM │  │
+│  │  porta: 5173 │    │  porta: 8006(h)  │    │ porta: 8002(h)│  │
+│  └──────┬───────┘    └────────┬─────────┘    └───────────────┘  │
+│         │                    │                                   │
+│         │            ┌───────▼──────────┐                       │
+│         └───────────►│   orchestrator   │                       │
+│                      │    FastAPI       │                       │
+│                      │  porta: 8001(h)  │                       │
+│                      └──┬──────────┬───┘                       │
+│                         │          │                            │
+│              ┌──────────▼──┐  ┌────▼────────────┐             │
+│              │model_service│  │nextflow_worker  │             │
+│              │FastAPI+MLflow│  │ FastAPI+Nextflow │             │
+│              │porta: 8003(h)│  │  porta: 8005(h) │             │
+│              └──────┬───────┘  └────────┬────────┘             │
+│                     │                   │ DooD                  │
+│              ┌──────▼────────┐    ┌─────▼──────────────────┐  │
+│              │inference_engine│   │  Docker daemon (HOST)   │  │
+│              │  R + Plumber   │   │  clinical-freesurfer    │  │
+│              │ porta: 8004(h) │   │  clinical-fsl           │  │
+│              └────────────────┘   │  clinical-pyradiomics   │  │
+│                                   │  ftd-training           │  │
+│                                   └────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+
+(h) = porta host su loopback 127.0.0.1
+```
+
+---
+
+## Dettaglio dei servizi
+
+| Servizio | Tecnologia | Porta (host) | Ruolo |
+|----------|-----------|-------------|-------|
+| `frontend` | React 18 + Vite + TailwindCSS | 5173 | Dashboard clinica: upload MRI, storico task, visualizzazione UMAP 3D |
+| `api_gateway` | FastAPI + SQLite | 127.0.0.1:8006 | Autenticazione JWT, gestione utenti |
+| `orchestrator` | FastAPI + SQLite | 127.0.0.1:8001 | Gestione task asincroni, coordinamento pipeline |
+| `model_service` | FastAPI + MLflow | 127.0.0.1:8003 | Download modello champion da DagsHub, trigger inferenza R |
+| `inference_engine` | R + Plumber + uwot | 127.0.0.1:8004 | Inferenza XGBoost, calcolo embedding UMAP 3D |
+| `llm_service` | FastAPI + Claude/Groq | 127.0.0.1:8002 | Assistente AI per interpretazione clinica |
+| `nextflow_worker` | FastAPI + Nextflow | 127.0.0.1:8005 | Coordinatore pipeline neuroimaging (DooD) |
+
+---
+
+## Flusso dati end-to-end
+
+```
+Utente (browser)
+    │ HTTP POST multipart (file NIfTI)
+    ▼
+Frontend :5173
+    │ POST /analyze/upload + JWT
+    ▼
+API Gateway :8006  ──► valida JWT
+    │
+    ▼
+Orchestrator :8001
+    │  Fase 0: GET /model_info/HC_vs_bvFTD → tag brain_segmenter
+    │  Fase 1: POST /start_preprocessing → nextflow_worker
+    │  Fase 2: POST /infer → model_service
+    │
+    ├──► Nextflow Worker :8005
+    │        │ subprocess: nextflow run preprocessing.nf
+    │        │ DooD: daemon Docker avvia 4 container sull'HOST
+    │        │
+    │        ├── clinical-freesurfer: recon-all (6–8h CPU / 30s mock)
+    │        ├── clinical-freesurfer: mri_convert  → nu.nii + aparc+aseg.nii
+    │        ├── clinical-fsl: fslmaths × 78       → ROI/*.nii.gz
+    │        └── clinical-pyradiomics              → radiomics_features.csv
+    │               → /shared_data/features/features_17.csv
+    │
+    └──► Model Service :8003
+             │ Scarica xgb.rds da DagsHub (o fallback locale)
+             └──► Inference Engine :8004 (R/Plumber)
+                      │ Predice HC/bvFTD + confidenza
+                      │ Calcola UMAP 3D
+                      └──► result_17.json → /shared_data/results/
+```
+
+---
+
+## DooD (Docker-out-of-Docker)
+
+Il `nextflow_worker` usa il pattern **Docker-out-of-Docker**:
+monta il socket Docker dell'host per avviare i container della pipeline
+direttamente sul **daemon Docker dell'host**.
+
+```yaml
+volumes:
+  - /var/run/docker.sock:/var/run/docker.sock  # DooD
+  - /tmp/nextflow_work:/tmp/nextflow_work       # directory lavoro condivisa
+```
+
+Il path `/tmp/nextflow_work` è il punto di coordinamento per la licenza
+FreeSurfer e la work directory di Nextflow.
+
+---
+
+## Volume condiviso: clinical_twin_shared_data
+
+```
+/shared_data/
+├── nifti/                    # File MRI caricati
+├── features/                 # CSV feature radiomiche (features_{task_id}.csv)
+├── results/                  # Risultati inferenza (result_{task_id}.json)
+├── models/HC_vs_bvFTD/       # Modello scaricato da MLflow
+└── ROI_labels.tsv            # Copiato da nextflow_worker al boot
+```
+
+---
+
+## Integrazione MLflow / DagsHub
+
+Il modello XGBoost viene salvato in formato **extended model** da `XGBoost.r`:
+- `$booster`: raw `xgb.Booster` (nessuna dipendenza `mlr`)
+- `$trainingData`: training set con fattore `.outcome` (HC/bvFTD)
+- `$x`, `$y`: dati per costruire lo spazio UMAP storico
+
+La catena di fallback in `model_service` è:
+1. Download da DagsHub MLflow (`models:/HC_vs_bvFTD@champion`)
+2. `/shared_data/models/{model_name}/model.rds`
+3. `/app/model.rds` (bind-mount locale)
+
+---
+
+## Sicurezza di rete
+
+Tutti i servizi (eccetto il frontend) si legano a `127.0.0.1`, impedendo
+l'accesso da rete esterna senza un reverse proxy. Il database SQLite è
+condiviso tra `api_gateway` e `orchestrator` tramite volume named `clinical_twin_db`.

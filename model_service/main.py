@@ -79,5 +79,9 @@ async def get_model_info(model_name: str):
 
 
 @app.get("/", tags=["Health"])
+def root():
+    return {"status": "ok", "service": "model_service"}
+
+@app.get("/health", tags=["Health"])
 def health():
     return {"status": "ok", "service": "model_service"}

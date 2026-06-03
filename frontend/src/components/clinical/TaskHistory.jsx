@@ -42,8 +42,9 @@ export default function TaskHistory({ onTaskCompleted, onTaskClick, theme, refre
 
     const formatFilename = (filename) => {
         if (!filename) return "Sconosciuto";
+        // Il filename è "{8-char-md5}_{originalname}" (vedi orchestrator/routers/analyze.py)
         const firstUnderscoreIndex = filename.indexOf('_');
-        if (firstUnderscoreIndex !== -1 && firstUnderscoreIndex === 36) {
+        if (firstUnderscoreIndex === 8) {
             return filename.substring(firstUnderscoreIndex + 1);
         }
         return filename;

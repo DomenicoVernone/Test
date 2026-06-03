@@ -13,6 +13,7 @@ params.fastsurfer_device = 'cpu' // default sicuro - viene sovrasctitto dalla CL
 params.fastsurfer_threads = 4
 params.fastsurfer_3T = false
 params.brain_segmenter = 'freesurfer'  // default sicuro
+params.test_mode       = false         // true = bypassa FreeSurfer con mock per CI/test
 
 
 workflow {
@@ -33,6 +34,7 @@ workflow {
                 def filename = nifti.name
                 def subject_id = (filename =~ /^NIFD_([0-9]*_S_[0-9]*)_.*/)
                     .findResult { _match, id -> id }
+                    ?: filename.replaceAll(/\.nii(\.gz)?$/, '')
                 return tuple(FTD_group, nifti, subject_id)
             }
     }
@@ -41,7 +43,14 @@ workflow {
     labels_file_ch = Channel.value(file(params.labels))
     params_file_ch = channel.fromPath(params.settings)
 
-    if (params.brain_segmenter == "freesurfer") {
+    // Groovy: la stringa "false" da CLI è truthy — normalizzare esplicitamente
+    def use_mock = (params.test_mode instanceof Boolean)
+        ? params.test_mode
+        : params.test_mode.toString().toLowerCase() == "true"
+
+    if (use_mock) {
+        segmenter_out = mock_freesurfer(subjects_ch)
+    } else if (params.brain_segmenter == "freesurfer") {
         segmenter_out = freesurfer(subjects_ch)
     } else if (params.brain_segmenter == "fastsurfer") {
         segmenter_out = fastsurfer(subjects_ch, file(params.license))
@@ -75,10 +84,70 @@ csv_out = csv_collector(
     )
 }
 
+// ── Mock FreeSurfer: crea nu.mgz + aparc+aseg.mgz sintetici senza recon-all ──
+// Attivato da params.test_mode = true. Bypassa FreeSurfer per CI/test rapidi,
+// consentendo di testare nifti_converter → roi_creator → radiomics → inference.
+process mock_freesurfer {
+    container 'clinical-freesurfer'
+    errorStrategy params.error_strategy
+
+    input:
+    tuple val(FTD_group), file(nifti), val(subject)
+
+    output:
+    tuple val(subject), path("${subject}", type: 'dir'), val(FTD_group)
+
+    script:
+    """
+    set -e
+    mkdir -p "${subject}/mri/transforms"
+
+    # nu.mgz: converte il NIfTI di input in formato MGZ
+    mri_convert "${nifti}" "${subject}/mri/nu.mgz"
+
+    # aparc+aseg.mgz: 78 label concentriche (corrispondono agli Index di ROI_labels.tsv)
+    cat > make_aparc.py << 'PYEOF'
+import sys
+import numpy as np
+import nibabel as nib
+
+subj = sys.argv[1]
+nu = nib.load(subj + '/mri/nu.mgz')
+shape = nu.header.get_data_shape()[:3]
+nx, ny, nz = int(shape[0]), int(shape[1]), int(shape[2])
+cx, cy, cz = nx // 2, ny // 2, nz // 2
+
+X, Y, Z = np.ogrid[:nx, :ny, :nz]
+R = np.sqrt((X - cx)**2 + (Y - cy)**2 + (Z - cz)**2).astype(np.float32)
+
+data = np.zeros(shape, dtype=np.int32)
+n_labels = 78
+r_max = float(min(cx, cy, cz)) * 0.90
+step = r_max / n_labels
+
+for i in range(1, n_labels + 1):
+    r0 = (i - 1) * step
+    r1 = i * step
+    data[(R >= r0) & (R < r1)] = i
+
+data[R < step] = 1  # centro = label 1
+
+out = nib.MGHImage(data.astype(np.float32), nu.affine, nu.header)
+out.to_filename(subj + '/mri/aparc+aseg.mgz')
+unique = np.unique(data[data > 0])
+print('Mock aparc+aseg.mgz: {} label unici (1-{})'.format(
+    len(unique), int(unique.max()) if len(unique) > 0 else 0))
+PYEOF
+
+    /usr/local/freesurfer/python/bin/python3 make_aparc.py "${subject}"
+    echo "mock_freesurfer completato per ${subject}"
+    """
+}
+
 process freesurfer {
     container 'clinical-freesurfer'
     errorStrategy params.error_strategy
-    publishDir "${params.segmenter_folder_output}/${FTD_group}", mode: 'copy', pattern: "${subject}"
+    publishDir { "${params.segmenter_folder_output}/${FTD_group}" }, mode: 'copy'
     maxForks params.maxforks
 
     input:
@@ -101,6 +170,7 @@ process freesurfer {
     -subject ${subject} \
     -i ${nifti} \
     -all \
+    -notal-check \
     -cw256 \
     -openmp 16
     """
@@ -110,7 +180,7 @@ process fastsurfer {
     container 'deepmi/fastsurfer:cuda-v2.4.2'
     containerOptions '--gpus all --user $(id -u):$(id -g) --entrypoint ""'
     errorStrategy params.error_strategy
-    publishDir "${params.segmenter_folder_output}/${FTD_group}", mode: 'copy', pattern: "${subject}"
+    publishDir { "${params.segmenter_folder_output}/${FTD_group}" }, mode: 'copy'
     maxForks params.maxforks
 
     input:
@@ -137,7 +207,7 @@ process fastsurfer {
 process nifti_converter {
     container 'clinical-freesurfer'
     errorStrategy params.error_strategy
-    publishDir "${params.segmenter_folder_output}/${FTD_group}/${subject}/mri", mode: 'copy'
+    publishDir { "${params.segmenter_folder_output}/${FTD_group}/${subject}/mri" }, mode: 'copy'
     //env.FS_LICENSE = "/app/license.txt"
     input:
     tuple val(subject), path(subject_dir), val(FTD_group)
@@ -196,7 +266,7 @@ process roi_creator {
     }
 
 process csv_collector {
-    container 'pyradiomics'
+    container 'clinical-pyradiomics'
     errorStrategy params.error_strategy
     publishDir "${params.features_output}", mode: 'copy'
 

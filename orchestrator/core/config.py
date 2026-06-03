@@ -25,6 +25,8 @@ class Settings(BaseSettings):
 
     # Flag per usare il mock runner invece di Nextflow (sviluppo/test)
     USE_MOCK: bool = Field(default=False)
+    # Flag per attivare params.test_mode in Nextflow (bypassa FreeSurfer con mock)
+    TEST_MODE: bool = Field(default=False)
 
     # Origini autorizzate per le richieste CORS dal browser
     CORS_ORIGINS: List[str] = Field(
