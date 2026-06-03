@@ -13,7 +13,7 @@ orchestrati tramite Docker Compose.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    clinical_twin_net (bridge)                    │
+│                    mlops_net (bridge)                    │
 │                                                                  │
 │  ┌──────────────┐    ┌──────────────────┐    ┌───────────────┐  │
 │  │   frontend   │    │   api_gateway    │    │  llm_service  │  │

@@ -299,4 +299,3 @@ Il flag è passato end-to-end: `orchestrator.settings.TEST_MODE` → `pipeline.p
 
 ---
 
-*Report generato automaticamente il 2026-06-02*

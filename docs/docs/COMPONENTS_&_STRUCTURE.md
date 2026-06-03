@@ -132,7 +132,7 @@ Tesi-FTD/
 
 ---
 
-## Key Files Added in Sessions 2026-05-27/28
+## Key Files Added
 
 | File | Type | Purpose |
 |------|------|---------|
@@ -145,19 +145,57 @@ Tesi-FTD/
 ## Inter-Service Communication
 
 ```
-Frontend ──HTTP──► API Gateway ──HTTP──► Orchestrator
-                                             │
-                              ┌──────────────┼──────────────┐
-                              │              │              │
-                       Model Service  Nextflow Worker   (polling)
-                              │              │
-                      Inference Engine  [Docker daemon]
-                                            │
-                                    [4 pipeline containers]
-                                    clinical-freesurfer
-                                    clinical-fsl
-                                    clinical-pyradiomics
-                                    ftd-training
+Browser (user)
+│ HTTP upload MRI (.nii/.nii.gz)
+▼
+Frontend  React/Vite  (5173)
+│ HTTP POST /analyze/upload + JWT Bearer
+▼
+API Gateway  FastAPI  (8006) ── JWT validation
+│ HTTP forward (authorized)
+▼
+Orchestrator  FastAPI  (8001)
+│                          │                        │
+│ HTTP POST /infer          │ HTTP POST              │ polling GET
+│                          │ /start_preprocessing   │ /status/{id}
+│                          │                        │ every 5s
+▼                          ▼                        │
+Model Service              Nextflow Worker ──────────┘
+FastAPI (8003)             FastAPI (8005)
+│                          │ Docker API (DooD via /var/run/docker.sock)
+│                          ▼
+│                    Docker daemon HOST
+│                    ├── clinical-freesurfer
+│                    │   recon-all (~4-8h CPU / 30s mock)
+│                    │   Output: nu.mgz + aparc+aseg.mgz
+│                    ├── clinical-freesurfer (mri_convert)
+│                    │   Output: nu.nii + aparc+aseg.nii
+│                    ├── clinical-fsl  fslmaths×78
+│                    │   Output: ROI/*.nii.gz  (~5 min)
+│                    └── clinical-pyradiomics  pyradiomics×78
+│                        Output: radiomics_features.csv  (~10 min)
+│                          │
+│                    /shared_data/  (named volume clinical_twin_shared_data)
+│                    features/features_{task_id}.csv
+│ HTTP POST /infer
+▼
+Inference Engine  R/Plumber  (8004)
+│ Load .rds model (XGBoost extended model)
+│ Align ~6864 features via ROI mapping
+│ XGBoost predict → HC or bvFTD + confidence
+│ Compute UMAP 3D (training set + new patient)
+│ Write /shared_data/results/result_{task_id}.json
+▼
+Result JSON
+{ "diagnosi_predetta": "HC", "confidenza": 0.7957, "plot_data": {...} }
+│
+▼
+Orchestrator → task COMPLETED (100%)
+│
+▼
+Frontend polls GET /analyze/status/{id} every 3s
+▼
+User sees: diagnosis + confidence score + 3D UMAP visualization
 ```
 
 Data exchange:

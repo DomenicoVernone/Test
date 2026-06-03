@@ -1,13 +1,6 @@
 ﻿# REPORT TECNICO DEFINITIVO — MLOps FTD
 ## Pipeline di Neuroimaging per la Diagnosi Differenziale della Demenza Frontotemporale
 
-**Data:** 2026-06-03  
-**Progetto:** MLOps — Pipeline di Neuroimaging FTD  
-**Repository:** Tesi-FTD / branch: main  
-**Sessioni di lavoro:** 2026-05-27 / 2026-05-28 / 2026-06-02  
-**Commit di riferimento:** b08aab0 (HEAD)  
-**Autore:** DomenicoVernone — Claude Sonnet 4.6
-
 ---
 
 ## INDICE
@@ -53,7 +46,7 @@ frontend, nextflow_worker) con volumi condivisi, porte e dipendenze.
 
 **COSA FA QUESTO FILE:**  
 È il file di configurazione principale di Docker Compose. Definisce i 7
-container del sistema, la rete interna `clinical_twin_net`, i volumi
+container del sistema, la rete interna `mlops_net`, i volumi
 `clinical_twin_shared_data` (dati NIfTI, feature CSV, risultati JSON) e
 `clinical_twin_db` (database SQLite condiviso tra api_gateway e orchestrator).
 Ogni servizio comunica internamente tramite nome container sulla porta 8000;
@@ -1470,7 +1463,7 @@ Dopo: il filename originale è mostrato correttamente (es. `sub-01_ses-test_T1w.
   ├── Valida token Bearer, controlla scadenza
   └── Proxy delle richieste autenticate verso Orchestrator
        │
-       │  [HTTP POST — rete Docker interna clinical_twin_net]
+       │  [HTTP POST — rete Docker interna mlops_net]
        │  Richiesta autenticata con task_id generato
        │  Latenza: <50ms
        ▼
@@ -1599,7 +1592,7 @@ SERVIZIO PARALLELO:
 | Fase 2: Download MLflow | Model Service → DagsHub | 5–30s |
 | Fase 2: R inference + UMAP | Inference Engine | 30–120s |
 | Risultato nel frontend | HTTP GET + rendering | < 1s |
-| **TOTALE (produzione)** | **End-to-end con FreeSurfer CPU** | **~8–10 ore** |
+| **TOTALE (produzione)** | **End-to-end con FreeSurfer CPU** | **~4h 21m** |
 | **TOTALE (test mode)** | **End-to-end con mock FreeSurfer** | **~3–5 min** |
 
 ---
@@ -1770,11 +1763,11 @@ Cinque ragioni:
 └──────────────────┴───────────┴──────────┴─────────────────────────────────┘
 ```
 
-**Stato del sistema prima delle sessioni di lavoro:** Pipeline completamente bloccata.
+**Stato del sistema prima delle modifiche:** Pipeline completamente bloccata.
 Nessun task raggiungeva lo stato COMPLETED. FreeSurfer crashava per licenza non trovata,
 le immagini Docker avevano nomi sbagliati, l'inferenza R crashava su qualsiasi modello.
 
-**Stato del sistema dopo le sessioni di lavoro:** Pipeline end-to-end funzionante.
+**Stato del sistema dopo le modifiche:** Pipeline end-to-end funzionante.
 Task 17–19 completati con stato COMPLETED, diagnosi "HC" con confidenza 79.57%,
 UMAP 3D popolato e visualizzato nel frontend. Modalità test operativa in ~15 minuti.
 
@@ -1872,6 +1865,3 @@ automatica dei metadati DICOM (dati PHI).
 
 ---
 
-*Report generato da Claude Sonnet 4.6 il 2026-06-03*  
-*Basato su sessioni di sviluppo 2026-05-27 / 2026-05-28 / 2026-06-02*  
-*Commit HEAD: b08aab0 — branch: main*

@@ -1,7 +1,7 @@
 ﻿# API Reference — MLOps
 
 La piattaforma MLOps espone API REST su 5 microservizi.
-Tutti i servizi comunicano sulla rete Docker `clinical_twin_net`.
+Tutti i servizi comunicano sulla rete Docker `mlops_net`.
 L'accesso esterno è vincolato a `127.0.0.1` (solo loopback).
 
 ---

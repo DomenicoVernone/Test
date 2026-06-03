@@ -121,7 +121,7 @@ Tesi-FTD/
 
 ---
 
-## File chiave aggiunti nelle sessioni 2026-05-27/28
+## File chiave aggiunti
 
 | File | Tipo | Scopo |
 |------|------|-------|
@@ -134,15 +134,57 @@ Tesi-FTD/
 ## Comunicazione tra servizi
 
 ```
-Frontend ──HTTP──► API Gateway ──HTTP──► Orchestrator
-                                             │
-                              ┌──────────────┼──────────────┐
-                              │              │              │
-                       Model Service  Nextflow Worker   (polling)
-                              │              │
-                      Inference Engine  [Docker daemon]
-                                            │
-                                    [4 container pipeline]
+Browser (utente)
+│ HTTP upload MRI (.nii/.nii.gz)
+▼
+Frontend  React/Vite  (5173)
+│ HTTP POST /analyze/upload + JWT Bearer
+▼
+API Gateway  FastAPI  (8006) ── validazione JWT
+│ HTTP forward (autorizzato)
+▼
+Orchestrator  FastAPI  (8001)
+│                          │                        │
+│ HTTP POST /infer          │ HTTP POST              │ polling GET
+│                          │ /start_preprocessing   │ /status/{id}
+│                          │                        │ ogni 5s
+▼                          ▼                        │
+Model Service              Nextflow Worker ──────────┘
+FastAPI (8003)             FastAPI (8005)
+│                          │ Docker API (DooD via /var/run/docker.sock)
+│                          ▼
+│                    Docker daemon HOST
+│                    ├── clinical-freesurfer
+│                    │   recon-all (~4-8h CPU / 30s mock)
+│                    │   Output: nu.mgz + aparc+aseg.mgz
+│                    ├── clinical-freesurfer (mri_convert)
+│                    │   Output: nu.nii + aparc+aseg.nii
+│                    ├── clinical-fsl  fslmaths×78
+│                    │   Output: ROI/*.nii.gz  (~5 min)
+│                    └── clinical-pyradiomics  pyradiomics×78
+│                        Output: radiomics_features.csv  (~10 min)
+│                          │
+│                    /shared_data/  (volume named clinical_twin_shared_data)
+│                    features/features_{task_id}.csv
+│ HTTP POST /infer
+▼
+Inference Engine  R/Plumber  (8004)
+│ Carica modello .rds (extended XGBoost model)
+│ Allinea ~6864 feature tramite mapping ROI
+│ XGBoost predict → HC o bvFTD + confidenza
+│ Calcola UMAP 3D (training set + nuovo paziente)
+│ Scrive /shared_data/results/result_{task_id}.json
+▼
+Risultato JSON
+{ "diagnosi_predetta": "HC", "confidenza": 0.7957, "plot_data": {...} }
+│
+▼
+Orchestrator → task COMPLETATO (100%)
+│
+▼
+Frontend polling GET /analyze/status/{id} ogni 3s
+▼
+Utente vede: diagnosi + confidenza + visualizzazione UMAP 3D
 ```
 
 Scambio dati:

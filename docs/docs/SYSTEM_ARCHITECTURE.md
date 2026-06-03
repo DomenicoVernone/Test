@@ -13,7 +13,7 @@ orchestrated via Docker Compose.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    clinical_twin_net (bridge)                    │
+│                    mlops_net (bridge)                    │
 │                                                                  │
 │  ┌──────────────┐    ┌──────────────────┐    ┌───────────────┐  │
 │  │   frontend   │    │   api_gateway    │    │  llm_service  │  │
@@ -183,7 +183,7 @@ The **extended model** format (saved by `XGBoost.r`) contains:
 
 ## Network Security
 
-All services bind on the internal Docker network `clinical_twin_net`.
+All services bind on the internal Docker network `mlops_net`.
 External access via host-bound ports is restricted to loopback:
 
 ```

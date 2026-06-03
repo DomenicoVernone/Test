@@ -1675,12 +1675,6 @@
 
 <h1 id="report-tecnico-definitivo-mlops-ftd">REPORT TECNICO DEFINITIVO — MLOps FTD<a class="headerlink" href="#report-tecnico-definitivo-mlops-ftd" title="Permanent link">&para;</a></h1>
 <h2 id="pipeline-di-neuroimaging-per-la-diagnosi-differenziale-della-demenza-frontotemporale">Pipeline di Neuroimaging per la Diagnosi Differenziale della Demenza Frontotemporale<a class="headerlink" href="#pipeline-di-neuroimaging-per-la-diagnosi-differenziale-della-demenza-frontotemporale" title="Permanent link">&para;</a></h2>
-<p><strong>Data:</strong> 2026-06-03<br />
-<strong>Progetto:</strong> MLOps — Pipeline di Neuroimaging FTD<br />
-<strong>Repository:</strong> Tesi-FTD / branch: main<br />
-<strong>Sessioni di lavoro:</strong> 2026-05-27 / 2026-05-28 / 2026-06-02<br />
-<strong>Commit di riferimento:</strong> b08aab0 (HEAD)<br />
-<strong>Autore:</strong> DomenicoVernone — Claude Sonnet 4.6</p>
 <hr />
 <h2 id="indice">INDICE<a class="headerlink" href="#indice" title="Permanent link">&para;</a></h2>
 <ol>
@@ -1722,7 +1716,7 @@ frontend, nextflow_worker) con volumi condivisi, porte e dipendenze.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</p>
 <p><strong>COSA FA QUESTO FILE:</strong><br />
 È il file di configurazione principale di Docker Compose. Definisce i 7
-container del sistema, la rete interna <code>clinical_twin_net</code>, i volumi
+container del sistema, la rete interna <code>mlops_net</code>, i volumi
 <code>clinical_twin_shared_data</code> (dati NIfTI, feature CSV, risultati JSON) e
 <code>clinical_twin_db</code> (database SQLite condiviso tra api_gateway e orchestrator).
 Ogni servizio comunica internamente tramite nome container sulla porta 8000;
@@ -2976,7 +2970,7 @@ Dopo: il filename originale è mostrato correttamente (es. <code>sub-01_ses-test
 <a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a>  ├── Valida token Bearer, controlla scadenza
 <a id="__codelineno-32-21" name="__codelineno-32-21" href="#__codelineno-32-21"></a>  └── Proxy delle richieste autenticate verso Orchestrator
 <a id="__codelineno-32-22" name="__codelineno-32-22" href="#__codelineno-32-22"></a>       │
-<a id="__codelineno-32-23" name="__codelineno-32-23" href="#__codelineno-32-23"></a>       │  [HTTP POST — rete Docker interna clinical_twin_net]
+<a id="__codelineno-32-23" name="__codelineno-32-23" href="#__codelineno-32-23"></a>       │  [HTTP POST — rete Docker interna mlops_net]
 <a id="__codelineno-32-24" name="__codelineno-32-24" href="#__codelineno-32-24"></a>       │  Richiesta autenticata con task_id generato
 <a id="__codelineno-32-25" name="__codelineno-32-25" href="#__codelineno-32-25"></a>       │  Latenza: &lt;50ms
 <a id="__codelineno-32-26" name="__codelineno-32-26" href="#__codelineno-32-26"></a>       ▼
@@ -3149,7 +3143,7 @@ Dopo: il filename originale è mostrato correttamente (es. <code>sub-01_ses-test
 <tr>
 <td><strong>TOTALE (produzione)</strong></td>
 <td><strong>End-to-end con FreeSurfer CPU</strong></td>
-<td><strong>~8–10 ore</strong></td>
+<td><strong>~4h 21m</strong></td>
 </tr>
 <tr>
 <td><strong>TOTALE (test mode)</strong></td>
@@ -3400,10 +3394,10 @@ sintetico) + 1 punto per il nuovo paziente proiettato nello spazio storico.</p>
 <a id="__codelineno-35-28" name="__codelineno-35-28" href="#__codelineno-35-28"></a>│                  │           │          │ ~4h 21m (FreeSurfer reale)      │
 <a id="__codelineno-35-29" name="__codelineno-35-29" href="#__codelineno-35-29"></a>└──────────────────┴───────────┴──────────┴─────────────────────────────────┘
 </code></pre></div>
-<p><strong>Stato del sistema prima delle sessioni di lavoro:</strong> Pipeline completamente bloccata.
+<p><strong>Stato del sistema prima delle modifiche:</strong> Pipeline completamente bloccata.
 Nessun task raggiungeva lo stato COMPLETED. FreeSurfer crashava per licenza non trovata,
 le immagini Docker avevano nomi sbagliati, l'inferenza R crashava su qualsiasi modello.</p>
-<p><strong>Stato del sistema dopo le sessioni di lavoro:</strong> Pipeline end-to-end funzionante.
+<p><strong>Stato del sistema dopo le modifiche:</strong> Pipeline end-to-end funzionante.
 Task 17–19 completati con stato COMPLETED, diagnosi "HC" con confidenza 79.57%,
 UMAP 3D popolato e visualizzato nel frontend. Modalità test operativa in ~15 minuti.</p>
 <hr />
@@ -3479,9 +3473,6 @@ accetta solo <code>.nii</code>/<code>.nii.gz</code>. Necessario: conversion step
 (via <code>dcm2niix</code>) integrato nella pipeline di upload, con anonimizzazione
 automatica dei metadati DICOM (dati PHI).</p>
 <hr />
-<p><em>Report generato da Claude Sonnet 4.6 il 2026-06-03</em><br />
-<em>Basato su sessioni di sviluppo 2026-05-27 / 2026-05-28 / 2026-06-02</em><br />
-<em>Commit HEAD: b08aab0 — branch: main</em></p>
 
 
 
