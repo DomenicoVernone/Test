@@ -1,8 +1,8 @@
-# System Architecture — Clinical Twin
+﻿# System Architecture — MLOps
 
 ## Overview
 
-Clinical Twin is a distributed platform for the differential diagnosis of
+MLOps is a distributed platform for the differential diagnosis of
 Frontotemporal Dementia (FTD) variants based on radiomics of T1 MRI.
 The system follows a microservices architecture with 7 containerized services
 orchestrated via Docker Compose.

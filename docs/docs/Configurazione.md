@@ -1,4 +1,4 @@
-# Configuration — Clinical Twin
+﻿# Configuration — MLOps
 
 The platform is configured via `.env` files, one per service.
 These files must be set up before starting the system.

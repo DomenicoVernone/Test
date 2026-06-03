@@ -1,4 +1,4 @@
-# Guida Rapida — Clinical Twin
+﻿# Guida Rapida — MLOps
 
 Questa guida descrive il percorso più veloce per eseguire la prima analisi MRI.
 

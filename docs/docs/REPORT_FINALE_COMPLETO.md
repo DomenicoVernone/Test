@@ -1,8 +1,8 @@
-# REPORT TECNICO DEFINITIVO — Clinical Twin FTD
+﻿# REPORT TECNICO DEFINITIVO — MLOps FTD
 ## Pipeline di Neuroimaging per la Diagnosi Differenziale della Demenza Frontotemporale
 
 **Data:** 2026-06-03  
-**Progetto:** Clinical Twin — Pipeline di Neuroimaging FTD  
+**Progetto:** MLOps — Pipeline di Neuroimaging FTD  
 **Repository:** Tesi-FTD / branch: main  
 **Sessioni di lavoro:** 2026-05-27 / 2026-05-28 / 2026-06-02  
 **Commit di riferimento:** b08aab0 (HEAD)  
@@ -517,7 +517,7 @@ esecuzioni manuali.
 
 **CODICE DOPO:**
 ```groovy
-// main.nf — entry point canonico della pipeline Clinical Twin (DSL2)
+// main.nf — entry point canonico della pipeline MLOps (DSL2)
 //
 // Uso rapido (singola immagine clinica):
 //   nextflow run main.nf -c nextflow.config \
@@ -1608,11 +1608,17 @@ SERVIZIO PARALLELO:
 
 ### Test eseguito con `sub-01_ses-test_T1w.nii`
 
-**Configurazione del test:**
-- Brain segmenter: `freesurfer` con `test_mode=true` (mock_freesurfer attivato)
+**Configurazione del test (due run eseguiti):**
+
+| Parametro | Test 1 (sviluppo) | Test 2 (validazione) |
+|-----------|-------------------|---------------------|
+| Brain segmenter | `freesurfer` + `test_mode=true` | `freesurfer` reale |
+| Mock FreeSurfer | ✅ attivato (~30s) | ✗ disattivato |
+| Durata totale | ~12–15 minuti | **4h 21m 50s** |
+| Task ID | 17–18 | 19 |
+
 - Modello: `HC_vs_bvFTD` — extended XGBoost model addestrato su dati sintetici
   (6 soggetti HC + 6 soggetti bvFTD generati da scan reale + rumore gaussiano ±15%)
-- Task ID: 17–19 (multipli tentativi durante lo sviluppo)
 
 ---
 
@@ -1670,6 +1676,24 @@ sintetico) + 1 punto per il nuovo paziente proiettato nello spazio storico.
 
 ---
 
+**Tabella riepilogo misurazioni reali (FreeSurfer CPU completo):**
+
+```
+┌─────────────────────────────┬────────────────────────────────────┐
+│ Step                        │ Risultato                          │
+├─────────────────────────────┼────────────────────────────────────┤
+│ File testato                │ sub-01_ses-test_T1w.nii (BIDS T1) │
+│ FreeSurfer recon-all        │ ✅ completato in 4h 21m 50s        │
+│ ROI estratte                │ 78 regioni cerebrali               │
+│ Feature radiomiche          │ radiomics_features.csv 251KB       │
+│ Diagnosi predetta           │ HC (Healthy Control)               │
+│ Confidenza                  │ 79.57%                             │
+│ Posizione UMAP 3D           │ x=0.703  y=−0.329  z=0.746        │
+└─────────────────────────────┴────────────────────────────────────┘
+```
+
+---
+
 **Perché la confidenza è 79.57% e non 100%:**
 
 Cinque ragioni:
@@ -1719,35 +1743,30 @@ Cinque ragioni:
 │ Categoria        │ File      │ Bug fix  │ Funzionalità aggiunte           │
 │                  │ toccati   │ risolti  │                                 │
 ├──────────────────┼───────────┼──────────┼─────────────────────────────────┤
-│ Infrastruttura   │     3     │    4     │ Binding loopback API Gateway,   │
+│ Infrastruttura   │ 3         │ 4        │ Binding loopback API Gateway,   │
 │                  │           │          │ VITE_AUTH_URL, NF_SETTINGS,     │
-│                  │           │          │ dipendenze Docker corrette       │
+│                  │           │          │ dipendenze Docker corrette      │
 ├──────────────────┼───────────┼──────────┼─────────────────────────────────┤
-│ Pipeline NF      │   5 (+2)  │    7     │ mock_freesurfer (CI/test),      │
+│ Pipeline NF      │ 5 (+2)    │ 7        │ mock_freesurfer (CI/test),      │
 │                  │           │          │ main.nf (entry point DSL2),     │
-│                  │           │          │ training.config (separazione    │
-│                  │           │          │ config/codice), test_mode API,  │
-│                  │           │          │ GPU lock FastSurfer              │
+│                  │           │          │ training.config,                │
+│                  │           │          │ test_mode API end-to-end        │
 ├──────────────────┼───────────┼──────────┼─────────────────────────────────┤
-│ ML/Inferenza     │     5     │    8     │ Extended XGBoost model con      │
-│                  │           │          │ trainingData per UMAP,          │
-│                  │           │          │ confidenza numerica, 3 branch   │
-│                  │           │          │ predizione (XGB/caret/raw),     │
+│ ML/Inferenza     │ 5         │ 8        │ Extended XGBoost model,         │
+│                  │           │          │ confidenza numerica,            │
+│                  │           │          │ 3 branch predizione,            │
 │                  │           │          │ fallback MLflow→locale,         │
-│                  │           │          │ /health endpoint inference       │
+│                  │           │          │ /health endpoint inference      │
 ├──────────────────┼───────────┼──────────┼─────────────────────────────────┤
-│ Orchestrazione   │     2     │    0     │ Propagazione test_mode          │
-│                  │           │          │ end-to-end via env var,         │
-│                  │           │          │ recupero brain_segmenter da     │
-│                  │           │          │ MLflow prima del preprocessing  │
+│ Orchestrazione   │ 2         │ 0        │ Propagazione test_mode          │
+│                  │           │          │ end-to-end via env var          │
 ├──────────────────┼───────────┼──────────┼─────────────────────────────────┤
-│ Frontend         │     1     │    1     │ Parsing filename MD5[:8]        │
-│                  │           │          │ corretto (era UUID v4),         │
-│                  │           │          │ LiveTimer per task attivi       │
+│ Frontend         │ 1         │ 1        │ Parsing filename MD5[:8]        │
+│                  │           │          │ corretto (era UUID v4)          │
 ├──────────────────┼───────────┼──────────┼─────────────────────────────────┤
-│ TOTALE           │  16 (+2)  │   20     │ Pipeline end-to-end COMPLETED   │
-│                  │  = 18     │          │ in 3–5 min (test mode) /        │
-│                  │           │          │ 8–10 ore (FreeSurfer reale)     │
+│ TOTALE           │ 16+2=18   │ 20       │ Pipeline end-to-end COMPLETATA  │
+│                  │           │          │ ~15min (test mode)              │
+│                  │           │          │ ~4h 21m (FreeSurfer reale)      │
 └──────────────────┴───────────┴──────────┴─────────────────────────────────┘
 ```
 
@@ -1757,7 +1776,7 @@ le immagini Docker avevano nomi sbagliati, l'inferenza R crashava su qualsiasi m
 
 **Stato del sistema dopo le sessioni di lavoro:** Pipeline end-to-end funzionante.
 Task 17–19 completati con stato COMPLETED, diagnosi "HC" con confidenza 79.57%,
-UMAP 3D popolato e visualizzato nel frontend. Modalità test operativa in <5 minuti.
+UMAP 3D popolato e visualizzato nel frontend. Modalità test operativa in ~15 minuti.
 
 ---
 

@@ -1,6 +1,6 @@
-# API Reference — Clinical Twin
+﻿# API Reference — MLOps
 
-La piattaforma Clinical Twin espone API REST su 5 microservizi.
+La piattaforma MLOps espone API REST su 5 microservizi.
 Tutti i servizi comunicano sulla rete Docker `clinical_twin_net`.
 L'accesso esterno è vincolato a `127.0.0.1` (solo loopback).
 

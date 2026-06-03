@@ -1,4 +1,4 @@
-# Components & Project Structure — Clinical Twin
+﻿# Components & Project Structure — MLOps
 
 ---
 

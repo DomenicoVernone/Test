@@ -1,6 +1,6 @@
-# Clinical Twin — FTD Radiomics Platform
+﻿# MLOps — FTD Radiomics Platform
 
-**Clinical Twin** is an MLOps platform for the differential diagnosis of
+**MLOps** is a clinical decision support platform for the differential diagnosis of
 Frontotemporal Dementia (FTD) variants through automated analysis of T1 MRI.
 
 ---

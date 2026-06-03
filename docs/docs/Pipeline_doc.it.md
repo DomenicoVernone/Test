@@ -1,4 +1,4 @@
-# Pipeline Radiomica — Clinical Twin
+﻿# Pipeline Radiomica — MLOps
 
 ## Panoramica
 

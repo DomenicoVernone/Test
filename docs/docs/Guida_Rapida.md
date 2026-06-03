@@ -1,4 +1,4 @@
-# Quickstart — Clinical Twin
+﻿# Quickstart — MLOps
 
 This guide covers the fastest path to run your first MRI analysis.
 

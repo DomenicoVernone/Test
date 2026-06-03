@@ -1,4 +1,4 @@
-# Configurazione — Clinical Twin
+﻿# Configurazione — MLOps
 
 La piattaforma è configurata tramite file `.env`, uno per servizio.
 Questi file devono essere configurati prima di avviare il sistema.
