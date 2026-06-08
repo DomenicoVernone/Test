@@ -52,3 +52,23 @@ class RegisterResponse(BaseModel):
     id: int
     username: str
     model_config = ConfigDict(from_attributes=True)
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def password_strength(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError("La password deve essere di almeno 8 caratteri")
+        if not re.search(r'[A-Z]', v):
+            raise ValueError("La password deve contenere almeno una lettera maiuscola")
+        if not re.search(r'[0-9]', v):
+            raise ValueError("La password deve contenere almeno un numero")
+        return v

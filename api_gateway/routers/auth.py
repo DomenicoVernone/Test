@@ -1,5 +1,7 @@
 # api_gateway/routers/auth.py
-from datetime import datetime, timezone
+import logging
+import secrets
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
@@ -20,7 +22,9 @@ from core.security import (
     _check_not_revoked,
 )
 from models.domain import User, RevokedToken, PasswordResetToken
-from models.schemas import Token, UserCreate, UserResponse, RefreshResponse, RegisterResponse
+from models.schemas import Token, UserCreate, UserResponse, RefreshResponse, RegisterResponse, ForgotPasswordRequest, ResetPasswordRequest
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["Authentication"])
 
@@ -172,6 +176,59 @@ def logout(
         except Exception:
             pass
     response.delete_cookie(key=_REFRESH_COOKIE)
+
+
+# ── Password dimenticata ──────────────────────────────────────────────────────
+
+@router.post("/forgot-password")
+@limiter.limit("3/hour")
+def forgot_password(
+    request: Request,
+    body: ForgotPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    """Risponde sempre 200 — non rivela se l'email esiste. Logga il token al posto dell'email."""
+    user = db.query(User).filter(User.email == body.email).first()
+    if user:
+        db.query(PasswordResetToken).filter(
+            PasswordResetToken.user_id == user.id,
+            PasswordResetToken.used == False,
+        ).update({"used": True})
+        db.commit()
+        token = secrets.token_urlsafe(32)
+        expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+        db.add(PasswordResetToken(user_id=user.id, token=token, expires_at=expires_at))
+        db.commit()
+        logger.info(f"RESET TOKEN per {body.email}: {token}")
+    return {"message": "Se l'email è registrata riceverai le istruzioni a breve."}
+
+
+@router.post("/reset-password")
+@limiter.limit("5/hour")
+def reset_password(
+    request: Request,
+    body: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    now = datetime.now(timezone.utc)
+    reset_token = (
+        db.query(PasswordResetToken)
+        .filter(
+            PasswordResetToken.token == body.token,
+            PasswordResetToken.used == False,
+            PasswordResetToken.expires_at > now,
+        )
+        .first()
+    )
+    if not reset_token:
+        raise HTTPException(status_code=400, detail="Token non valido o scaduto")
+    user = db.query(User).filter(User.id == reset_token.user_id).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Token non valido o scaduto")
+    user.hashed_password = get_password_hash(body.new_password)
+    reset_token.used = True
+    db.commit()
+    return {"message": "Password aggiornata"}
 
 
 # ── Admin endpoints ───────────────────────────────────────────────────────────
