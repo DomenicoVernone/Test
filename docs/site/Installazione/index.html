@@ -9,16 +9,16 @@
       
       
       
-        <link rel="prev" href="../COMPONENTS_%26_STRUCTURE/">
+        <link rel="prev" href="../struttura_componenti/">
       
       
-        <link rel="next" href="../Configurazione/">
+        <link rel="next" href="../configurazione/">
       
       
         
           <link rel="alternate" href="./" hreflang="en">
         
-          <link rel="alternate" href="../it/Installazione/" hreflang="it">
+          <link rel="alternate" href="../it/installazione/" hreflang="it">
         
       
       
@@ -137,7 +137,7 @@
           </li>
         
           <li class="md-select__item">
-            <a href="../it/Installazione/" hreflang="it" class="md-select__link">
+            <a href="../it/installazione/" hreflang="it" class="md-select__link">
               Italiano
             </a>
           </li>
@@ -230,7 +230,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../SYSTEM_ARCHITECTURE/" class="md-tabs__link">
+        <a href="../architettura/" class="md-tabs__link">
           
   
   
@@ -272,7 +272,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../Pipeline_doc/" class="md-tabs__link">
+        <a href="../pipeline/" class="md-tabs__link">
           
   
   
@@ -292,7 +292,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../Guida_Rapida/" class="md-tabs__link">
+        <a href="../guida_rapida/" class="md-tabs__link">
           
   
   
@@ -312,7 +312,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../api/" class="md-tabs__link">
+        <a href="../api_reference/" class="md-tabs__link">
           
   
   
@@ -332,7 +332,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../Deployment/" class="md-tabs__link">
+        <a href="../deployment/" class="md-tabs__link">
           
   
   
@@ -372,7 +372,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../REPORT_FINALE_COMPLETO/" class="md-tabs__link">
+        <a href="../report_tecnico/" class="md-tabs__link">
           
   
   
@@ -503,7 +503,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../SYSTEM_ARCHITECTURE/" class="md-nav__link">
+      <a href="../architettura/" class="md-nav__link">
         
   
   
@@ -531,7 +531,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../COMPONENTS_%26_STRUCTURE/" class="md-nav__link">
+      <a href="../struttura_componenti/" class="md-nav__link">
         
   
   
@@ -858,7 +858,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Configurazione/" class="md-nav__link">
+      <a href="../configurazione/" class="md-nav__link">
         
   
   
@@ -945,7 +945,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Pipeline_doc/" class="md-nav__link">
+      <a href="../pipeline/" class="md-nav__link">
         
   
   
@@ -1032,7 +1032,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Guida_Rapida/" class="md-nav__link">
+      <a href="../guida_rapida/" class="md-nav__link">
         
   
   
@@ -1119,7 +1119,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../api_reference/" class="md-nav__link">
         
   
   
@@ -1206,7 +1206,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Deployment/" class="md-nav__link">
+      <a href="../deployment/" class="md-nav__link">
         
   
   
@@ -1380,14 +1380,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../REPORT_FINALE_COMPLETO/" class="md-nav__link">
+      <a href="../report_tecnico/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Technical Report (Session)
+    Technical Report
   
 
     
@@ -1408,7 +1408,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHANGES_AND_PERFORMANCE/" class="md-nav__link">
+      <a href="../changelog/" class="md-nav__link">
         
   
   
@@ -1416,6 +1416,34 @@
     
   
     Changelog & Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sicurezza_api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Security Report
   
 
     
@@ -1735,7 +1763,7 @@
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import secrets; print(secrets.token_hex(32))&quot;</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="c1"># Copy the output into SECRET_KEY in both files</span>
 </code></pre></div></p>
-<p>See <a href="../Configurazione/">Configuration</a> for the full variable reference.</p>
+<p>See <a href="../configurazione/">Configuration</a> for the full variable reference.</p>
 <hr />
 <h2 id="step-5-build-nextflow-pipeline-images">Step 5 — Build Nextflow pipeline images<a class="headerlink" href="#step-5-build-nextflow-pipeline-images" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>nextflow_worker/docker-compose.yml<span class="w"> </span>build
@@ -1788,7 +1816,7 @@
 <a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="c1"># For quick pipeline test, set TEST_MODE=true in orchestrator/.env</span>
 <a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="c1"># Then restart: docker compose restart orchestrator</span>
 </code></pre></div>
-<p>See <a href="../Guida_Rapida/">Quickstart</a> for the first analysis walkthrough.</p>
+<p>See <a href="../guida_rapida/">Quickstart</a> for the first analysis walkthrough.</p>
 <hr />
 <h2 id="nvidia-gpu-setup-optional">NVIDIA GPU Setup (optional)<a class="headerlink" href="#nvidia-gpu-setup-optional" title="Permanent link">&para;</a></h2>
 <p>For FastSurfer acceleration:</p>

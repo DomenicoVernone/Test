@@ -9,14 +9,14 @@
       
       
       
-        <link rel="prev" href="../COMPONENTS_%26_STRUCTURE/">
+        <link rel="prev" href="../struttura_componenti/">
       
       
-        <link rel="next" href="../Configurazione/">
+        <link rel="next" href="../configurazione/">
       
       
         
-          <link rel="alternate" href="../../Installazione/" hreflang="en">
+          <link rel="alternate" href="../../installazione/" hreflang="en">
         
           <link rel="alternate" href="./" hreflang="it">
         
@@ -131,7 +131,7 @@
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../../Installazione/" hreflang="en" class="md-select__link">
+            <a href="../../installazione/" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
@@ -230,7 +230,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../SYSTEM_ARCHITECTURE/" class="md-tabs__link">
+        <a href="../architettura/" class="md-tabs__link">
           
   
   
@@ -272,7 +272,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../Pipeline_doc/" class="md-tabs__link">
+        <a href="../pipeline/" class="md-tabs__link">
           
   
   
@@ -292,7 +292,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../Guida_Rapida/" class="md-tabs__link">
+        <a href="../guida_rapida/" class="md-tabs__link">
           
   
   
@@ -312,7 +312,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../api/" class="md-tabs__link">
+        <a href="../api_reference/" class="md-tabs__link">
           
   
   
@@ -332,7 +332,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../Deployment/" class="md-tabs__link">
+        <a href="../deployment/" class="md-tabs__link">
           
   
   
@@ -372,7 +372,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../REPORT_FINALE_COMPLETO/" class="md-tabs__link">
+        <a href="../report_tecnico/" class="md-tabs__link">
           
   
   
@@ -503,7 +503,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../SYSTEM_ARCHITECTURE/" class="md-nav__link">
+      <a href="../architettura/" class="md-nav__link">
         
   
   
@@ -531,7 +531,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../COMPONENTS_%26_STRUCTURE/" class="md-nav__link">
+      <a href="../struttura_componenti/" class="md-nav__link">
         
   
   
@@ -858,7 +858,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Configurazione/" class="md-nav__link">
+      <a href="../configurazione/" class="md-nav__link">
         
   
   
@@ -945,7 +945,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Pipeline_doc/" class="md-nav__link">
+      <a href="../pipeline/" class="md-nav__link">
         
   
   
@@ -1032,7 +1032,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Guida_Rapida/" class="md-nav__link">
+      <a href="../guida_rapida/" class="md-nav__link">
         
   
   
@@ -1119,7 +1119,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../api_reference/" class="md-nav__link">
         
   
   
@@ -1206,7 +1206,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Deployment/" class="md-nav__link">
+      <a href="../deployment/" class="md-nav__link">
         
   
   
@@ -1380,14 +1380,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../REPORT_FINALE_COMPLETO/" class="md-nav__link">
+      <a href="../report_tecnico/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Technical Report (Session)
+    Technical Report
   
 
     
@@ -1408,7 +1408,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../CHANGES_AND_PERFORMANCE/" class="md-nav__link">
+      <a href="../changelog/" class="md-nav__link">
         
   
   
@@ -1416,6 +1416,34 @@
     
   
     Changelog & Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sicurezza_api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Security Report
   
 
     
@@ -1732,7 +1760,7 @@
 <code>api_gateway/.env</code> e <code>orchestrator/.env</code>:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import secrets; print(secrets.token_hex(32))&quot;</span>
 </code></pre></div></p>
-<p>Vedi <a href="../Configurazione/">Configurazione</a> per il riferimento completo alle variabili.</p>
+<p>Vedi <a href="../configurazione/">Configurazione</a> per il riferimento completo alle variabili.</p>
 <hr />
 <h2 id="step-5-costruisci-le-immagini-docker-nextflow">Step 5 — Costruisci le immagini Docker Nextflow<a class="headerlink" href="#step-5-costruisci-le-immagini-docker-nextflow" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>nextflow_worker/docker-compose.yml<span class="w"> </span>build
@@ -1774,7 +1802,7 @@
 </code></pre></div>
 <p>Per il test rapido della pipeline, imposta <code>TEST_MODE=true</code> in <code>orchestrator/.env</code>,
 poi riavvia: <code>docker compose restart orchestrator</code>.</p>
-<p>Vedi <a href="../Guida_Rapida/">Guida Rapida</a> per il walkthrough della prima analisi.</p>
+<p>Vedi <a href="../guida_rapida/">Guida Rapida</a> per il walkthrough della prima analisi.</p>
 <hr />
 <h2 id="setup-gpu-nvidia-opzionale">Setup GPU NVIDIA (opzionale)<a class="headerlink" href="#setup-gpu-nvidia-opzionale" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Installa NVIDIA Container Toolkit</span>

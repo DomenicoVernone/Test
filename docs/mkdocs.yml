@@ -39,28 +39,29 @@ nav:
   - Introduction: index.md
 
   - Architecture:
-      - System Architecture: SYSTEM_ARCHITECTURE.md
-      - Components & Structure: COMPONENTS_&_STRUCTURE.md
+      - System Architecture: architettura.md
+      - Components & Structure: struttura_componenti.md
 
   - Setup:
-      - Installation: Installazione.md
-      - Configuration: Configurazione.md
+      - Installation: installazione.md
+      - Configuration: configurazione.md
 
   - Pipeline:
-      - Radiomics Pipeline: Pipeline_doc.md
+      - Radiomics Pipeline: pipeline.md
 
   - Usage:
-      - Quickstart: Guida_Rapida.md
+      - Quickstart: guida_rapida.md
 
   - API:
-      - API Reference: api.md
+      - API Reference: api_reference.md
 
   - Deployment:
-      - Deployment Guide: Deployment.md
+      - Deployment Guide: deployment.md
 
   - Testing:
       - Test Plan & Results: testing.md
 
   - Reports:
-      - Technical Report (Session): REPORT_FINALE_COMPLETO.md
-      - Changelog & Performance: CHANGES_AND_PERFORMANCE.md
+      - Technical Report: report_tecnico.md
+      - Changelog & Performance: changelog.md
+      - API Security Report: sicurezza_api.md

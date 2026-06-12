@@ -1,29 +1,27 @@
-# api_gateway/core/config.py
-#
-# Configurazione centralizzata del servizio tramite pydantic-settings.
-# Le variabili vengono lette dal file .env — vedere .env.example in root.
-
 import os
 from typing import List
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
-    # Percorso del database SQLite — il volume /shared_db è condiviso
-    # con l'orchestrator per permettere la lettura dello stato dei task
-    DATABASE_URL: str = Field(
-        default="sqlite:////shared_db/clinical_twin.db"
-    )
-    # Chiave per la firma dei token JWT — obbligatoria, nessun default
+    DATABASE_URL: str = Field(default="sqlite:////shared_db/clinical_twin.db")
     SECRET_KEY: str = Field(...)
     ALGORITHM: str = Field(default="HS256")
-    # Durata del token: 1440 minuti = 24 ore
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=1440)
-    # Origini autorizzate per le richieste CORS dal browser
-    CORS_ORIGINS: List[str] = Field(
-        default=["http://localhost:5173"]
-    )
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=15)
+    REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7)
+    CORS_ORIGINS: List[str] = Field(default=["http://localhost:5173"])
+
+    @field_validator("SECRET_KEY")
+    @classmethod
+    def secret_key_strength(cls, v: str) -> str:
+        if len(v) < 64:
+            raise ValueError(
+                f"SECRET_KEY deve essere >= 64 caratteri (attuale: {len(v)})"
+            )
+        return v
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
+
 
 settings = Settings()

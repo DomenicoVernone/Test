@@ -1,0 +1,2517 @@
+
+<!doctype html>
+<html lang="it" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../changelog/">
+      
+      
+      
+        
+          <link rel="alternate" href="../../sicurezza_api/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="it">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>API Security Report - MLOps — FTD Radiomics Platform</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-security-test-report" class="md-skip">
+          Vai al contenuto
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Intestazione">
+    <a href="../" title="MLOps — FTD Radiomics Platform" class="md-header__button md-logo" aria-label="MLOps — FTD Radiomics Platform" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MLOps — FTD Radiomics Platform
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API Security Report
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Seleziona la lingua">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../sicurezza_api/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="it" class="md-select__link">
+              Italiano
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Cerca" placeholder="Cerca" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Cerca">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Cancella" aria-label="Cancella" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inizializza la ricerca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../architettura/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../installazione/" class="md-tabs__link">
+          
+  
+  
+  Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../pipeline/" class="md-tabs__link">
+          
+  
+  
+  Pipeline
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guida_rapida/" class="md-tabs__link">
+          
+  
+  
+  Usage
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api_reference/" class="md-tabs__link">
+          
+  
+  
+  API
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../deployment/" class="md-tabs__link">
+          
+  
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../testing/" class="md-tabs__link">
+          
+  
+  
+  Testing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../report_tecnico/" class="md-tabs__link">
+          
+  
+  
+  Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigazione" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../" title="MLOps — FTD Radiomics Platform" class="md-nav__button md-logo" aria-label="MLOps — FTD Radiomics Platform" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    MLOps — FTD Radiomics Platform
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architettura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../struttura_componenti/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components & Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Setup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installazione/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configurazione/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipeline
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Pipeline
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Radiomics Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guida_rapida/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Testing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test Plan & Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../report_tecnico/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Technical Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog & Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Security Report
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Security Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configurazione-testata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configurazione testata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tabella-risultati" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tabella risultati
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vulnerabilita-dettaglio-e-fix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vulnerabilità — Dettaglio e Fix
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Vulnerabilità — Dettaglio e Fix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vuln-01-nessun-rate-limiting-s5-s7-medio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-01 — Nessun Rate Limiting (S5, S7) MEDIO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vuln-02-ssrf-tramite-model_name-s8-alto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-02 — SSRF tramite model_name (S8) ALTO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vuln-03-security-headers-mancanti-s9-basso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-03 — Security Headers mancanti (S9) BASSO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vuln-04-docs-e-openapijson-pubblici-s10-medio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-04 — /docs e /openapi.json pubblici (S10) MEDIO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vuln-05-errore-500-con-dettagli-r-interni-s11-medio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-05 — Errore 500 con dettagli R interni (S11) MEDIO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vuln-06-file-vuoto-accettato-i2-basso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-06 — File vuoto accettato (I2) BASSO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vuln-07-xss-stored-nel-campo-username-i5-medio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-07 — XSS stored nel campo username (I5) MEDIO
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo-per-priorita" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo per priorità
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fix-applicati-riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix applicati — Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gap-funzionali-rimanenti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap funzionali rimanenti
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#jwt-bola-bfla-mass-assignment-hardening-2026-06-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWT / BOLA / BFLA / Mass Assignment Hardening (2026-06-04)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="JWT / BOLA / BFLA / Mass Assignment Hardening (2026-06-04)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#security-score" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Score
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#note-tecniche-fix-applicati-durante-il-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Note tecniche (fix applicati durante il test)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#auth-pages-security-features-2026-06-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auth Pages — Security Features (2026-06-09)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Auth Pages — Security Features (2026-06-09)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modifiche-di-sicurezza-implementate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modifiche di sicurezza implementate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#endpoint-implementati-precedentemente-mancanti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Endpoint implementati (precedentemente mancanti)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dettaglio-tecnico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dettaglio tecnico
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configurazione-testata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configurazione testata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tabella-risultati" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tabella risultati
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vulnerabilita-dettaglio-e-fix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vulnerabilità — Dettaglio e Fix
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Vulnerabilità — Dettaglio e Fix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vuln-01-nessun-rate-limiting-s5-s7-medio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-01 — Nessun Rate Limiting (S5, S7) MEDIO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vuln-02-ssrf-tramite-model_name-s8-alto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-02 — SSRF tramite model_name (S8) ALTO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vuln-03-security-headers-mancanti-s9-basso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-03 — Security Headers mancanti (S9) BASSO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vuln-04-docs-e-openapijson-pubblici-s10-medio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-04 — /docs e /openapi.json pubblici (S10) MEDIO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vuln-05-errore-500-con-dettagli-r-interni-s11-medio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-05 — Errore 500 con dettagli R interni (S11) MEDIO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vuln-06-file-vuoto-accettato-i2-basso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-06 — File vuoto accettato (I2) BASSO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vuln-07-xss-stored-nel-campo-username-i5-medio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VULN-07 — XSS stored nel campo username (I5) MEDIO
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo-per-priorita" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo per priorità
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fix-applicati-riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fix applicati — Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gap-funzionali-rimanenti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap funzionali rimanenti
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#jwt-bola-bfla-mass-assignment-hardening-2026-06-04" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWT / BOLA / BFLA / Mass Assignment Hardening (2026-06-04)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="JWT / BOLA / BFLA / Mass Assignment Hardening (2026-06-04)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#security-score" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Score
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#note-tecniche-fix-applicati-durante-il-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Note tecniche (fix applicati durante il test)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#auth-pages-security-features-2026-06-09" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auth Pages — Security Features (2026-06-09)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Auth Pages — Security Features (2026-06-09)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modifiche-di-sicurezza-implementate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modifiche di sicurezza implementate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#endpoint-implementati-precedentemente-mancanti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Endpoint implementati (precedentemente mancanti)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dettaglio-tecnico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dettaglio tecnico
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="api-security-test-report">API Security Test Report<a class="headerlink" href="#api-security-test-report" title="Permanent link">&para;</a></h1>
+<p><strong>Progetto:</strong> Clinical Twin — FTD Diagnosis System<br />
+<strong>Data:</strong> 2026-06-04<br />
+<strong>Standard:</strong> OWASP API Security Top 10 — 2023<br />
+<strong>Ambiente:</strong> localhost, tutti i container attivi</p>
+<hr />
+<h2 id="configurazione-testata">Configurazione testata<a class="headerlink" href="#configurazione-testata" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Servizio</th>
+<th>Porta</th>
+<th>Container</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API Gateway</td>
+<td>8006</td>
+<td>clinical_api_gateway</td>
+</tr>
+<tr>
+<td>Orchestrator</td>
+<td>8001</td>
+<td>clinical_orchestrator</td>
+</tr>
+<tr>
+<td>LLM Service</td>
+<td>8002</td>
+<td>clinical_llm_service</td>
+</tr>
+<tr>
+<td>Model Service</td>
+<td>8003</td>
+<td>clinical_model_service</td>
+</tr>
+<tr>
+<td>Inference Engine</td>
+<td>8004</td>
+<td>inference_engine</td>
+</tr>
+<tr>
+<td>Nextflow Worker</td>
+<td>8005</td>
+<td>nextflow_worker</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tabella-risultati">Tabella risultati<a class="headerlink" href="#tabella-risultati" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Test</th>
+<th>Esito</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1</td>
+<td>Health check tutti i servizi</td>
+<td>PARZIALE</td>
+<td>8001–8005: 200 OK. API Gateway: <code>/health</code> → 404, health è su <code>/</code></td>
+</tr>
+<tr>
+<td>F2</td>
+<td>Auth register + token</td>
+<td>OK</td>
+<td>POST <code>/signup</code> → 201, POST <code>/login</code> → JWT</td>
+</tr>
+<tr>
+<td>F3</td>
+<td>GET /users/me</td>
+<td>FAIL</td>
+<td>Endpoint non esiste (404) — non implementato</td>
+</tr>
+<tr>
+<td>F4</td>
+<td>GET /analyze/results/19</td>
+<td>FAIL</td>
+<td>Endpoint non esiste — usare <code>/analyze/status/{id}</code></td>
+</tr>
+<tr>
+<td>F4b</td>
+<td>GET /analyze/status/19</td>
+<td>OK</td>
+<td>200 con dati completi, diagnosi HC</td>
+</tr>
+<tr>
+<td>F5</td>
+<td>LLM Service /health</td>
+<td>OK</td>
+<td>200</td>
+</tr>
+<tr>
+<td>F6</td>
+<td>Model Service /model_info/HC_vs_bvFTD</td>
+<td>OK</td>
+<td>200 con metadata MLflow</td>
+</tr>
+<tr>
+<td>S1</td>
+<td>OWASP API1 — Object Auth (BOLA)</td>
+<td>OK</td>
+<td>task_id=1 → 404 "Task non trovato o non autorizzato"</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>OWASP API2 — Auth mancante</td>
+<td>OK</td>
+<td>401 "Not authenticated"</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>OWASP API2 — Token falso</td>
+<td>OK</td>
+<td>401 "Credenziali non valide o token scaduto"</td>
+</tr>
+<tr>
+<td>S3b</td>
+<td>OWASP API2 — JWT malformato</td>
+<td>OK</td>
+<td>401</td>
+</tr>
+<tr>
+<td>S4</td>
+<td>OWASP API3 — Mass assignment (is_admin)</td>
+<td>OK</td>
+<td>Campo ignorato, utente creato senza privilegi admin</td>
+</tr>
+<tr>
+<td>S5</td>
+<td>OWASP API4 — Rate limiting</td>
+<td><strong>VULN</strong></td>
+<td>20 richieste consecutive → tutte 200. Nessun rate limit.</td>
+</tr>
+<tr>
+<td>S6</td>
+<td>OWASP API5 — Admin endpoints</td>
+<td>OK</td>
+<td><code>/admin</code>, <code>/admin/users</code> → 404</td>
+</tr>
+<tr>
+<td>S7</td>
+<td>OWASP API6 — Pipeline flood</td>
+<td><strong>VULN</strong></td>
+<td>5 pipeline concorrenti → tutte accettate (200). Nessun limite.</td>
+</tr>
+<tr>
+<td>S8</td>
+<td>OWASP API7 — SSRF (model_name URL)</td>
+<td><strong>VULN</strong></td>
+<td><code>model_name=http://evil.com/malicious</code> accettato dal Orchestrator. Fallisce solo a runtime in R.</td>
+</tr>
+<tr>
+<td>S9</td>
+<td>OWASP API8 — Security headers</td>
+<td><strong>VULN</strong></td>
+<td><code>server: uvicorn</code> esposto. Mancano X-Frame-Options, X-Content-Type-Options, CSP, HSTS. Porte su 127.0.0.1: OK.</td>
+</tr>
+<tr>
+<td>S10</td>
+<td>OWASP API9 — Debug/docs endpoints</td>
+<td><strong>VULN</strong></td>
+<td><code>/docs</code>, <code>/redoc</code>, <code>/openapi.json</code> accessibili senza autenticazione su 8006 e 8001.</td>
+</tr>
+<tr>
+<td>S11</td>
+<td>OWASP API10 — Path traversal</td>
+<td>PARZIALE</td>
+<td><code>../../etc/passwd</code> → 422 (Pydantic blocca). Ma <code>task_id=999999</code> → 500 con stacktrace R interno esposto.</td>
+</tr>
+<tr>
+<td>I1</td>
+<td>File non valido (.txt)</td>
+<td>OK</td>
+<td>400 "Formato non supportato"</td>
+</tr>
+<tr>
+<td>I2</td>
+<td>File vuoto (.nii.gz)</td>
+<td><strong>VULN</strong></td>
+<td>File vuoto accettato → task PENDING (dovrebbe essere 400)</td>
+</tr>
+<tr>
+<td>I3</td>
+<td>JSON malformato</td>
+<td>OK</td>
+<td>422 con dettagli validazione</td>
+</tr>
+<tr>
+<td>I4</td>
+<td>SQL injection in username</td>
+<td>OK</td>
+<td>401 — ORM protegge</td>
+</tr>
+<tr>
+<td>I5</td>
+<td>XSS in username</td>
+<td><strong>VULN</strong></td>
+<td><code>&lt;script&gt;alert(1)&lt;/script&gt;</code> accettato e persistito (id=8).</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="vulnerabilita-dettaglio-e-fix">Vulnerabilità — Dettaglio e Fix<a class="headerlink" href="#vulnerabilita-dettaglio-e-fix" title="Permanent link">&para;</a></h2>
+<h3 id="vuln-01-nessun-rate-limiting-s5-s7-medio">VULN-01 — Nessun Rate Limiting (S5, S7) <code>MEDIO</code><a class="headerlink" href="#vuln-01-nessun-rate-limiting-s5-s7-medio" title="Permanent link">&para;</a></h3>
+<p><strong>Rischio:</strong> Un attaccante può inondare l'API con richieste arbitrarie o avviare decine di pipeline computazionalmente costose (Nextflow + R) senza limiti, causando DoS/resource exhaustion.</p>
+<p><strong>Fix — API Gateway (FastAPI):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># pip install slowapi</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">slowapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">Limiter</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">slowapi.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_remote_address</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">limiter</span> <span class="o">=</span> <span class="n">Limiter</span><span class="p">(</span><span class="n">key_func</span><span class="o">=</span><span class="n">get_remote_address</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">limiter</span> <span class="o">=</span> <span class="n">limiter</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nd">@limiter</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="s2">&quot;10/minute&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="o">...</span><span class="p">):</span> <span class="o">...</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/analyze/&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nd">@limiter</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="s2">&quot;3/minute&quot;</span><span class="p">)</span>  <span class="c1"># pipeline costose</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">analyze</span><span class="p">(</span><span class="o">...</span><span class="p">):</span> <span class="o">...</span>
+</code></pre></div></p>
+<p><strong>Applicare su:</strong> api_gateway <code>/login</code>, <code>/signup</code>; orchestrator <code>/analyze/</code>.</p>
+<hr />
+<h3 id="vuln-02-ssrf-tramite-model_name-s8-alto">VULN-02 — SSRF tramite model_name (S8) <code>ALTO</code><a class="headerlink" href="#vuln-02-ssrf-tramite-model_name-s8-alto" title="Permanent link">&para;</a></h3>
+<p><strong>Rischio:</strong> Il campo <code>model_name</code> non è validato prima di essere passato al Model Service e poi all'Inference Engine R. Un attaccante può iniettare URL arbitrari (<code>http://internal-service:8003/admin</code>, <code>file:///etc/passwd</code>) che vengono risolti dal container R sulla rete interna Docker.</p>
+<p><strong>Fix — Orchestrator / Model Service:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">ALLOWED_MODELS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;HC_vs_bvFTD&quot;</span><span class="p">}</span>  <span class="c1"># whitelist da config/DB</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">validate_model_name</span><span class="p">(</span><span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">if</span> <span class="n">model_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ALLOWED_MODELS</span><span class="p">:</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">422</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Modello non riconosciuto&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="k">return</span> <span class="n">model_name</span>
+</code></pre></div></p>
+<p>Aggiungere la validazione prima di inoltrare la richiesta al model_service.</p>
+<hr />
+<h3 id="vuln-03-security-headers-mancanti-s9-basso">VULN-03 — Security Headers mancanti (S9) <code>BASSO</code><a class="headerlink" href="#vuln-03-security-headers-mancanti-s9-basso" title="Permanent link">&para;</a></h3>
+<p><strong>Rischio:</strong> <code>server: uvicorn</code> rivela il framework. L'assenza di X-Content-Type-Options, X-Frame-Options e CSP aumenta l'esposizione a clickjacking e MIME sniffing.</p>
+<p><strong>Fix — middleware FastAPI (tutti i servizi):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">starlette.middleware.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseHTTPMiddleware</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">SecurityHeadersMiddleware</span><span class="p">(</span><span class="n">BaseHTTPMiddleware</span><span class="p">):</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">call_next</span><span class="p">):</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">call_next</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-Content-Type-Options&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;nosniff&quot;</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-Frame-Options&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;DENY&quot;</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-XSS-Protection&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1; mode=block&quot;</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="k">return</span> <span class="n">response</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">SecurityHeadersMiddleware</span><span class="p">)</span>
+</code></pre></div></p>
+<hr />
+<h3 id="vuln-04-docs-e-openapijson-pubblici-s10-medio">VULN-04 — /docs e /openapi.json pubblici (S10) <code>MEDIO</code><a class="headerlink" href="#vuln-04-docs-e-openapijson-pubblici-s10-medio" title="Permanent link">&para;</a></h3>
+<p><strong>Rischio:</strong> Tutta la superficie API è documentata e accessibile senza autenticazione. In produzione questo facilita il discovery di endpoint e parametri da parte di attaccanti.</p>
+<p><strong>Fix — disabilitare in produzione:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># In main.py — condizionale su env</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">docs_url</span> <span class="o">=</span> <span class="s2">&quot;/docs&quot;</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;ENV&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;development&quot;</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">redoc_url</span> <span class="o">=</span> <span class="s2">&quot;/redoc&quot;</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;ENV&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;development&quot;</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">openapi_url</span> <span class="o">=</span> <span class="s2">&quot;/openapi.json&quot;</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;ENV&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;development&quot;</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span><span class="n">docs_url</span><span class="o">=</span><span class="n">docs_url</span><span class="p">,</span> <span class="n">redoc_url</span><span class="o">=</span><span class="n">redoc_url</span><span class="p">,</span> <span class="n">openapi_url</span><span class="o">=</span><span class="n">openapi_url</span><span class="p">)</span>
+</code></pre></div></p>
+<hr />
+<h3 id="vuln-05-errore-500-con-dettagli-r-interni-s11-medio">VULN-05 — Errore 500 con dettagli R interni (S11) <code>MEDIO</code><a class="headerlink" href="#vuln-05-errore-500-con-dettagli-r-interni-s11-medio" title="Permanent link">&para;</a></h3>
+<p><strong>Rischio:</strong> Quando <code>task_id</code> non esiste o R fallisce, l'API restituisce il messaggio di errore interno R (incluso il tipo di eccezione e traccia). Questo espone dettagli dell'architettura interna.</p>
+<p><strong>Risposta attuale:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span><span class="nt">&quot;detail&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Inference engine R ha risposto con errore 500: {\&quot;status\&quot;:[\&quot;error\&quot;],\&quot;message\&quot;:[\&quot;Errore durante l&#39;inferenza R: cannot open the connection\&quot;]}&quot;</span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Fix — Model Service:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Task o modello non trovato&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="c1"># Log internamente, non esporre</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inference engine error: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">502</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Errore interno del servizio di inferenza&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+<hr />
+<h3 id="vuln-06-file-vuoto-accettato-i2-basso">VULN-06 — File vuoto accettato (I2) <code>BASSO</code><a class="headerlink" href="#vuln-06-file-vuoto-accettato-i2-basso" title="Permanent link">&para;</a></h3>
+<p><strong>Rischio:</strong> Un file <code>.nii.gz</code> vuoto viene accettato e messo in coda. La pipeline fallirà a runtime con un errore interno invece di essere rifiutata in input.</p>
+<p><strong>Fix — Orchestrator, validazione upload:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Il file caricato è vuoto&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># oppure dopo il salvataggio:</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Il file caricato è vuoto&quot;</span><span class="p">)</span>
+</code></pre></div></p>
+<hr />
+<h3 id="vuln-07-xss-stored-nel-campo-username-i5-medio">VULN-07 — XSS stored nel campo username (I5) <code>MEDIO</code><a class="headerlink" href="#vuln-07-xss-stored-nel-campo-username-i5-medio" title="Permanent link">&para;</a></h3>
+<p><strong>Rischio:</strong> Username <code>&lt;script&gt;alert(1)&lt;/script&gt;</code> viene persistito nel database. Se l'username viene renderizzato in una UI HTML senza escape (es. dashboard admin, log visualizer), si ottiene XSS stored.</p>
+<p><strong>Fix — Schema Pydantic con validazione:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">validator</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">UserCreate</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">username_alphanumeric</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^[a-zA-Z0-9_.-]{3,50}$&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Username non valido: solo caratteri alfanumerici, _, ., -&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>        <span class="k">return</span> <span class="n">v</span>
+</code></pre></div></p>
+<hr />
+<h2 id="riepilogo-per-priorita">Riepilogo per priorità<a class="headerlink" href="#riepilogo-per-priorita" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Priorità</th>
+<th>#</th>
+<th>Vulnerabilità</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ALTO</td>
+<td>1</td>
+<td>SSRF tramite model_name (VULN-02)</td>
+</tr>
+<tr>
+<td>MEDIO</td>
+<td>4</td>
+<td>No rate limiting (VULN-01), /docs pubblici (VULN-04), 500 con errori interni (VULN-05), XSS stored (VULN-07)</td>
+</tr>
+<tr>
+<td>BASSO</td>
+<td>2</td>
+<td>Security headers mancanti (VULN-03), file vuoto accettato (VULN-06)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="fix-applicati-riepilogo">Fix applicati — Riepilogo<a class="headerlink" href="#fix-applicati-riepilogo" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Fix</th>
+<th>Vulnerabilità</th>
+<th>Applicato</th>
+<th>Testato</th>
+<th>Risultato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1</td>
+<td>SSRF model_name</td>
+<td><code>orchestrator/routers/analyze.py</code>, <code>model_service/main.py</code></td>
+<td>✓</td>
+<td><code>model_name=http://evil.com</code> → 422</td>
+</tr>
+<tr>
+<td>F2</td>
+<td>Rate limiting</td>
+<td><code>api_gateway/core/limiter.py</code>, <code>routers/auth.py</code>, <code>orchestrator/core/limiter.py</code>, <code>routers/analyze.py</code></td>
+<td>✓</td>
+<td>6° login → 429</td>
+</tr>
+<tr>
+<td>F3</td>
+<td>Docs pubblici</td>
+<td>Tutti i <code>main.py</code> + <code>ENV=development</code> in <code>docker-compose.yml</code></td>
+<td>✓</td>
+<td>/docs → 200 in dev, 404 in prod</td>
+</tr>
+<tr>
+<td>F4</td>
+<td>Errori R nascosti</td>
+<td><code>model_service/main.py</code> (catch generico)</td>
+<td>✓</td>
+<td>500 → "Errore durante l'inferenza. Riprova."</td>
+</tr>
+<tr>
+<td>F5</td>
+<td>XSS username</td>
+<td><code>api_gateway/models/schemas.py</code> (field_validator)</td>
+<td>✓</td>
+<td><code>&lt;script&gt;</code> → 422</td>
+</tr>
+<tr>
+<td>F6</td>
+<td>Security headers</td>
+<td>Tutti i <code>main.py</code> (middleware) + <code>--no-server-header</code> nei Dockerfile</td>
+<td>✓</td>
+<td><code>server: webserver</code>, X-Frame-Options, X-Content-Type-Options presenti</td>
+</tr>
+<tr>
+<td>F7</td>
+<td>Validazione file MRI</td>
+<td><code>orchestrator/routers/analyze.py</code> (size + magic bytes)</td>
+<td>✓</td>
+<td>file vuoto → 422</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="gap-funzionali-rimanenti">Gap funzionali rimanenti<a class="headerlink" href="#gap-funzionali-rimanenti" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Endpoint atteso</th>
+<th>Stato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /users/me</code> (API Gateway)</td>
+<td>Non implementato — 404</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="jwt-bola-bfla-mass-assignment-hardening-2026-06-04">JWT / BOLA / BFLA / Mass Assignment Hardening (2026-06-04)<a class="headerlink" href="#jwt-bola-bfla-mass-assignment-hardening-2026-06-04" title="Permanent link">&para;</a></h2>
+<h3 id="security-score">Security Score<a class="headerlink" href="#security-score" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Prima del fix:</strong> 0/13 controlli OK</li>
+<li><strong>Dopo il fix:</strong> 13/13 controlli OK</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Vulnerabilità</th>
+<th>File</th>
+<th>Testato</th>
+<th>Risultato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JWT1</td>
+<td>Scadenza token 15min</td>
+<td>api_gateway/core/config.py</td>
+<td>✓</td>
+<td>expires_in=900 — PASS</td>
+</tr>
+<tr>
+<td>JWT2</td>
+<td>Refresh token implementato</td>
+<td>api_gateway/routers/auth.py</td>
+<td>✓</td>
+<td>POST /refresh → 401 senza cookie — PASS</td>
+</tr>
+<tr>
+<td>JWT3</td>
+<td>jti + blacklist logout</td>
+<td>api_gateway/core/security.py, routers/auth.py</td>
+<td>✓</td>
+<td>logout → 204, token riusato → 401 "Token revocato" — PASS</td>
+</tr>
+<tr>
+<td>JWT4</td>
+<td>SECRET_KEY &gt;= 64 chars</td>
+<td>api_gateway/.env, core/config.py</td>
+<td>✓</td>
+<td>64 chars (<code>bb7a091739...</code>), validator attivo — PASS</td>
+</tr>
+<tr>
+<td>JWT5</td>
+<td>sub = user_id numerico</td>
+<td>api_gateway/core/security.py</td>
+<td>✓</td>
+<td>sub="1" (admin), sub="10" (userA) — numerico — PASS</td>
+</tr>
+<tr>
+<td>BOLA</td>
+<td>owner_id su tutti gli endpoint</td>
+<td>orchestrator/routers/analyze.py</td>
+<td>✓</td>
+<td>task altrui → 404 "Task non trovato o non autorizzato" — PASS</td>
+</tr>
+<tr>
+<td>BFLA1</td>
+<td>Sistema ruoli user/admin</td>
+<td>api_gateway/models/domain.py</td>
+<td>✓</td>
+<td>UserRole enum con valori lowercase, colonna role — PASS</td>
+</tr>
+<tr>
+<td>BFLA2</td>
+<td>/admin/* protetti da require_admin</td>
+<td>api_gateway/routers/auth.py</td>
+<td>✓</td>
+<td>user normale → 403, admin → 200 — PASS</td>
+</tr>
+<tr>
+<td>MA1</td>
+<td>Schema input/output separati</td>
+<td>api_gateway/models/schemas.py</td>
+<td>✓</td>
+<td>UserResponse espone id/username/role, nessun password_hash — PASS</td>
+</tr>
+<tr>
+<td>MA2</td>
+<td>role/is_admin ignorati da input</td>
+<td>api_gateway/routers/auth.py</td>
+<td>✓</td>
+<td>signup con role=admin, is_admin=true → role="user" — PASS</td>
+</tr>
+<tr>
+<td>HC1</td>
+<td>bcrypt rounds &gt;= 12</td>
+<td>api_gateway/core/security.py</td>
+<td>✓</td>
+<td>bcrypt__rounds=12 — PASS</td>
+</tr>
+<tr>
+<td>HC2</td>
+<td>Timing attack protection</td>
+<td>api_gateway/core/security.py</td>
+<td>✓</td>
+<td>_DUMMY_HASH pre-calcolato, authenticate_user sempre esegue verify — PASS</td>
+</tr>
+<tr>
+<td>HC3</td>
+<td>Password strength validation</td>
+<td>api_gateway/models/schemas.py</td>
+<td>✓</td>
+<td>password "abc" (&lt; 8 chars) → 422 con messaggio di errore — PASS</td>
+</tr>
+</tbody>
+</table>
+<h3 id="note-tecniche-fix-applicati-durante-il-test">Note tecniche (fix applicati durante il test)<a class="headerlink" href="#note-tecniche-fix-applicati-durante-il-test" title="Permanent link">&para;</a></h3>
+<p>Durante l'esecuzione dei test sono stati identificati e risolti i seguenti problemi di avvio:</p>
+<ol>
+<li>
+<p><strong>SQLAlchemy Enum storage</strong> — <code>Enum(UserRole)</code> di default salva il <em>nome</em> dell'enum (es. <code>"ADMIN"</code>) invece del <em>valore</em> (es. <code>"admin"</code>). Risolto aggiungendo <code>values_callable=lambda obj: [e.value for e in obj]</code> in <code>api_gateway/models/domain.py</code> e <code>orchestrator/models/domain.py</code>.</p>
+</li>
+<li>
+<p><strong>_seed_admin crash</strong> — La funzione controllava <code>filter(User.role == "admin")</code> ma il DB conteneva valori uppercase. Risolto aggiungendo controllo per username E correzione automatica del ruolo se errato.</p>
+</li>
+<li>
+<p><strong>Migration di normalizzazione</strong> — Aggiunta migrazione in <code>api_gateway/main.py</code> che normalizza i valori <code>ADMIN</code>→<code>admin</code> e <code>USER</code>→<code>user</code> nei dati esistenti.</p>
+</li>
+</ol>
+<hr />
+<h2 id="auth-pages-security-features-2026-06-09">Auth Pages — Security Features (2026-06-09)<a class="headerlink" href="#auth-pages-security-features-2026-06-09" title="Permanent link">&para;</a></h2>
+<h3 id="modifiche-di-sicurezza-implementate">Modifiche di sicurezza implementate<a class="headerlink" href="#modifiche-di-sicurezza-implementate" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Feature</th>
+<th>File</th>
+<th>Attacco prevenuto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AP1</td>
+<td>Errori login generici — mai rivela se username esiste o password è sbagliata</td>
+<td>frontend/src/pages/Login.jsx</td>
+<td>User enumeration</td>
+</tr>
+<tr>
+<td>AP2</td>
+<td>Blocco client-side 60s dopo 3 tentativi falliti</td>
+<td>frontend/src/pages/Login.jsx</td>
+<td>Brute force login</td>
+</tr>
+<tr>
+<td>AP3</td>
+<td>POST /forgot-password risponde sempre 200 con messaggio identico indipendentemente dall'email</td>
+<td>api_gateway/routers/auth.py</td>
+<td>Email enumeration</td>
+</tr>
+<tr>
+<td>AP4</td>
+<td>POST /reset-password revoca tutti i JWT attivi dell'utente dopo il reset</td>
+<td>api_gateway/routers/auth.py + core/security.py</td>
+<td>Token hijacking post-reset</td>
+</tr>
+<tr>
+<td>AP5</td>
+<td>POST /register — ruolo hardcoded a UserRole.USER lato server, mai dal client</td>
+<td>api_gateway/routers/auth.py</td>
+<td>Mass assignment su nuovo endpoint</td>
+</tr>
+<tr>
+<td>AP6</td>
+<td>Token reset password scadenza 1 ora + marcato come "usato" dopo il primo utilizzo</td>
+<td>api_gateway/models/domain.py</td>
+<td>Riuso token reset</td>
+</tr>
+</tbody>
+</table>
+<h3 id="endpoint-implementati-precedentemente-mancanti">Endpoint implementati (precedentemente mancanti)<a class="headerlink" href="#endpoint-implementati-precedentemente-mancanti" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Stato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST /forgot-password</code></td>
+<td>Implementato — 200 con risposta generica</td>
+</tr>
+<tr>
+<td><code>POST /reset-password</code></td>
+<td>Implementato — reset + revoca JWT</td>
+</tr>
+<tr>
+<td><code>POST /register</code></td>
+<td>Implementato — endpoint pubblico senza admin</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dettaglio-tecnico">Dettaglio tecnico<a class="headerlink" href="#dettaglio-tecnico" title="Permanent link">&para;</a></h3>
+<p><strong>AP1 — User enumeration protection</strong><br />
+Prima: messaggi di errore differenziati ("utente non trovato" vs "password errata") permettevano di enumerare gli username validi.<br />
+Dopo: risposta sempre generica "Credenziali non valide" in tutti i casi di errore 401/400.</p>
+<p><strong>AP3 — Email enumeration protection</strong><br />
+Il backend risponde sempre:<br />
+<code>{"message": "Se l'email è registrata riceverai le istruzioni entro pochi minuti."}</code><br />
+Sia che l'email esista nel DB che non esista.<br />
+Un attaccante non può scoprire quali email sono registrate nel sistema.</p>
+<p><strong>AP4 — Token hijacking post-reset</strong><br />
+Dopo reset password riuscito:
+1. Nuova password salvata con bcrypt hash
+2. Query su RevokedToken: inserisce i jti di tutti i token attivi dell'utente
+3. Qualsiasi token precedente → 401 "Token revocato" al prossimo utilizzo</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Torna su
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiato", "clipboard.copy": "Copia", "search.result.more.one": "1 altro in questa pagina", "search.result.more.other": "# altri in questa pagina", "search.result.none": "Nessun documento trovato", "search.result.one": "1 documento trovato", "search.result.other": "# documenti trovati", "search.result.placeholder": "Scrivi per iniziare a cercare", "search.result.term.missing": "Non presente", "select.version": "Seleziona la versione"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

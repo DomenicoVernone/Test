@@ -2,168 +2,182 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
         <loc>None./</loc>
-        <lastmod>2026-06-03</lastmod>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="None"/>
         <xhtml:link rel="alternate" hreflang="it" href="Noneit/"/>
     </url>
     <url>
-        <loc>NoneCHANGES_AND_PERFORMANCE/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneapi_reference/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneCHANGES_AND_PERFORMANCE/"/>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/CHANGES_AND_PERFORMANCE/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneapi_reference/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/api_reference/"/>
     </url>
     <url>
-        <loc>NoneCOMPONENTS_%26_STRUCTURE/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Nonearchitettura/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneCOMPONENTS_%26_STRUCTURE/"/>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/COMPONENTS_%26_STRUCTURE/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonearchitettura/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/architettura/"/>
     </url>
     <url>
-        <loc>NoneConfigurazione/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Nonechangelog/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneConfigurazione/"/>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/Configurazione/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonechangelog/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/changelog/"/>
     </url>
     <url>
-        <loc>NoneDeployment/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneconfigurazione/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneDeployment/"/>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/Deployment/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneconfigurazione/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/configurazione/"/>
     </url>
     <url>
-        <loc>NoneGuida_Rapida/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Nonedeployment/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneGuida_Rapida/"/>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/Guida_Rapida/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonedeployment/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/deployment/"/>
     </url>
     <url>
-        <loc>NoneInstallazione/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneguida_rapida/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneInstallazione/"/>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/Installazione/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneguida_rapida/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/guida_rapida/"/>
     </url>
     <url>
-        <loc>NonePipeline_doc/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneinstallazione/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="NonePipeline_doc/"/>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/Pipeline_doc/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneinstallazione/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/installazione/"/>
     </url>
     <url>
-        <loc>NoneREPORT_FINALE_COMPLETO/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Nonepipeline/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneREPORT_FINALE_COMPLETO/"/>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/REPORT_FINALE_COMPLETO/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonepipeline/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/pipeline/"/>
     </url>
     <url>
-        <loc>NoneSYSTEM_ARCHITECTURE/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Nonereport_tecnico/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneSYSTEM_ARCHITECTURE/"/>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/SYSTEM_ARCHITECTURE/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonereport_tecnico/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/report_tecnico/"/>
     </url>
     <url>
-        <loc>Noneapi/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Nonesicurezza_api/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="Noneapi/"/>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesicurezza_api/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/sicurezza_api/"/>
+    </url>
+    <url>
+        <loc>Nonestruttura_componenti/</loc>
+        <lastmod>2026-06-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonestruttura_componenti/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/struttura_componenti/"/>
     </url>
     <url>
         <loc>Nonetesting/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="Nonetesting/"/>
         <xhtml:link rel="alternate" hreflang="it" href="Noneit/testing/"/>
     </url>
     <url>
         <loc>Noneit/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="Noneit/"/>
         <xhtml:link rel="alternate" hreflang="en" href="None"/>
     </url>
     <url>
-        <loc>Noneit/CHANGES_AND_PERFORMANCE/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneit/api_reference/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/CHANGES_AND_PERFORMANCE/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneCHANGES_AND_PERFORMANCE/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/api_reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneapi_reference/"/>
     </url>
     <url>
-        <loc>Noneit/COMPONENTS_%26_STRUCTURE/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneit/architettura/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/COMPONENTS_%26_STRUCTURE/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneCOMPONENTS_%26_STRUCTURE/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/architettura/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonearchitettura/"/>
     </url>
     <url>
-        <loc>Noneit/Configurazione/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneit/changelog/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/Configurazione/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneConfigurazione/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonechangelog/"/>
     </url>
     <url>
-        <loc>Noneit/Deployment/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneit/configurazione/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/Deployment/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneDeployment/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/configurazione/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneconfigurazione/"/>
     </url>
     <url>
-        <loc>Noneit/Guida_Rapida/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneit/deployment/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/Guida_Rapida/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneGuida_Rapida/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/deployment/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonedeployment/"/>
     </url>
     <url>
-        <loc>Noneit/Installazione/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneit/guida_rapida/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/Installazione/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneInstallazione/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/guida_rapida/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneguida_rapida/"/>
     </url>
     <url>
-        <loc>Noneit/Pipeline_doc/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneit/installazione/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/Pipeline_doc/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="NonePipeline_doc/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/installazione/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneinstallazione/"/>
     </url>
     <url>
-        <loc>Noneit/REPORT_FINALE_COMPLETO/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneit/pipeline/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/REPORT_FINALE_COMPLETO/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneREPORT_FINALE_COMPLETO/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/pipeline/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonepipeline/"/>
     </url>
     <url>
-        <loc>Noneit/SYSTEM_ARCHITECTURE/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneit/report_tecnico/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/SYSTEM_ARCHITECTURE/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="NoneSYSTEM_ARCHITECTURE/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/report_tecnico/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonereport_tecnico/"/>
     </url>
     <url>
-        <loc>Noneit/api/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <loc>Noneit/sicurezza_api/</loc>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="it" href="Noneit/api/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="Noneapi/"/>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/sicurezza_api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesicurezza_api/"/>
+    </url>
+    <url>
+        <loc>Noneit/struttura_componenti/</loc>
+        <lastmod>2026-06-09</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="it" href="Noneit/struttura_componenti/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonestruttura_componenti/"/>
     </url>
     <url>
         <loc>Noneit/testing/</loc>
-        <lastmod>2026-06-03</lastmod>
+        <lastmod>2026-06-09</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="Noneit/testing/"/>
         <xhtml:link rel="alternate" hreflang="en" href="Nonetesting/"/>

@@ -31,7 +31,7 @@ Tempo di analisi totale: **~12 minuti** (modalità test) o **~4–10 ore** (pipe
 | LLM Service | 127.0.0.1:8002 | Assistente AI |
 | Nextflow Worker | 127.0.0.1:8005 | Pipeline neuroimaging |
 
-Vedi [Architettura del Sistema](SYSTEM_ARCHITECTURE.it.md) per il diagramma completo.
+Vedi [Architettura del Sistema](architettura.it.md) per il diagramma completo.
 
 ---
 
@@ -46,7 +46,7 @@ MRI T1 (.nii.gz)
     → Diagnosi + confidenza + visualizzazione
 ```
 
-Vedi [Documentazione Pipeline](Pipeline_doc.it.md) per i dettagli completi.
+Vedi [Documentazione Pipeline](pipeline.it.md) per i dettagli completi.
 
 ---
 
@@ -73,7 +73,7 @@ docker compose up --build -d
 # 6. Apri dashboard: http://localhost:5173
 ```
 
-Vedi [Guida Rapida](Guida_Rapida.it.md) per il walkthrough completo.
+Vedi [Guida Rapida](guida_rapida.it.md) per il walkthrough completo.
 
 ---
 
@@ -93,14 +93,15 @@ Vedi [Guida Rapida](Guida_Rapida.it.md) per il walkthrough completo.
 
 ## Documentazione
 
-- [Architettura del Sistema](SYSTEM_ARCHITECTURE.it.md)
-- [Componenti e Struttura](COMPONENTS_&_STRUCTURE.it.md)
-- [Installazione](Installazione.it.md)
-- [Configurazione](Configurazione.it.md)
-- [Pipeline](Pipeline_doc.it.md)
-- [Guida Rapida](Guida_Rapida.it.md)
-- [API Reference](api.it.md)
-- [Deployment](Deployment.it.md)
+- [Architettura del Sistema](architettura.it.md)
+- [Componenti e Struttura](struttura_componenti.it.md)
+- [Installazione](installazione.it.md)
+- [Configurazione](configurazione.it.md)
+- [Pipeline](pipeline.it.md)
+- [Guida Rapida](guida_rapida.it.md)
+- [API Reference](api_reference.it.md)
+- [Deployment](deployment.it.md)
 - [Testing](testing.it.md)
-- [Report Tecnico](REPORT_FINALE_COMPLETO.md)
-- [Changelog](CHANGES_AND_PERFORMANCE.md)
+- [Report Tecnico](report_tecnico.it.md)
+- [Changelog](changelog.it.md)
+- [Report Sicurezza API](sicurezza_api.it.md)

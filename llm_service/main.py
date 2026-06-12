@@ -1,15 +1,11 @@
 # File: llm_service/main.py
-#
-# Entry point del microservizio llm_service.
-# Espone il router /chat per la conversazione clinica multi-turno con il modello LLM.
-# Il middleware CORS è configurato per accettare richieste dal frontend React.
-
 import logging
 import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from core.config import settings
 from routers import chat
@@ -27,13 +23,30 @@ async def lifespan(app: FastAPI):
     logger.info("llm_service in shutdown.")
 
 
+_dev = os.getenv("ENV") == "development"
+
 app = FastAPI(
     title="Clinical Twin — LLM Service",
     description="Assistente AI context-aware per la diagnosi differenziale",
     version="1.0.0",
     lifespan=lifespan,
+    docs_url="/docs" if _dev else None,
+    redoc_url="/redoc" if _dev else None,
+    openapi_url="/openapi.json" if _dev else None,
 )
 
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers["server"] = "webserver"
+        response.headers["x-content-type-options"] = "nosniff"
+        response.headers["x-frame-options"] = "DENY"
+        response.headers["x-xss-protection"] = "1; mode=block"
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -48,6 +61,7 @@ app.include_router(chat.router)
 @app.get("/", tags=["Health"])
 def root():
     return {"status": "ok", "service": "llm_service"}
+
 
 @app.get("/health", tags=["Health"])
 def health():

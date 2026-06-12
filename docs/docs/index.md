@@ -31,7 +31,7 @@ Total analysis time: **~12 minutes** (test mode) or **~4–10 hours** (full Free
 | LLM Service | 127.0.0.1:8002 | AI assistant |
 | Nextflow Worker | 127.0.0.1:8005 | Neuroimaging pipeline |
 
-See [System Architecture](SYSTEM_ARCHITECTURE.md) for the complete diagram.
+See [System Architecture](architettura.md) for the complete diagram.
 
 ---
 
@@ -46,7 +46,7 @@ T1 MRI (.nii.gz)
     → Diagnosis + confidence + visualization
 ```
 
-See [Pipeline Documentation](Pipeline_doc.md) for full details.
+See [Pipeline Documentation](pipeline.md) for full details.
 
 ---
 
@@ -75,7 +75,7 @@ docker compose up --build -d
 # http://localhost:5173
 ```
 
-See [Quickstart](Guida_Rapida.md) for the complete walkthrough.
+See [Quickstart](guida_rapida.md) for the complete walkthrough.
 
 ---
 
@@ -95,14 +95,15 @@ See [Quickstart](Guida_Rapida.md) for the complete walkthrough.
 
 ## Documentation
 
-- [System Architecture](SYSTEM_ARCHITECTURE.md) — service diagram, DooD, shared volume
-- [Components & Structure](COMPONENTS_&_STRUCTURE.md) — directory structure, file roles
-- [Installation](Installazione.md) — prerequisites, setup steps
-- [Configuration](Configurazione.md) — .env variables, TEST_MODE, GPU config
-- [Pipeline](Pipeline_doc.md) — Nextflow processes, mock_freesurfer, training
-- [Quickstart](Guida_Rapida.md) — run your first analysis
-- [API Reference](api.md) — all endpoints with curl examples
-- [Deployment](Deployment.md) — Docker commands, DooD, troubleshooting
+- [System Architecture](architettura.md) — service diagram, DooD, shared volume
+- [Components & Structure](struttura_componenti.md) — directory structure, file roles
+- [Installation](installazione.md) — prerequisites, setup steps
+- [Configuration](configurazione.md) — .env variables, TEST_MODE, GPU config
+- [Pipeline](pipeline.md) — Nextflow processes, mock_freesurfer, training
+- [Quickstart](guida_rapida.md) — run your first analysis
+- [API Reference](api_reference.md) — all endpoints with curl examples
+- [Deployment](deployment.md) — Docker commands, DooD, troubleshooting
 - [Testing](testing.md) — test results, bug fixes, known limitations
-- [Technical Report](REPORT_FINALE_COMPLETO.md) — complete session report
-- [Changelog](CHANGES_AND_PERFORMANCE.md) — diff and performance data
+- [Technical Report](report_tecnico.md) — complete session report
+- [Changelog](changelog.md) — diff and performance data
+- [API Security Report](sicurezza_api.md) — OWASP tests and fixes

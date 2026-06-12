@@ -1,18 +1,4 @@
 # File: nextflow_worker/main.py
-#
-# Entry point del microservizio nextflow_worker.
-# Espone due endpoint:
-#   POST /start_preprocessing — avvia la pipeline Nextflow in background
-#   GET  /status/{task_id}    — restituisce lo stato corrente del task
-#
-# Pattern DooD (Docker-out-of-Docker): il container monta il socket Docker
-# dell'host per poter avviare i container Nextflow direttamente sull'host.
-# Questo implica che i path dei volumi nei comandi Nextflow devono essere
-# path dell'host, non del container — da cui HOST_SHARED_VOLUME_DIR.
-#
-# NOTA: TASKS_STATUS e' un dizionario in memoria. Gli stati vengono persi
-# al riavvio del container. Sufficiente per il contesto corrente.
-
 import asyncio
 import hashlib
 import logging
@@ -24,6 +10,7 @@ from typing import Optional
 
 from fastapi import BackgroundTasks, FastAPI
 from pydantic import BaseModel
+from starlette.middleware.base import BaseHTTPMiddleware
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -43,9 +30,6 @@ gpu_lock = asyncio.Lock()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Copia dei file statici al bootstrap del servizio.
-    # ROI_labels.tsv viene copiato sia in /tmp (fallback per NF_LABELS in nextflow.config)
-    # che nel volume condiviso (per inference_engine, che lo legge tramite NF_LABELS).
-    # pyradiomics.yaml viene copiato in /tmp come fallback per NF_SETTINGS.
     try:
         os.makedirs("/tmp/nextflow_work", exist_ok=True)
         shutil.copy2("/app/data/external/ROI_labels.tsv", "/tmp/ROI_labels.tsv")
@@ -59,12 +43,30 @@ async def lifespan(app: FastAPI):
     logger.info("nextflow_worker in shutdown.")
 
 
+_dev = os.getenv("ENV") == "development"
+
 app = FastAPI(
     title="Clinical Twin — Nextflow Worker",
     description="Pipeline neuroimaging DooD per la segmentazione cerebrale e l'estrazione di feature radiomiche",
     version="1.0.0",
     lifespan=lifespan,
+    docs_url="/docs" if _dev else None,
+    redoc_url="/redoc" if _dev else None,
+    openapi_url="/openapi.json" if _dev else None,
 )
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers["server"] = "webserver"
+        response.headers["x-content-type-options"] = "nosniff"
+        response.headers["x-frame-options"] = "DENY"
+        response.headers["x-xss-protection"] = "1; mode=block"
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 
 class NextflowTask(BaseModel):
@@ -87,10 +89,8 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
     host_outdir = outdir.replace(CONTAINER_BASE, HOST_BASE)
     os.makedirs(host_outdir, exist_ok=True)
 
-    # La workDir include hash NIfTI, segmentatore e task_id.
-    # Questo garantisce che ogni task abbia una directory isolata,
-    # evitando conflitti sul lock di sessione Nextflow in caso di
-    # esecuzioni parallele sullo stesso file con lo stesso segmentatore.
+    # La workDir include hash NIfTI, segmentatore e task_id per isolare ogni task
+    # ed evitare conflitti sul lock di sessione Nextflow in esecuzioni parallele.
     nifti_hash = get_nifti_hash(input_path)
     work_dir = f"/tmp/nextflow_work/cache_{nifti_hash}_{brain_segmenter}_{task_id}"
     os.makedirs(work_dir, exist_ok=True)
@@ -114,7 +114,6 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
     ]
     # Groovy interpreta la stringa "false" come truthy: passare il flag
     # solo quando è true, lasciando il default booleano false di preprocessing.nf
-    # quando test_mode è disabilitato.
     if test_mode:
         cmd.extend(["--test_mode", "true"])
 
@@ -131,10 +130,8 @@ def run_nextflow_pipeline(task_id: str, input_path: str, outdir: str, brain_segm
 
 async def run_pipeline_with_gpu_lock(task_id: str, input_path: str, outdir: str, brain_segmenter: str, test_mode: bool = False):
     """
-    Wrapper asincrono per la pipeline Nextflow.
-    I task FastSurfer acquisiscono il GPU lock prima di partire: la MIG instance
-    non supporta esecuzioni concorrenti di PyTorch. I task FreeSurfer girano
-    liberamente senza lock, mantenendo la parallelizzazione CPU.
+    I task FastSurfer acquisiscono il GPU lock: la MIG instance non supporta
+    esecuzioni concorrenti di PyTorch. I task FreeSurfer girano liberamente.
     """
     if brain_segmenter == "fastsurfer":
         logger.info(f"Task {task_id}: in attesa del GPU lock (FastSurfer)...")

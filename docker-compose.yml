@@ -32,6 +32,7 @@ services:
       - ./api_gateway/.env
     environment:
       - PYTHONUNBUFFERED=1
+      - ENV=development
 
   # 2. ORCHESTRATOR — Pipeline asincrona e task management
   orchestrator:
@@ -51,6 +52,7 @@ services:
       - ./orchestrator/.env
     environment:
       - PYTHONUNBUFFERED=1
+      - ENV=development
     depends_on:
       - api_gateway
 
@@ -71,6 +73,7 @@ services:
       - ./model_service/.env
     environment:
       - PYTHONUNBUFFERED=1
+      - ENV=development
     depends_on:
       - inference_engine
 
@@ -91,6 +94,7 @@ services:
       - ./llm_service/.env
     environment:
       - PYTHONUNBUFFERED=1
+      - ENV=development
 
   # 5. INFERENCE ENGINE — Motore statistico R (Plumber)
   inference_engine:
@@ -153,5 +157,6 @@ services:
       - NF_LABELS=${NF_LABELS:-/app/data/external/ROI_labels.tsv}
       - NF_SETTINGS=${NF_SETTINGS:-/app/nextflow/configs/pyradiomics.yaml}
       - MIG_DEVICE=${MIG_DEVICE:-all}
+      - ENV=development
     depends_on:
       - api_gateway

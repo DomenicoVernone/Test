@@ -38,5 +38,4 @@ class TaskResponse(BaseModel):
     model_name: Optional[str] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
-    owner_id: int
     model_config = ConfigDict(from_attributes=True)
