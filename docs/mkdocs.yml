@@ -54,6 +54,7 @@ nav:
 
   - API:
       - API Reference: api_reference.md
+      - SECURITY_COMPLETE_REPORT: SECURITY_COMPLETE_REPORT.md
 
   - Deployment:
       - Deployment Guide: deployment.md

@@ -7,3 +7,4 @@ passlib[bcrypt]
 bcrypt==4.0.1  # versioni superiori rompono la compatibilità con passlib
 python-multipart
 slowapi
+fastapi-mail

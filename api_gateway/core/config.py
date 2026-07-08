@@ -12,6 +12,15 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7)
     CORS_ORIGINS: List[str] = Field(default=["http://localhost:5173"])
 
+    MAIL_USERNAME: str = Field(default="")
+    MAIL_PASSWORD: str = Field(default="")
+    MAIL_FROM: str = Field(default="")
+    MAIL_FROM_NAME: str = Field(default="MLOps Clinical")
+    MAIL_PORT: int = Field(default=587)
+    MAIL_SERVER: str = Field(default="smtp.gmail.com")
+    MAIL_STARTTLS: bool = Field(default=True)
+    MAIL_SSL_TLS: bool = Field(default=False)
+
     @field_validator("SECRET_KEY")
     @classmethod
     def secret_key_strength(cls, v: str) -> str:

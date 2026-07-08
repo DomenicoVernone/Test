@@ -1,4 +1,5 @@
 # api_gateway/routers/auth.py
+import asyncio
 import logging
 import secrets
 from datetime import datetime, timedelta, timezone
@@ -23,6 +24,7 @@ from core.security import (
 )
 from models.domain import User, RevokedToken, PasswordResetToken
 from models.schemas import Token, UserCreate, UserResponse, RefreshResponse, RegisterResponse, ForgotPasswordRequest, ResetPasswordRequest
+from services.email import send_reset_email
 
 logger = logging.getLogger(__name__)
 
@@ -182,12 +184,12 @@ def logout(
 
 @router.post("/forgot-password")
 @limiter.limit("3/hour")
-def forgot_password(
+async def forgot_password(
     request: Request,
     body: ForgotPasswordRequest,
     db: Session = Depends(get_db),
 ):
-    """Risponde sempre 200 — non rivela se l'email esiste. Logga il token al posto dell'email."""
+    """Risponde sempre 200 — non rivela se l'email esiste."""
     user = db.query(User).filter(User.email == body.email).first()
     if user:
         db.query(PasswordResetToken).filter(
@@ -199,7 +201,7 @@ def forgot_password(
         expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
         db.add(PasswordResetToken(user_id=user.id, token=token, expires_at=expires_at))
         db.commit()
-        logger.info(f"RESET TOKEN per {body.email}: {token}")
+        asyncio.create_task(send_reset_email(body.email, token))
     return {"message": "Se l'email è registrata riceverai le istruzioni a breve."}
 
 
