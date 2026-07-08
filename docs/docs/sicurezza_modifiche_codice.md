@@ -1248,7 +1248,7 @@ I browser moderni hanno protezioni contro attacchi XSS, clickjacking e MIME-snif
 ```
 # Senza X-Frame-Options:
 # Attaccante crea sito con iframe che carica la dashboard clinica:
-<iframe src="https://clinical-twin.hospital.it/dashboard" style="opacity:0"></iframe>
+<iframe src="https://MLOps.hospital.it/dashboard" style="opacity:0"></iframe>
 # Utente pensa di cliccare sul sito dell'attaccante ma clicca nella dashboard
 # → Clickjacking: azioni involontarie sull'applicazione (logout, delete)
 
@@ -1311,7 +1311,7 @@ Swagger/OpenAPI (`/docs`) mostra automaticamente tutti gli endpoint dell'API con
 ### Scenario di attacco prima del fix
 ```
 # Attaccante accede a /docs in produzione:
-GET https://clinical-twin.hospital.it:8006/docs
+GET https://MLOps.hospital.it:8006/docs
 
 # Vede automaticamente:
 # - Tutti gli endpoint: /login, /register, /admin/users, /analyze/, ecc.

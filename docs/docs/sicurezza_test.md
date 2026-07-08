@@ -707,4 +707,4 @@ Il `return` finale in `forgot_password()` è fuori dal blocco `if user:` — vie
 ---
 
 *Test eseguiti manualmente il 2026-06-23 con PowerShell su Windows 11*  
-*Ambiente: Docker Compose locale, stack clinical-twin completo*
+*Ambiente: Docker Compose locale, stack MLOps completo*
