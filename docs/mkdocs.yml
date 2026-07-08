@@ -54,7 +54,10 @@ nav:
 
   - API:
       - API Reference: api_reference.md
-      - SECURITY_COMPLETE_REPORT: SECURITY_COMPLETE_REPORT.md
+      - Sicurezza API:
+          - Riepilogo: sicurezza_riepilogo.md
+          - Modifiche al codice: sicurezza_modifiche_codice.md
+          - Test eseguiti: sicurezza_test.md
 
   - Deployment:
       - Deployment Guide: deployment.md
