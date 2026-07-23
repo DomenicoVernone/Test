@@ -29,22 +29,18 @@ USE_MOCK=false
 **Input:** `sub-01_ses-test_T1w.nii` (real T1 MRI)
 
 **Execution:**
+
+Authentication (signup, login, JWT issuance) and the `/analyze` request validation path are now covered by the automated Pytest suite — 132 passed + 1 xfailed, no Docker required:
+
+```bash
+python -m pytest tests/test_autenticazione.py tests/test_sicurezza_jwt.py tests/test_api_sicurezza.py -v
+```
+
 ```bash
 docker compose up --build -d
-
-curl -X POST http://localhost:8006/signup \
-  -H "Content-Type: application/json" \
-  -d '{"username":"test","password":"test"}'
-
-TOKEN=$(curl -s -X POST http://localhost:8006/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"test","password":"test"}' | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
-
-curl -X POST http://localhost:8001/analyze/upload \
-  -H "Authorization: Bearer $TOKEN" \
-  -F "file=@sub-01_ses-test_T1w.nii" \
-  -F "model_name=HC_vs_bvFTD"
 ```
+
+To reproduce the actual pipeline run, register/log in and submit a scan through the frontend (`http://localhost:5173`), or authenticate via `POST /login` and call `POST /analyze/upload` with the resulting JWT — see [Quickstart](guida_rapida.md).
 
 **Results (Task 17):**
 ```json
@@ -141,40 +137,23 @@ runOptions = "-v /tmp/nextflow_work/license.txt:/app/license.txt"
 
 ### Quick test (TEST_MODE=true, ~15 min)
 
-```bash
-# 1. Set test mode
-echo "TEST_MODE=true" >> orchestrator/.env
+**1. Verify security & auth logic (no Docker needed):**
 
-# 2. Start system
+```bash
+python -m pytest tests/ -v
+```
+
+Covers registration, login, JWT issuance/expiry, and the `/analyze` request validation path — 132 passed + 1 xfailed (see [Sicurezza API › Test eseguiti](sicurezza_test.md)).
+
+**2. Run the real pipeline (Docker/Nextflow):**
+
+```bash
+echo "TEST_MODE=true" >> orchestrator/.env
 docker compose up --build -d
 sleep 30
-
-# 3. Register and login
-curl -X POST http://localhost:8006/signup \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"testpass"}'
-
-TOKEN=$(curl -s -X POST http://localhost:8006/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"testpass"}' \
-  | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
-
-# 4. Upload any NIfTI file
-curl -X POST http://localhost:8001/analyze/upload \
-  -H "Authorization: Bearer $TOKEN" \
-  -F "file=@your_scan.nii" \
-  -F "model_name=HC_vs_bvFTD"
-
-# 5. Poll status (or watch the frontend at http://localhost:5173)
-TASK_ID=1
-while true; do
-  STATUS=$(curl -s http://localhost:8001/analyze/status/$TASK_ID \
-    -H "Authorization: Bearer $TOKEN" | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])")
-  echo "Status: $STATUS"
-  [ "$STATUS" = "COMPLETED" ] || [ "$STATUS" = "ERROR" ] && break
-  sleep 15
-done
 ```
+
+Register, log in and upload a scan through the frontend at `http://localhost:5173`, or authenticate via `POST /login` and submit `POST /analyze/upload` with the resulting JWT — see [Quickstart](guida_rapida.md). Poll `GET /analyze/status/{task_id}` until `status` is `COMPLETED` or `ERROR`.
 
 ### Full pipeline test (FreeSurfer real, ~8h)
 

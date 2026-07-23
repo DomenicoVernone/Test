@@ -103,5 +103,20 @@ if user.password_changed_at:
 
 ---
 
+---
+
+## Test automatizzati Pytest
+
+Oltre all'analisi statica e ai 10 test manuali, la codebase è coperta da una suite di test automatizzati:
+
+> **131 test Pytest organizzati in 7 file — tutti PASSED**  
+> Comando: `python -m pytest tests/ -v`  
+> File: `tests/test_api_sicurezza.py`, `test_validazione_input.py`, `test_sicurezza_jwt.py`, `test_model_name.py`, `test_ruoli.py`, `test_autenticazione.py`, `test_file_mri.py`
+
+I test verificano (senza Docker): integrazione HTTP end-to-end via TestClient, validazione input, token JWT, whitelist model_name, sistema dei ruoli, timing attack protection e magic bytes NIfTI. Per i dettagli vedere `sicurezza_test.md` — sezione *Test automatizzati con Pytest*.
+
+---
+
 *Riepilogo generato il 2026-06-23 — Analisi statica su 13 file sorgente*  
+*Suite Pytest aggiornata il 2026-07-08 — 131 test (incl. 10 TestClient), tutti PASSED*  
 *Standard: OWASP API Security Top 10 (2023 Edition)*

@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../SECURITY_COMPLETE_REPORT/">
+        <link rel="prev" href="../security_tests/">
       
       
         <link rel="next" href="../sicurezza_modifiche_codice/">
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#riepilogo-sicurezza-api-MLOps" class="md-skip">
+        <a href="#riepilogo-sicurezza-api-clinical-twin" class="md-skip">
           Vai al contenuto
         </a>
       
@@ -939,15 +939,70 @@
   
   
   
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Security
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Security
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../SECURITY_COMPLETE_REPORT/" class="md-nav__link">
+      <a href="../security_summary/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    SECURITY_COMPLETE_REPORT
+    Summary
   
 
     
@@ -956,6 +1011,70 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security_code_changes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code Changes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security_tests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1153,6 +1272,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-automatizzati-pytest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test automatizzati Pytest
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1651,6 +1781,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#test-automatizzati-pytest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test automatizzati Pytest
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1668,7 +1809,7 @@
 
 
 
-<h1 id="riepilogo-sicurezza-api-MLOps">Riepilogo Sicurezza API — Clinical Twin<a class="headerlink" href="#riepilogo-sicurezza-api-MLOps" title="Permanent link">&para;</a></h1>
+<h1 id="riepilogo-sicurezza-api-clinical-twin">Riepilogo Sicurezza API — Clinical Twin<a class="headerlink" href="#riepilogo-sicurezza-api-clinical-twin" title="Permanent link">&para;</a></h1>
 <p><strong>Progetto:</strong> Tesi-FTD — MLOps Clinical Twin<br />
 <strong>Standard:</strong> OWASP API Security Top 10 (2023)<br />
 <strong>Data:</strong> 2026-06-23</p>
@@ -1971,7 +2112,18 @@
 <strong>Dove dovrebbe essere:</strong> Codice frontend React (non analizzato)<br />
 <strong>Nota:</strong> Questa logica risiede nel frontend e non è verificabile dall'analisi del codice backend. Si ricorda che il blocco client-side è <strong>solo UX</strong> — può essere aggirato da qualsiasi strumento che non sia il browser. Il rate limiting server-side (#17) è la vera protezione ed è implementato correttamente.</p>
 <hr />
+<hr />
+<h2 id="test-automatizzati-pytest">Test automatizzati Pytest<a class="headerlink" href="#test-automatizzati-pytest" title="Permanent link">&para;</a></h2>
+<p>Oltre all'analisi statica e ai 10 test manuali, la codebase è coperta da una suite di test automatizzati:</p>
+<blockquote>
+<p><strong>131 test Pytest organizzati in 7 file — tutti PASSED</strong><br />
+Comando: <code>python -m pytest tests/ -v</code><br />
+File: <code>tests/test_api_sicurezza.py</code>, <code>test_validazione_input.py</code>, <code>test_sicurezza_jwt.py</code>, <code>test_model_name.py</code>, <code>test_ruoli.py</code>, <code>test_autenticazione.py</code>, <code>test_file_mri.py</code></p>
+</blockquote>
+<p>I test verificano (senza Docker): integrazione HTTP end-to-end via TestClient, validazione input, token JWT, whitelist model_name, sistema dei ruoli, timing attack protection e magic bytes NIfTI. Per i dettagli vedere <code>sicurezza_test.md</code> — sezione <em>Test automatizzati con Pytest</em>.</p>
+<hr />
 <p><em>Riepilogo generato il 2026-06-23 — Analisi statica su 13 file sorgente</em><br />
+<em>Suite Pytest aggiornata il 2026-07-08 — 131 test (incl. 10 TestClient), tutti PASSED</em><br />
 <em>Standard: OWASP API Security Top 10 (2023 Edition)</em></p>
 
 

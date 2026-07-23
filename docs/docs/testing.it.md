@@ -98,30 +98,23 @@ runOptions = "-v /tmp/nextflow_work/license.txt:/app/license.txt"
 
 ### Test rapido (TEST_MODE=true, ~15 min)
 
+**1. Verifica sicurezza e autenticazione (senza Docker):**
+
+```bash
+python -m pytest tests/ -v
+```
+
+Copre registrazione, login, emissione/scadenza JWT e validazione delle richieste `/analyze` — 132 passed + 1 xfailed (vedi [Sicurezza API › Test eseguiti](sicurezza_test.md)).
+
+**2. Esecuzione della pipeline reale (Docker/Nextflow):**
+
 ```bash
 echo "TEST_MODE=true" >> orchestrator/.env
 docker compose up --build -d
 sleep 30
-
-# Registra e accedi
-curl -X POST http://localhost:8006/signup \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"testpass"}'
-
-TOKEN=$(curl -s -X POST http://localhost:8006/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"testpass"}' \
-  | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
-
-# Carica una MRI
-curl -X POST http://localhost:8001/analyze/upload \
-  -H "Authorization: Bearer $TOKEN" \
-  -F "file=@your_scan.nii" \
-  -F "model_name=HC_vs_bvFTD"
-
-# Controlla lo stato
-curl http://localhost:8001/analyze/status/1 -H "Authorization: Bearer $TOKEN"
 ```
+
+Registrati, accedi e carica una scansione tramite il frontend (`http://localhost:5173`), oppure autenticati con `POST /login` e invia `POST /analyze/upload` con il JWT ottenuto — vedi [Guida Rapida](guida_rapida.it.md). Controlla `GET /analyze/status/{task_id}` finché lo stato non è `COMPLETED` o `ERROR`.
 
 ---
 

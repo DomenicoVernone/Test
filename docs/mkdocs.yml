@@ -54,6 +54,10 @@ nav:
 
   - API:
       - API Reference: api_reference.md
+      - API Security:
+          - Summary: security_summary.md
+          - Code Changes: security_code_changes.md
+          - Tests: security_tests.md
       - Sicurezza API:
           - Riepilogo: sicurezza_riepilogo.md
           - Modifiche al codice: sicurezza_modifiche_codice.md

@@ -1,5 +1,5 @@
 import enum
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Enum
 from core.database import Base
 
@@ -28,7 +28,7 @@ class RevokedToken(Base):
     __tablename__ = "revoked_tokens"
 
     jti = Column(String, primary_key=True, index=True)
-    revoked_at = Column(DateTime, default=datetime.utcnow)
+    revoked_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     expires_at = Column(DateTime, nullable=False)
 
 
